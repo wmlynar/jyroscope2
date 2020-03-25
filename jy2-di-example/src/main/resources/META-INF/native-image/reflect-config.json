@@ -1,0 +1,41 @@
+[
+{
+  "name":"com.jyroscope.ros.XMLRPCSlave",
+  "allPublicMethods":true
+},
+{
+  "name":"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+  "methods" : [{ "name" : "<init>", "parameterTypes" : [] }]
+},
+{
+  "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
+  "methods" : [{ "name" : "<init>", "parameterTypes" : [] }]
+},
+{
+  "name":"com.jyroscope.dynamic.StandardConvertersInitializer",
+  "allPublicMethods":true,
+  "allDeclaredMethods":true,
+  "allPublicConstructors":true,
+  "allDeclaredConstructors":true
+},
+{
+  "name":"com.github.jy2.rosjava.di.example.DemoPublisher",
+  "methods" : [{ "name" : "<init>", "parameterTypes" : [] }],
+  "allPublicMethods":true,
+  "allDeclaredMethods":true,
+  "allPublicConstructors":true,
+  "allDeclaredConstructors":true,
+  "allPublicFields": true,
+  "allDeclaredFields": true
+},
+{
+  "name":"com.github.jy2.rosjava.di.example.DemoSubscriber",
+  "methods" : [{ "name" : "<init>", "parameterTypes" : [] }],
+  "allPublicMethods":true,
+  "allDeclaredMethods":true,
+  "allPublicConstructors":true,
+  "allDeclaredConstructors":true,
+  "allPublicFields": true,
+  "allDeclaredFields": true
+}
+]

@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.jy2</groupId>
+		<artifactId>jy2-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>jy2-example</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>com.github.jy2</groupId>
+			<artifactId>jy2-core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jy2</groupId>
+			<artifactId>jy2-messages</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.github.jy2.jy2.Main</mainClass>
+							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<profile>
+			<id>graalvm</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<dependencies>
+				<!-- nativeimage -->
+				<dependency>
+					<groupId>javax.cache</groupId>
+					<artifactId>cache-api</artifactId>
+					<version>1.0.0</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<!-- nativeimage -->
+					<plugin>
+						<groupId>com.oracle.substratevm</groupId>
+						<artifactId>native-image-maven-plugin</artifactId>
+						<version>19.2.0</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>native-image</goal>
+								</goals>
+								<phase>package</phase>
+							</execution>
+						</executions>
+						<configuration>
+							<buildArgs>
+								-H:-UseServiceLoaderFeature
+								--enable-url-protocols=http,https
+								--enable-all-security-services
+								--no-fallback
+								--report-unsupported-elements-at-runtime
+								-H:Log=registerResource
+							</buildArgs>
+							<!-- waiting for fixes -->
+							<!-- https://github.com/oracle/graal/pull/1076 -->
+							<!-- https://github.com/oracle/graal/pull/1406 -->
+							<!-- no-fallback report-unsupported-elements-at-runtime -H:IncludeResources='.*\.properties' -->
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

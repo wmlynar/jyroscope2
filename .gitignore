@@ -1,0 +1,29 @@
+target
+.classpath
+.project
+.settings
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+.sts4-cache
+
+nbactions.xml
+
+*.pyc
+
+#universal ignore for NetBeans and IntelliJ Idea
+**/.idea/
+**/*.iml
+**/target/
+**/nbproject
+
+# ignore backup files created by nano editor
+*~
+
+# pico editor temporary files
+**/*.swp
+
+# maven versions backup
+**/*.versionsBackup
+
