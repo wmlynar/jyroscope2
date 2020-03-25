@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.github.jy2</groupId>
+		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>jy2-messages</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.jy2</groupId>
+			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-base</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -23,7 +23,7 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.github.jy2</groupId>
+				<groupId>com.github.wmlynar</groupId>
 				<artifactId>jy2-maven-plugin</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<executions>
@@ -51,7 +51,7 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>com.github.jy2</groupId>
+										<groupId>com.github.wmlynar</groupId>
 										<artifactId>jy2-maven-plugin</artifactId>
 										<versionRange>0.0.9-SNAPSHOT</versionRange>
 										<goals>

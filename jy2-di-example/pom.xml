@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.github.jy2</groupId>
+		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>jy2-di-example</artifactId>
 	<dependencies>
 		<dependency>
-			<groupId>com.github.jy2</groupId>
+			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
@@ -25,7 +25,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.jy2.di.example.Main</mainClass>
+							<mainClass>com.github.wmlynar.di.example.Main</mainClass>
 							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
 						</manifest>
 					</archive>
