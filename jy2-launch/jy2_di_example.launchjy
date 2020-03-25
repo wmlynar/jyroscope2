@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node name="jy2_di_example_launch" type="jy2-di-example-*.jar">
+  </node>
+
+</launch>
+
+

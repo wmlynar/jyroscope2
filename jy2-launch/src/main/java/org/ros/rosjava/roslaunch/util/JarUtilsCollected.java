@@ -1,0 +1,116 @@
+package org.ros.rosjava.roslaunch.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.jar.Attributes;
+import java.util.jar.JarInputStream;
+import java.util.jar.Manifest;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.ros.rosjava.roslaunch.logging.PrintLog;
+
+import com.github.jy2.log.NodeNameManager;
+
+public class JarUtilsCollected {
+
+	private static ArrayList<JarWithParams> jarList = new ArrayList<>();
+
+	public static synchronized void addJar(String fileName, String[] params) {
+		jarList.add(new JarWithParams(fileName, params));
+	}
+
+	public static synchronized void createContextClassloader() {
+		try {
+			// DO NOT CLOSE THE CLASSLOADER HERE
+			// classes will be loaded in different threads
+			URLClassLoader classloader = createUrlClassloaderWithJars(jarList);
+			Thread.currentThread().setContextClassLoader(classloader);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static synchronized void runAllAddedJars() {
+		try {
+			ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+			for (JarWithParams jar : jarList) {
+				runJarThroughClassloader(classloader, jar.fileName, jar.params);
+			}
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static URLClassLoader createUrlClassloaderWithJars(ArrayList<JarWithParams> jars) {
+		try {
+			int size = jars.size();
+			URL[] urls = new URL[size];
+			for (int i = 0; i < size; i++) {
+				urls[i] = new URL("file://" + jars.get(i).fileName);
+			}
+			return new URLClassLoader(urls, JarUtilsCollected.class.getClassLoader());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	// run main method (in new thread)
+	public static ThreadGroup runJarThroughClassloader(ClassLoader classloader, String jarFileName, String[] params) {
+		ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+		Thread t = new Thread(tg, new Runnable() {
+			@Override
+			public void run() {
+				try {
+					// ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+					Thread.currentThread().setContextClassLoader(classloader);
+					String mainClassName = getMainClassName(new File(jarFileName));
+					if (mainClassName == null) {
+						throw new RuntimeException(
+								"Cannot find attribute Main-Class in manifest inside jar file: " + jarFileName);
+					}
+					Class<?> cls = classloader.loadClass(mainClassName);
+					Method method = cls.getMethod("main", String[].class);
+					if (method == null) {
+						throw new RuntimeException("Cannot find main function in class " + mainClassName
+								+ " inside manifest inside jar file: " + jarFileName);
+					}
+					method.invoke(null, (Object) params);
+				} catch (Throwable e) {
+					PrintLog.error(e.getMessage());
+					PrintLog.error(ExceptionUtils.getStackTrace(e));
+				}
+			}
+		});
+		t.start();
+		return tg;
+	}
+
+	public static String getMainClassName(File jar) throws FileNotFoundException, IOException {
+
+		try (FileInputStream in = new FileInputStream(jar); JarInputStream jarStream = new JarInputStream(in)) {
+			Manifest mf = jarStream.getManifest();
+			if (mf == null) {
+				throw new RuntimeException("Cannot find manifest inside jar file: " + jar.getAbsolutePath());
+			}
+			Attributes attributes = mf.getMainAttributes();
+			return attributes.getValue("Main-Class");
+		}
+	}
+
+	private static class JarWithParams {
+		public String fileName;
+		public String[] params;
+
+		public JarWithParams(String fileName, String[] params) {
+			this.fileName = fileName;
+			this.params = params;
+		}
+	}
+}

@@ -1,0 +1,210 @@
+package com.github.jy2.di.internal;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.function.Consumer;
+
+import com.github.jy2.JyroscopeCore;
+import com.github.jy2.Publisher;
+import com.github.jy2.Subscriber;
+import com.github.jy2.di.JyroscopeDi;
+import com.github.jy2.di.LogSeldom;
+import com.github.jy2.di.annotations.Init;
+import com.github.jy2.di.annotations.Parameter;
+import com.github.jy2.di.annotations.Publish;
+import com.github.jy2.di.annotations.Repeat;
+import com.github.jy2.di.exceptions.CreationException;
+
+import go.jyroscope.ros.introspection_msgs.Member;
+import go.jyroscope.ros.introspection_msgs.Node;
+
+public class JyroscopeDiSingleton {
+
+	private final LogSeldom LOG = JyroscopeDi.getLog();
+	
+	public static JyroscopeCore jy2;
+	
+	private static JyroscopeDiSingleton singleton;
+	private static boolean isShutdown;
+
+	private static String memberName;
+	private static ArrayList<JyroscopeDi> nodes = new ArrayList<JyroscopeDi>();
+
+	@Parameter("/use_memory_observer")
+	private boolean useMemoryObserver = false;
+
+	@Parameter("/install_uncaught_exception_handler")
+	private boolean installUncaughtExceptionHandler = true;
+
+	@Parameter("/install_jvm_hiccup")
+	private boolean installJvmHiccupMonitor = false;
+
+	@Parameter("/install_pubsub_hiccup")
+	private boolean installPubSubHiccupMonitor = false;
+
+	@Parameter("/min_jvm_hiccup_to_log_ms")
+	private double minJvmHiccupToLog = 5;
+
+	@Parameter("/min_jvm_hiccup_to_publish_ms")
+	private double minJvmHiccupToPublish = 0.1;
+
+	@Parameter("/min_pubsub_hiccup_to_log_ms")
+	private double minPubSubHiccupToLog = 5;
+
+	@Parameter("/min_pubsub_hiccup_to_publish_ms")
+	private double minPubSubHiccupToPublish = 0.5;
+	
+	@Publish("/introspection")
+	private Publisher<Member> introspectionPublisher;
+
+	public JyroscopeDiSingleton(HashMap<String, String> specialParameters, String name, JyroscopeDi jy2Di) {
+		memberName = name;
+		
+		// parse ip,hostname
+		String host = "127.0.0.1";
+
+		String rosIp = System.getenv("ROS_IP");
+		if (rosIp != null && !rosIp.isEmpty()) {
+			host = rosIp;
+		}
+		String rosHostname = System.getenv("ROS_HOSTNAME");
+		if (rosHostname != null && !rosHostname.isEmpty()) {
+			host = rosHostname;
+		}
+		String specialParameterValue = specialParameters.get("ip");
+		if (specialParameterValue != null && !specialParameterValue.isEmpty()) {
+			host = specialParameterValue;
+		}
+		specialParameterValue = specialParameters.get("hostname");
+		if (specialParameterValue != null && !specialParameterValue.isEmpty()) {
+			host = specialParameterValue;
+		}
+
+		// parse master
+		String master = "http://127.0.0.1:11311";
+
+		String rosMasterUri = System.getenv("ROS_MASTER_URI");
+		if (rosMasterUri != null && !rosMasterUri.isEmpty()) {
+			master = rosMasterUri;
+		}
+		specialParameterValue = specialParameters.get("master");
+		if (specialParameterValue != null) {
+			master = specialParameterValue;
+		}
+
+		jy2 = new JyroscopeCore();
+		jy2.addRemoteMaster(master, host, name);
+
+		try {
+			jy2Di.inject(this);
+		} catch (CreationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static synchronized void initialize(HashMap<String, String> specialParameters, String name, JyroscopeDi jy2Di) {
+		nodes.add(jy2Di);
+		if(singleton!=null) {
+			return;
+		}
+		singleton = new JyroscopeDiSingleton(specialParameters, name, jy2Di);
+	}
+
+	public static synchronized void shutdown() {
+		if(isShutdown) {
+			return;
+		}
+		jy2.shutdown();
+		isShutdown = true;
+	}
+
+	@Init
+	public void init() {
+		// start memory observer
+		if (useMemoryObserver) {
+			new MemoryObserver().start();
+		}
+
+		if (installUncaughtExceptionHandler) {
+			ExitProcessOnUncaughtException.register();
+		}
+
+		if (installJvmHiccupMonitor) {
+//			Publisher<Double> jvmHiccupPublisher = hzDi.createPublisher("/hiccup/jvm/" + member.getUuid(),
+//					double.class);
+			// one common topic for collecting hiccups from all members
+			Publisher<Double> jvmHiccupPublisher = jy2.createPublisher("/hiccup/jvm", Double.class);
+			new JvmHiccupMeterThread(value -> {
+				double valueMs = value * 0.0000001;
+				if (valueMs > minJvmHiccupToLog) {
+					LOG.warn("Jvm hiccup: " + valueMs);
+				}
+				if (valueMs > minJvmHiccupToPublish) {
+					jvmHiccupPublisher.publish(valueMs);
+				}
+			}, 5).start();
+		}
+
+		// TODO: will crash for client code
+		if (installPubSubHiccupMonitor) {
+//			Publisher<Double> pubsubHiccupPublisher = hzDi.createPublisher("/hiccup/pubsub/" + member.getUuid(),
+//					double.class);
+			// one common topic for collecting hiccups from all members
+			Publisher<Double> pubsubHiccupPublisher = jy2.createPublisher("/hiccup/pubsub", Double.class);
+
+			Publisher<Long> publisher = jy2.createPublisher("pubsubhiccup", Long.class);
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						while (true) {
+							publisher.publish(System.nanoTime());
+							Thread.sleep(10);
+						}
+					} catch (InterruptedException e) {
+						LOG.info("Pub sub hiccup exiting");
+					}
+				};
+
+			}.start();
+			Subscriber<Long> ssubscriber = jy2.createSubscriber("pubsubhiccup", Long.class);
+			ssubscriber.addMessageListener(new Consumer<Long>() {
+				@Override
+				public void accept(Long t) {
+					long time = System.nanoTime() - t;
+					double timeMs = time * 0.000001;
+					if (timeMs > minPubSubHiccupToLog) {
+						LOG.warn("Pubsub hiccup: " + timeMs);
+					}
+					if (timeMs > minPubSubHiccupToPublish) {
+						pubsubHiccupPublisher.publish(timeMs);
+					}
+				}
+			});
+		}
+	}
+	
+	@Repeat(interval = 1000)
+	public void publishIntrospection() {
+		if(introspectionPublisher.getNumberOfMessageListeners()<1) {
+			return;
+		}
+		Member m = new Member();
+		m.name = memberName;
+		int s = nodes.size();
+		m.nodes = new Node[s];
+		for(int i=0; i<s; i++) {
+			m.nodes[i] = new Node();
+			JyroscopeDi di = nodes.get(i);
+			m.nodes[i].name = di.getName();
+			m.nodes[i].publishers = di.publishedTopics.toArray(new String[di.publishedTopics.size()]);
+			m.nodes[i].subscribers = di.subscribedTopics.toArray(new String[di.subscribedTopics.size()]);
+		}
+		introspectionPublisher.publish(m);
+	}
+
+	public static Object getMemberName() {
+		return memberName;
+	}
+
+}

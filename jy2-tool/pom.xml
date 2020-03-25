@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.jy2</groupId>
+		<artifactId>jy2-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>jy2-tool</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>com.github.jy2</groupId>
+			<artifactId>jy2-di</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.jy2</groupId>
+			<artifactId>jy2-tf-lib</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jline</groupId>
+			<artifactId>jline</artifactId>
+			<version>3.11.0</version>
+		</dependency>
+		<!-- <dependency> <groupId>info.picocli</groupId> <artifactId>picocli-shell-jline3</artifactId> 
+			<version>3.9.6</version> </dependency> -->
+		<!-- To get list of classes for autocompletion of create yaml and create 
+			json -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>28.0-jre</version>
+		</dependency>
+		<!--Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.10.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jdk8</artifactId>
+			<version>2.10.3</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>com.github.jy2.commandline.picocli.Main</mainClass>
+							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,0 +1,9 @@
+{
+  "resources":[
+    {"pattern":".*output_xml\\.properties"},
+    {"pattern":"jyroscope2.*"}
+  ],
+  "bundles": [
+    {"name":"com.sun.org.apache.xml.internal.serializer.utils.SerializerMessages"}
+  ]
+}

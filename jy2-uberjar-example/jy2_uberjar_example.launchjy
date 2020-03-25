@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node name="jy2_uberjar_example" type="jy2-uberjar-example-*.jar">
+  </node>
+
+</launch>
+
+

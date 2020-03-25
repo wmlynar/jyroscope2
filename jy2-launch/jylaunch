@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -jar /opt/jy2/jars/jy2-launch-*.jar "$@"
