@@ -129,7 +129,7 @@
 	</pluginRepositories>
 	<profiles>
 		<profile>
-			<id>sonatype</id>
+			<id>deploy</id>
 			<build>
 				<pluginManagement>
 					<plugins>
