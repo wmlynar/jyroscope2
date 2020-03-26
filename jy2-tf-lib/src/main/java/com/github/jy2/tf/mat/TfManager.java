@@ -74,6 +74,8 @@ public class TfManager {
 
 	/**
 	 * Add transform list.
+	 * 
+	 * @param transformList Transform message to be added
 	 */
 	public void add(TFMessage transformList) {
 		// synchronized, bacuse adding all transforms need to an atomic operation
@@ -90,6 +92,8 @@ public class TfManager {
 
 	/**
 	 * Add single transform.
+	 * 
+	 * @param transform Transform to be added
 	 */
 	public void add(TransformStamped transform) {
 		synchronized (mutex) {
@@ -113,6 +117,12 @@ public class TfManager {
 
 	/**
 	 * Obtain transform at specific time.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @param time Time of the transform
+	 * @param mat  Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransform(String from, String to, double time, Matrix4d mat) {
 		if (from.equals(to)) {
@@ -133,6 +143,12 @@ public class TfManager {
 	 * use with care, it can cause strange effects when used incorrectly. Especially
 	 * NEVER publish computations based on this again to TfManager, only publish for
 	 * example as odometry or pose.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @param time Time of the transform
+	 * @param mat  Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformSemi(String from, String to, double time, Matrix4d mat) {
 		if (from.equals(to)) {
@@ -150,6 +166,11 @@ public class TfManager {
 
 	/**
 	 * Obtain latest available transform chain.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @param mat  Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformLatest(String from, String to, Matrix4d mat) {
 		if (from.equals(to)) {
@@ -173,6 +194,11 @@ public class TfManager {
 	 * WARNING! use with care, it can cause strange effects when used incorrectly.
 	 * Especially NEVER publish computations based on this again to TfManager, only
 	 * publish for example as odometry or pose.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @param mat  Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformSemiLatest(String from, String to, Matrix4d mat) {
 		if (from.equals(to)) {
@@ -200,6 +226,18 @@ public class TfManager {
 		}
 	}
 
+	/**
+	 * Waits for transform to be available by sleeping short amount of time and
+	 * checking for availability.
+	 * 
+	 * @param timeProvider Time provider
+	 * @param from         Parent transform
+	 * @param to           Child transform
+	 * @param time         Time of the transform
+	 * @param mat          Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found, <code>true</code> when
+	 *         transform does not exist
+	 */
 	public boolean waitForTransform(TimeProvider timeProvider, String from, String to, double time, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
@@ -230,6 +268,18 @@ public class TfManager {
 		return multiplyMatricesInPath(path.indexes, path.inverted, time, mat);
 	}
 
+	/**
+	 * Waits for semi-static transform to be available by sleeping short amount of
+	 * time and checking for availability.
+	 * 
+	 * @param timeProvider Time provider
+	 * @param from         Parent transform
+	 * @param to           Child transform
+	 * @param time         Time of the transform
+	 * @param mat          Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found, <code>true</code> when
+	 *         transform does not exist.
+	 */
 	public boolean waitForTransformSemi(TimeProvider timeProvider, String from, String to, double time, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
@@ -265,6 +315,11 @@ public class TfManager {
 	 * with care, it can cause strange effects when used incorrectly. Especially
 	 * NEVER publish computations based on this again to TfManager, only publish for
 	 * example as odometry or pose.
+	 * 
+	 * @param from      Parent transform
+	 * @param to        Child transform
+	 * @param transform Output where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformLatestIndividually(String from, String to, TransformStamped transform) {
 		if (from.equalsIgnoreCase(to)) {
@@ -297,6 +352,11 @@ public class TfManager {
 	 * with care, it can cause strange effects when used incorrectly. Especially
 	 * NEVER publish computations based on this again to TfManager, only publish for
 	 * example as odometry or pose.
+	 * 
+	 * @param from   Parent transform
+	 * @param to     Child transform
+	 * @param matrix Output matrix where transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformLatestIndividually(String from, String to, Matrix4d matrix) {
 		if (from.equalsIgnoreCase(to)) {
@@ -319,6 +379,10 @@ public class TfManager {
 
 	/**
 	 * Get the time of the latest available transform chain.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @return Time of the transform.
 	 */
 	public double getLatestTime(String from, String to) {
 		synchronized (mutex) {
@@ -336,6 +400,10 @@ public class TfManager {
 
 	/**
 	 * Get the time of the latest available transform chain.
+	 * 
+	 * @param from Parent transform
+	 * @param to   Child transform
+	 * @return Time of the transform.
 	 */
 	public double getSemiLatestTime(String from, String to) {
 		synchronized (mutex) {
@@ -353,6 +421,8 @@ public class TfManager {
 
 	/**
 	 * Returns list of known transforms.
+	 * 
+	 * @return List of transforms
 	 */
 	public ArrayList<TransformStamped> getTransformList() {
 		TransformMatrix tm = new TransformMatrix();

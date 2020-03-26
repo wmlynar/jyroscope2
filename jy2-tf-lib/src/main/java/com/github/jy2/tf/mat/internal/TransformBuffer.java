@@ -38,6 +38,10 @@ public class TransformBuffer {
 
 	/**
 	 * When transform is static than it is valid for all time periods.
+	 * 
+	 * @param from              Parent transform
+	 * @param to                Child transform
+	 * @param isStaticTransform Set to true when transform is static
 	 */
 	public TransformBuffer(String from, String to, boolean isStaticTransform) {
 		this.from = from;
@@ -59,6 +63,9 @@ public class TransformBuffer {
 	 * When <code>TransformBuffer</code> is dynamic it will add the transform to the
 	 * end of the list, sorted by time and it will not accept transform before the
 	 * latest received.
+	 * 
+	 * @param time   Time of the transform
+	 * @param matrix Matrix thet defines the transform
 	 */
 	public void addTransform(double time, Matrix4d matrix) {
 		if (isStaticTransform) {
@@ -81,6 +88,10 @@ public class TransformBuffer {
 	 * Get transform at specific time. When transform is static it will always
 	 * return the latest transform. When transform is dynamic it will return
 	 * interpolated transform between two transforms before and next in time.
+	 * 
+	 * @param time   Time of the transform
+	 * @param matrix Output matrix where the transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransform(double time, Matrix4d matrix) {
 		if (isStaticTransform) {
@@ -119,6 +130,9 @@ public class TransformBuffer {
 
 	/**
 	 * Get latest available transform.
+	 * 
+	 * @param matrix Output matrix where the transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformLatest(Matrix4d matrix) {
 		if (isStaticTransform) {
@@ -136,6 +150,9 @@ public class TransformBuffer {
 
 	/**
 	 * Get latest available transform.
+	 * 
+	 * @param transform Output transform matrix where the transform will be stored
+	 * @return <code>true</code> when transform was found
 	 */
 	public boolean getTransformLatest(TransformMatrix transform) {
 		if (isStaticTransform) {
@@ -158,6 +175,12 @@ public class TransformBuffer {
 
 	}
 
+	/**
+	 * Get the time of the latest transform.
+	 * 
+	 * @param latestTime Strusture where the output will be stored
+	 * @return <code>true</code> when transform was found
+	 */
 	public boolean getLatestTime(LatestTime latestTime) {
 		if (isStaticTransform) {
 			return true;
@@ -175,7 +198,7 @@ public class TransformBuffer {
 	/**
 	 * Reset transform buffer to initial state.
 	 *
-	 * @param time
+	 * @param time Time to which should be reset
 	 */
 	public void reset(double time) {
 		boolean found = false;
@@ -193,6 +216,9 @@ public class TransformBuffer {
 
 	/**
 	 * WARNING: returns -1 when time is older than the youngest available transform
+	 * 
+	 * @param time Time of the transform
+	 * @return Index value
 	 */
 	private int findFloorIndex(double time) {
 		int start = pos - 1 + 2 * CAPACITY_SIZE; // make sure pos is always positive
