@@ -121,10 +121,31 @@
 				</pluginManagement>
 				<plugins>
 					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>versions-maven-plugin</artifactId>
+						<version>2.1</version>
+						<configuration>
+							<generateBackupPoms>false</generateBackupPoms>
+						</configuration>
+					</plugin>
+					<plugin>
 						<artifactId>maven-source-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>jcabi-sources</id>
+								<id>package-sources</id>
 								<configuration>
 									<forceCreation>true</forceCreation>
 								</configuration>
@@ -139,14 +160,24 @@
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>jcabi-javadoc</id>
+								<id>package-javadoc</id>
 								<phase>package</phase>
 								<goals>
 									<goal>jar</goal>
 								</goals>
-								<configuration>
-									<additionalparam>${javadoc.opts}</additionalparam>
-								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
 							</execution>
 						</executions>
 					</plugin>
