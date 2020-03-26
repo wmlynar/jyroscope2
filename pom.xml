@@ -2,14 +2,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jy2-parent</artifactId>
 	<groupId>com.github.wmlynar</groupId>
+	<artifactId>jy2-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Jyroscope2</name>
 	<description>Next version of Jyroscope ROS Java client.</description>
 	<url>https://github.com/wmlynar/jyroscope2</url>
-	<inceptionYear>2020</inceptionYear>
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -26,6 +25,11 @@
 			<name>Marcin Wieczorek</name>
 		</developer>
 	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/wmlynar/jyroscope2.git</connection>
+		<developerConnection>scm:git:ssh://github.com:wmlynar/jyroscope2.git</developerConnection>
+		<url>http://github.com/wmlynar/jyroscope2/tree/master</url>
+	</scm>
 	<modules>
 		<module>jy2-api</module>
 		<module>jy2-base</module>
