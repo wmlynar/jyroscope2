@@ -30,7 +30,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.wmlynar.example.Main</mainClass>
+							<mainClass>com.github.jy2.example.Main</mainClass>
 							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
 						</manifest>
 					</archive>

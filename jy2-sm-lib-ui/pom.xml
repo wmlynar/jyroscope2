@@ -35,7 +35,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.wmlynar.sm.monitor.SmLibMonitorMain </mainClass>
+							<mainClass>com.github.jy2.sm.monitor.SmLibMonitorMain </mainClass>
 							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
 						</manifest>
 					</archive>
