@@ -186,7 +186,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<id>jcabi-deploy-to-sonatype</id>
+								<id>deploy-to-sonatype</id>
 								<phase>deploy</phase>
 								<goals>
 									<goal>deploy</goal>
