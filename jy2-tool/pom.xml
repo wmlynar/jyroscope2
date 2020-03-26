@@ -57,7 +57,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.wmlynar.commandline.picocli.Main</mainClass>
+							<mainClass>com.github.jy2.commandline.picocli.Main</mainClass>
 							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
 						</manifest>
 					</archive>
