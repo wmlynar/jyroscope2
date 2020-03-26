@@ -106,6 +106,11 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>com.amashchenko.maven.plugin</groupId>
+				<artifactId>gitflow-maven-plugin</artifactId>
+				<version>1.14.0</version>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -116,11 +121,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	<repositories>
-		<!-- You should keep it empty in your project. @see http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
-	</repositories>
 	<pluginRepositories>
-		<!-- You should keep it empty in your project. @see http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
 		<pluginRepository>
 			<id>oss.sonatype.org</id>
 			<url>https://oss.sonatype.org/content/groups/public</url>
@@ -128,9 +129,6 @@
 	</pluginRepositories>
 	<profiles>
 		<profile>
-			<!-- The profile deploys all artifacts to oss.sonatype.org repository 
-				(if you're registered there). It also skips default deployment plugin. @see 
-				http://www.jcabi.com/jcabi-parent/profile-sonatype.html -->
 			<id>sonatype</id>
 			<build>
 				<pluginManagement>
@@ -168,7 +166,6 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<!-- Generate -javadoc.jar artifact, required by Maven Central. -->
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>3.2.0</version>
 						<executions>
@@ -194,11 +191,17 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<configuration>
+									<!-- Prevent `gpg` from using pinentry programs -->
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 					<plugin>
-						<!-- @see http://www.sonatype.com/books/nexus-book/reference/staging-sect-deployment.html -->
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 						<version>1.6.8</version>
