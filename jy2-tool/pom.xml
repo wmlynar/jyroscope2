@@ -5,20 +5,20 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.2</version>
 	</parent>
 	<artifactId>jy2-tool</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-tf-lib</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -57,7 +57,7 @@
 					<archive>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.github.wmlynar.commandline.picocli.Main</mainClass>
+							<mainClass>com.github.jy2.commandline.picocli.Main</mainClass>
 							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
 						</manifest>
 					</archive>

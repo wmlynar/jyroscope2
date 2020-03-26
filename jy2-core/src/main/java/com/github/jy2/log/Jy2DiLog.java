@@ -190,14 +190,14 @@ public class Jy2DiLog implements Log, LogSeldom {
 		String msg = String.valueOf(message);
 		// Hack (?) to get the stack trace.
 //		Throwable dummyException = new Throwable();
-//		StackTraceElement locations[] = dummyException.getStackTrace();
-		StackTraceElement[] locations = Thread.currentThread().getStackTrace();
+//		StackTraceElement locations[] = dummyException.getStackTrace(); // location=2
+		StackTraceElement[] locations = Thread.currentThread().getStackTrace(); // location=3
 		// Caller will be the third element
 		String cname = "unknown";
 		String method = "unknown";
 		int line = -1;
-		if (locations != null && locations.length > 2) {
-			StackTraceElement caller = locations[2];
+		if (locations != null && locations.length > 3) {
+			StackTraceElement caller = locations[3];
 			cname = caller.getClassName();
 			method = caller.getMethodName();
 			line = caller.getLineNumber();
