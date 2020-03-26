@@ -6,6 +6,26 @@
 	<groupId>com.github.wmlynar</groupId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<name>Jyroscope2</name>
+	<description>Next version of Jyroscope ROS Java client.</description>
+	<url>https://github.com/wmlynar/jyroscope2</url>
+	<inceptionYear>2020</inceptionYear>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>wmlynar</id>
+			<name>Wojciech Mlynarczyk</name>
+		</developer>
+		<developer>
+			<id>pacinpm</id>
+			<name>Marcin Wieczorek</name>
+		</developer>
+	</developers>
 	<modules>
 		<module>jy2-api</module>
 		<module>jy2-base</module>
