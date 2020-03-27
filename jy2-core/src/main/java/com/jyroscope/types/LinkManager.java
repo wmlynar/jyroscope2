@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.github.jy2.mapper.RosTypeConverters;
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
-import com.github.jy2.serialization.fst.FstCodec;
 import com.jyroscope.Link;
 import com.jyroscope.ros.RosMessage;
 
