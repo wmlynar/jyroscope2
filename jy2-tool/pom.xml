@@ -50,18 +50,27 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>2.1.0</version>
 				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
+					<programs>
+						<program>
+							<id>jy</id>
 							<mainClass>com.github.jy2.commandline.picocli.Main</mainClass>
-							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
-						</manifest>
-					</archive>
+						</program>
+					</programs>
+					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
+					<repositoryLayout>${jy2.assemble.repository.layout}</repositoryLayout>
+					<maxMemorySize>${jy2.assemble.max.memory}</maxMemorySize>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
