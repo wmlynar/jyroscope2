@@ -91,10 +91,8 @@ public class LocalTopic<T> implements Topic<T> {
             }
 
 			@Override
-			public void setLatched(boolean isLatched) {
-				// in theory this would have worked, but lets keep compatibility with ros topics
-				//LocalTopic.this.isLatched = isLatched;
-				throw new UnsupportedOperationException("Latching in publisher can only be set through constructor, because there is no way to inform subscriber about it after the connection is made");
+			public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
+				throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
 			}
         };
     }

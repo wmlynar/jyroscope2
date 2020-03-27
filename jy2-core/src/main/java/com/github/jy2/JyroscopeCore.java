@@ -348,9 +348,8 @@ public class JyroscopeCore implements PubSubClient {
 			}
 
 			@Override
-			public void setLatched(boolean isLatched) {
-				throw new UnsupportedOperationException(
-						"Latching in publisher can only be set through constructor, because there is no way to inform subscriber about it after the connection is made");
+			public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
+				throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
 			}
 		}
 	}
