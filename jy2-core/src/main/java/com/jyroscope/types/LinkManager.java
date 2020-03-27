@@ -358,20 +358,14 @@ public class LinkManager {
 							r.computeRemoteTypeWithoutLock();
 							to = r.remoteToType;
 						}
-
-						TypeConverter converter;
-						if (r.fromType.equals(RosMessage.class) && to.equals(RosMessage.class)) {
-							converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
-						} else {
-							converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
-						}
-
 						// TODO: this should be moved to message converter code generator
 						if (r.latchedValue instanceof RosMessage) {
 							// make sure that when ros message is handled for the second time
 							// the buffer will be at start position
 							((RosMessage) r.latchedValue).reset();
 						}
+
+						TypeConverter converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
 						Object converted = converter.convert(r.latchedValue);
 						latched.add((D) converted);
 					} catch (Exception e) {

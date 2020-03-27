@@ -53,7 +53,11 @@ public class RosTypeConverters {
 
 	public static TypeConverter get(Class<?> fromType, Class<?> toType) {
 		if (fromType.equals(RosMessage.class)) {
-			return RosTypeConverters.fromRosClass(toType);
+			if (toType.equals(RosMessage.class)) {
+				return IDENTITY_TYPE_CONVERTER;
+			} else {
+				return RosTypeConverters.fromRosClass(toType);
+			}
 		} else if (toType.equals(RosMessage.class)) {
 			return RosTypeConverters.toRosClass(fromType);
 		} else {
@@ -144,7 +148,7 @@ public class RosTypeConverters {
 			isInitializedRosMap.put(typeName, true);
 		}
 	}
-	
+
 //	public static void scanAnnotationsAndInitialize() {
 //		try (ScanResult result = new ClassGraph().enableClassInfo().enableAnnotationInfo().scan()) {
 //			for (ClassInfo info : result.getClassesWithAnnotation(Initializer.class.getName())) {
