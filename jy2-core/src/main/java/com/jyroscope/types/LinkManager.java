@@ -58,8 +58,15 @@ public class LinkManager {
                     if (deliver.hasClients(isLocal)) {
 						try {
 //							TypeConverter converter = TypeConverter.get(fromType, entry.getKey());
-							TypeConverter converter = RosTypeConvertersSerializationWrapper.get(fromType,
-									entry.getKey());
+							TypeConverter converter;
+							if (entry.getKey() == null) {
+								// accept all types
+								converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
+								// TODO: why not this?
+								// converter = RosTypeConverters.fromRosClass(fromType);
+							} else {
+								converter = RosTypeConvertersSerializationWrapper.get(fromType, entry.getKey());
+							}
 							Object converted = converter.convert(message);
 							((Deliver) deliver).handle(converted, isLocal);
 						} catch (Throwable e) {
@@ -310,7 +317,17 @@ public class LinkManager {
 								// the buffer will be at start position
 								((RosMessage)r.latchedValue).reset();
 							}
-							TypeConverter converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
+							TypeConverter converter;
+							if (to == null) {
+								// accept all types
+								converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
+								// TODO: why not this?
+								// converter = RosTypeConverters.fromRosClass(r.fromType);
+							} else if (r.fromType.equals(RosMessage.class) && to.equals(RosMessage.class)) {
+								converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
+							} else {
+								converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
+							}
 							Object converted = converter.convert(r.latchedValue);
 							latched.add((D) converted);
 						} catch (Exception e) {
