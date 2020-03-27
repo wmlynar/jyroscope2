@@ -67,21 +67,26 @@ public class JyroscopeCore implements PubSubClient {
 
 	private void configureLogging(RosTopicProvider topicProvider) {
 		Object param = topicProvider.getParameterClient().getParameter("/logging");
+		String configuration;
 		if (param != null) {
-			String configuration = param.toString();
-			InputStream stream = new ByteArrayInputStream(configuration.getBytes());
-			try {
-				LogManager.getLogManager().readConfiguration(stream);
-			} catch (SecurityException | IOException e) {
-				e.printStackTrace();
-			}
+			configuration = param.toString();
+		} else {
+			// Set jyroscope logging level to severe by default
+			configuration = "com.jyroscope.level=SEVERE";
+		}
+		InputStream stream = new ByteArrayInputStream(configuration.getBytes());
+		try {
+			LogManager.getLogManager().readConfiguration(stream);
+		} catch (SecurityException | IOException e) {
+			e.printStackTrace();
 		}
 		Logger logger = Logger.getLogger("");
-		Handler[] handlers = logger.getHandlers();
-		for (Handler h : handlers) {
-			logger.removeHandler(h);
-		}
-		logger.addHandler(new ConsoleHandler());
+// leave logging handlers as configured by the user
+//		Handler[] handlers = logger.getHandlers();
+//		for (Handler h : handlers) {
+//			logger.removeHandler(h);
+//		}
+//		logger.addHandler(new ConsoleHandler());
 		logger.addHandler(new RosoutHandler());
 	}
 
@@ -343,9 +348,8 @@ public class JyroscopeCore implements PubSubClient {
 			}
 
 			@Override
-			public void setLatched(boolean isLatched) {
-				throw new UnsupportedOperationException(
-						"Latching in publisher can only be set through constructor, because there is no way to inform subscriber about it after the connection is made");
+			public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
+				throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
 			}
 		}
 	}

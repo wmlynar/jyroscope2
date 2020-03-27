@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wmlynar</groupId>
 	<artifactId>jy2-parent</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<packaging>pom</packaging>
 	<name>Jyroscope2</name>
 	<description>Next version of Jyroscope ROS Java client.</description>
@@ -54,7 +54,11 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<output.jar.folder>/opt/jy2/jars</output.jar.folder>
+
+		<jy2.assemble.directory>/opt/jy2</jy2.assemble.directory>
+		<!-- flat layout for shorter classpath string -->
+		<jy2.assemble.repository.layout>flat</jy2.assemble.repository.layout>
+		<jy2.assemble.max.memory>256M</jy2.assemble.max.memory>
 	</properties>
 	<dependencies>
 		<!-- testing -->
@@ -67,45 +71,6 @@
 	</dependencies>
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<excludeGroupIds>
-								junit,org.hamcrest,org.mockito,org.powermock,${project.groupId}
-							</excludeGroupIds>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<outputDirectory>${output.jar.folder}</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>copy-installed</id>
-						<phase>install</phase>
-						<goals>
-							<goal>copy</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>${project.artifactId}</artifactId>
-									<version>${project.version}</version>
-									<type>${project.packaging}</type>
-								</artifactItem>
-							</artifactItems>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<outputDirectory>${output.jar.folder}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>

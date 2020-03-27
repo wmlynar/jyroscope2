@@ -21,7 +21,7 @@ import com.jyroscope.types.TypeConverter;
 
 public class RosTypeConverters {
 
-	private static final IdentityTypeConverter IDENTITY_TYPE_CONVERTER = new IdentityTypeConverter();
+	public static final IdentityTypeConverter IDENTITY_TYPE_CONVERTER = new IdentityTypeConverter();
 
 	public static HashMap<String, TypeConverter> fromRosName = new HashMap<>();
 	public static HashMap<String, TypeConverter> toRosName = new HashMap<>();

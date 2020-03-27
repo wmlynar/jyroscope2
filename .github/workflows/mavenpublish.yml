@@ -3,9 +3,7 @@ name: Release
 # Run workflow on commits to the `develop` branch
 on:
   push:
-    branches: [ develop, master ]
-  pull_request:
-    branches: [ develop ]
+    branches: [ master ]
 
 jobs:
   release:

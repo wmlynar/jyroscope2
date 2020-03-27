@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.2</version>
+		<version>0.0.3</version>
 	</parent>
 	<artifactId>jy2-sm-lib-ui</artifactId>
 	<dependencies>
@@ -17,31 +17,40 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-sm-lib-messages</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>2.1.0</version>
 				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>com.github.jy2.sm.monitor.SmLibMonitorMain </mainClass>
-							<classpathPrefix>${autofork.jar.folder}</classpathPrefix>
-						</manifest>
-					</archive>
+					<programs>
+						<program>
+							<id>jylogs</id>
+							<mainClass>com.github.jy2.sm.monitor.SmLibMonitorMain</mainClass>
+						</program>
+					</programs>
+					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
+					<!-- flat layout for shorter classpath string -->
+					<repositoryLayout>flat</repositoryLayout>
+					<maxMemorySize>256M</maxMemorySize>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

@@ -89,7 +89,7 @@ public class RosTopicConnector {
 				// In such case only the first subscriber got the latched message.
 				// The fix below informs local broker that message is latched and when new local
 				// subscriber joins he gets the latched message that was received form remote connection
-				this.listener.setLatched(this.remoteIsLatched);
+				this.listener.setRemoteAttributes(this.remoteIsLatched, this.remoteRosType, this.remoteJavaType);
             } else {
                 //throw new SystemException("Could not open TCPROS connection to " + slaveURI + " (" + String.valueOf(result.get(1)) + ")");
             	Log.warn(this, "Could not open TCPROS connection to " + slaveURI + " (" + String.valueOf(result.get(1)) + ")");
