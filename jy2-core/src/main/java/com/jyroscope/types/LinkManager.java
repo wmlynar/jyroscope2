@@ -259,7 +259,7 @@ public class LinkManager {
         listeners = new HashMap<>();
     }
 
-	public synchronized <D> Link<D> getPublisher(Class<? extends D> from, boolean isLocal, boolean latched)
+	public <D> Link<D> getPublisher(Class<? extends D> from, boolean isLocal, boolean latched)
 			throws ConversionException {
         Receive<?> publisher;
         lock.readLock().lock();
@@ -348,38 +348,37 @@ public class LinkManager {
             // Pass latched messages to new subscribers
             // Note that we need to convert them again because we don't cache the conversions
             latched = new ArrayList<>();
-            for (Receive<?> r : publishers.values())
-                synchronized (r) {
-                	// woj fix for message being null/empty for latched topics without published message
-					if (r.isLatched && r.latchedValue != null) {
-						try {
-							// WOJ: Handle case where subscriber wishes to accept all types: "*"
-							// In that case to == null
-							if (to == null) {
-								r.computeRemoteTypeWithoutLock();
-								to = r.remoteToType;
-				            }
-							
-							TypeConverter converter;
-							if (r.fromType.equals(RosMessage.class) && to.equals(RosMessage.class)) {
-								converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
-							} else {
-								converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
-							}
-							
-							// TODO: this should be moved to message converter code generator
-							if(r.latchedValue instanceof RosMessage) {
-								// make sure that when ros message is handled for the second time
-								// the buffer will be at start position
-								((RosMessage)r.latchedValue).reset();
-							}
-							Object converted = converter.convert(r.latchedValue);
-							latched.add((D) converted);
-						} catch (Exception e) {
-							e.printStackTrace();
+			for (Receive<?> r : publishers.values()) {
+				// woj fix for message being null/empty for latched topics without published message
+				if (r.isLatched && r.latchedValue != null) {
+					try {
+						// WOJ: Handle case where subscriber wishes to accept all types: "*"
+						// In that case to == null
+						if (to == null) {
+							r.computeRemoteTypeWithoutLock();
+							to = r.remoteToType;
 						}
-                    }
-                }
+
+						TypeConverter converter;
+						if (r.fromType.equals(RosMessage.class) && to.equals(RosMessage.class)) {
+							converter = RosTypeConverters.IDENTITY_TYPE_CONVERTER;
+						} else {
+							converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
+						}
+
+						// TODO: this should be moved to message converter code generator
+						if (r.latchedValue instanceof RosMessage) {
+							// make sure that when ros message is handled for the second time
+							// the buffer will be at start position
+							((RosMessage) r.latchedValue).reset();
+						}
+						Object converted = converter.convert(r.latchedValue);
+						latched.add((D) converted);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
         } finally {
             lock.readLock().unlock();
         }
