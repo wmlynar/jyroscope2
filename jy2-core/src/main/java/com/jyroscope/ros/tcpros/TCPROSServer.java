@@ -126,7 +126,7 @@ public class TCPROSServer implements RosTransport {
                             started = false;
                             stopped = false;
                         } catch (IOException e) {
-                        	LOG.log(Level.SEVERE, "Unable to listen on interface " + hostname);
+                        	LOG.log(Level.SEVERE, "Unable to listen on interface " + hostname, e);
                         }
                     }
 //                });
