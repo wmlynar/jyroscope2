@@ -7,6 +7,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.github.jy2.di.LogSeldom;
+import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
 import com.jyroscope.Link;
@@ -14,7 +16,9 @@ import com.jyroscope.ros.RosMessage;
 
 // TODO handle concurrent access
 public class LinkManager {
-    
+	
+	private final static LogSeldom LOG = new Jy2DiLog(LinkManager.class);
+
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	private boolean sendLocalMessages = true;
@@ -79,8 +83,7 @@ public class LinkManager {
 							Object converted = converter.convert(message);
 							((Deliver) deliver).handle(converted, isLocal);
 						} catch (Throwable e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							LOG.error("Exception caught when handling message: " + message, e);
 						}
                     }
                 }
@@ -122,8 +125,8 @@ public class LinkManager {
 						}
 					}
 				}
-			} catch (Exception e1) {
-				e1.printStackTrace();
+			} catch (Exception e) {
+				LOG.error("Exception caught when converting message: " + fromType + " " + remoteRosType + " " + remoteJavaType, e);
 			}
 		}
     }
@@ -259,8 +262,7 @@ public class LinkManager {
         listeners = new HashMap<>();
     }
 
-	public <D> Link<D> getPublisher(Class<? extends D> from, boolean isLocal, boolean latched)
-			throws ConversionException {
+	public <D> Link<D> getPublisher(Class<? extends D> from, boolean isLocal, boolean latched) {
         Receive<?> publisher;
         lock.readLock().lock();
         try {
@@ -300,11 +302,11 @@ public class LinkManager {
 		return (Link<D>) publisher;
     }
 
-	public <D> void subscribe(Link<D> link, boolean isLocal) throws ConversionException {
+	public <D> void subscribe(Link<D> link, boolean isLocal) {
 		subscribe(link, isLocal, 1);
 	}
     
-	public <D> void subscribe(Link<D> link, boolean isLocal, int queueSize) throws ConversionException {
+	public <D> void subscribe(Link<D> link, boolean isLocal, int queueSize) {
         ArrayList<D> latched;
         lock.readLock().lock();
         try {
@@ -369,7 +371,7 @@ public class LinkManager {
 						Object converted = converter.convert(r.latchedValue);
 						latched.add((D) converted);
 					} catch (Exception e) {
-						e.printStackTrace();
+						LOG.error("Exception caught when handling message: " + r.fromType + " " + r.latchedValue, e);
 					}
 				}
 			}

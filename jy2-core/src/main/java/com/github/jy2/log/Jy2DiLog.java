@@ -205,7 +205,7 @@ public class Jy2DiLog implements Log, LogSeldom {
 		if (seldom && line >= 0 && shouldOmitMessage(cname, line)) {
 			return;
 		}
-		LogRecord rec = new LogRecord(level, message.toString());
+		LogRecord rec = new LogRecord(level, msg);
 		rec.setSourceClassName(cname);
 		rec.setSourceMethodName(method);
 		rec.setThrown(ex);

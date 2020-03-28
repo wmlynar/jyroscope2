@@ -1,9 +1,9 @@
 package com.jyroscope.ros;
 
 import java.net.URI;
+import java.util.logging.Logger;
 
 import com.jyroscope.CompatibilityException;
-import com.jyroscope.Log;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.parameters.RosParameterClient;
@@ -14,7 +14,9 @@ import com.jyroscope.server.xmlrpc.XMLRPCArray;
 import com.jyroscope.server.xmlrpc.XMLRPCService;
 
 public class RosSlave {
-    
+
+	private static final Logger LOG = Logger.getLogger(RosSlave.class.getCanonicalName());
+	
     private final Name<RosTopic> topics;
     private final URI masterURI;
     private final URI slaveURI;
@@ -57,7 +59,7 @@ public class RosSlave {
     }
     
     public void shutdown(String msg) {
-        Log.msg(this, "Shutdown Request: " + msg);
+        LOG.info("Shutdown Request: " + msg);
         tcpros.shutdown();
         // TODO propagate this to the rest of the system
     }

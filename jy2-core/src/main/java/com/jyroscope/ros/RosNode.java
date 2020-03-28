@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import com.jyroscope.Link;
 import com.jyroscope.Name;
-import com.jyroscope.types.ConversionException;
 
 /**
  * A RosNode represents a *remote* ROS Node
@@ -42,7 +41,7 @@ public class RosNode {
         return remoteSlaveURI.toASCIIString();
     }
     
-    public void connect(RosTopic topic) throws ConversionException {
+    public void connect(RosTopic topic) {
         Link<RosMessage> remotePublisher = topic.getRemotePublisher();
         RosTopicConnector connector = connectors.get(topic);
         if (connector == null)

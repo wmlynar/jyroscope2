@@ -6,11 +6,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import com.jyroscope.Log;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SimpleHTTPServer {
-    
+
+	private static final Logger LOG = Logger.getLogger(SimpleHTTPServer.class.getCanonicalName());
+	
     private static final int DEFAULT_BACKLOG = 50; // using the same default as in the ServerSocket source code
     
     private int port;
@@ -47,14 +49,13 @@ public class SimpleHTTPServer {
                                     try {
                                         s.close();
                                     } catch (IOException ioe) {
-                                        Log.exception(s, ioe, "Could not close connection with client");
+                                    	LOG.log(Level.SEVERE, "Could not close connection with client", ioe);
                                     }
                                 }
                             }).start();
                         }
                     } catch (IOException ioe) {
-                    	System.err.println("Unable to listen on interface " + host);
-                        ioe.printStackTrace();
+                    	LOG.log(Level.SEVERE, "Unable to listen on interface " + host, ioe);
                     }
                 }
 			}, "SimpleHTTPServer");
@@ -62,8 +63,7 @@ public class SimpleHTTPServer {
                 thread.setDaemon(true);
             thread.start();
         } catch (IOException ioe) {
-        	System.err.println("Unable to listen on interface " + host);
-            ioe.printStackTrace();
+        	LOG.log(Level.SEVERE, "Unable to listen on interface " + host, ioe);
         }
     }
     
@@ -83,13 +83,13 @@ public class SimpleHTTPServer {
                 a.parseIn(s.getInputStream());
                 service.process(a);
             } catch (HTTPException he) {
-                he.printStackTrace();
+            	LOG.log(Level.SEVERE, "Exception caught when processing request " + a, he);
                 he.writeOut(s.getOutputStream());
                 return;
             }
             a.writeOut(s.getOutputStream());
         } catch (IOException ioe) {
-            ioe.printStackTrace();
+        	LOG.log(Level.SEVERE, "Exception caught when processing request ", ioe);
         }
     }
     

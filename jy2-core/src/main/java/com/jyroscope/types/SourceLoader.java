@@ -1,14 +1,18 @@
 package com.jyroscope.types;
 
-import com.jyroscope.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.lang.model.element.*;
 import javax.tools.*;
 
 public class SourceLoader {
-    
+
+	private static final Logger log = Logger.getLogger(SourceLoader.class.getCanonicalName());
+	
     private static final MemoryClassLoader classLoader;
     private static final JavaCompiler compiler;
     private static final MemoryJavaFileManager memoryManager;
@@ -34,14 +38,14 @@ public class SourceLoader {
                 Class<?> clazz = classLoader.findClass(name);
                 return clazz.newInstance();
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                Log.exception(SourceLoader.class, e, "Could not instantiate dynamically compiled file " + name);
+            	log.log(Level.SEVERE, "Could not instantiate dynamically compiled file " + name, e);
                 return null;
             }
         } else {
             for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
-                Log.msg(SourceLoader.class, diagnostic.getMessage(null));
+                log.info(diagnostic.getMessage(null));
             }
-            Log.msg(SourceLoader.class, "Failed to dynamically compile file " + name);
+            log.info("Failed to dynamically compile file " + name);
             return null;
         }
     }

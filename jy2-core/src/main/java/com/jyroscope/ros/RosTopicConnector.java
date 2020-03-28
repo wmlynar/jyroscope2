@@ -2,13 +2,13 @@ package com.jyroscope.ros;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.FormatException;
 import com.jyroscope.Link;
-import com.jyroscope.Log;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.tcpros.TCPROSRemoteToLocalConnection;
 import com.jyroscope.server.xmlrpc.XMLRPCArray;
@@ -18,6 +18,8 @@ import com.jyroscope.types.ConversionException;
 
 public class RosTopicConnector {
     
+	private static final Logger LOG = Logger.getLogger(RosTopicConnector.class.getCanonicalName());
+	
     private final RosTopic topic;
     private final URI slaveURI;
     private final RosSlave localSlave;
@@ -27,7 +29,6 @@ public class RosTopicConnector {
 	private String remoteJavaType;
 	private String remoteRosType;
 	private Semaphore semaphore = new Semaphore(1);
-	private CountDownLatch connectedLatch;
     
     public RosTopicConnector(RosTopic topic, URI slaveURI, RosSlave localSlave) {
         this.topic = topic;
@@ -54,7 +55,7 @@ public class RosTopicConnector {
                 try {
                     open();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                	LOG.log(Level.SEVERE, "Exception caught", e);
                 }
 			}
 //        });
@@ -92,12 +93,12 @@ public class RosTopicConnector {
 				this.listener.setRemoteAttributes(this.remoteIsLatched, this.remoteRosType, this.remoteJavaType);
             } else {
                 //throw new SystemException("Could not open TCPROS connection to " + slaveURI + " (" + String.valueOf(result.get(1)) + ")");
-            	Log.warn(this, "Could not open TCPROS connection to " + slaveURI + " (" + String.valueOf(result.get(1)) + ")");
+            	LOG.warning("Could not open TCPROS connection to " + slaveURI + " (" + String.valueOf(result.get(1)) + ")");
             	return;
             }
         } catch (XMLRPCException | IOException e) {
 //            throw new SystemException("Could not open TCPROS connection to " + slaveURI, e);
-        	Log.warn(this, "Could not open TCPROS connection to " + slaveURI);
+        	LOG.log(Level.WARNING, "Could not open TCPROS connection to " + slaveURI, e);
         	return;
         } catch (ConversionException ex) {
             throw new SystemException("Could not create TCPROS connection", ex);
@@ -114,7 +115,7 @@ public class RosTopicConnector {
 		        if (subscriber.read(buffer))
 		            listener.handle(buffer);
 		        else {
-		            Log.msg(this, "Publisher closed connection");
+		            LOG.info("Publisher closed connection");
 		            break;
 		        }
 		    }
@@ -122,24 +123,24 @@ public class RosTopicConnector {
 		    try {
 		        subscriber.close();
 		    } catch (IOException ioe) {
-		        Log.exception(RosTopicConnector.this, ioe, "Error while closing connection to topic " + topic);
+		        LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
 		    }
 		} catch (FormatException fe) {
-		    Log.exception(RosTopicConnector.this, fe, "Format exception while reading from connection to topic " + topic);
+			LOG.log(Level.SEVERE, "Format exception while reading from connection to topic " + topic, fe);
 		    try {
 		        subscriber.close();
 		    } catch (IOException ioe) {
-		        Log.exception(RosTopicConnector.this, ioe, "Error while closing connection to topic " + topic);
+		    	LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
 		    }
 		} catch (IOException e) {
-		    Log.exception(RosTopicConnector.this, e, "Exception while reading from connection to topic " + topic);
+			LOG.log(Level.SEVERE, "Exception while reading from connection to topic " + topic, e);
 		} catch (Exception e) {
 	        // added try-catch for null pointers when missing type converter etc.
-		    Log.exception(RosTopicConnector.this, e, "Exception while reading from connection to topic " + topic);
+			LOG.log(Level.SEVERE, "Exception while reading from connection to topic " + topic, e);
 		    try {
 		        subscriber.close();
 		    } catch (IOException ioe) {
-		        Log.exception(RosTopicConnector.this, ioe, "Error while closing connection to topic " + topic);
+		    	LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
 		    }
 		}
 	}

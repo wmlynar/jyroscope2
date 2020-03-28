@@ -3,8 +3,8 @@ package com.jyroscope.local.types;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
-import com.jyroscope.Log;
 import com.jyroscope.annotations.Message;
 import com.jyroscope.types.BeanType;
 import com.jyroscope.types.ConversionException;
@@ -17,6 +17,8 @@ import com.jyroscope.types.TypeConverterHelperCollection;
 
 public class JavaTypeConverterFactory implements TypeConverterFactory {
 
+	private static final Logger LOG = Logger.getLogger(JavaTypeConverterFactory.class.getCanonicalName());
+	
     private static final String copyArray = "#1[] #t = #2; #= t";
     private static final String startArrayReadLoop = "#1[] #t = new #1[#2.length]; for (int i=0; i<#t.length; i++) { #= #t";
     private static final String getArrayLoop = "#1[i]";
@@ -59,7 +61,7 @@ public class JavaTypeConverterFactory implements TypeConverterFactory {
         typeConverterBuilder.setOutput(result);
         String newClass = typeConverterBuilder.getName();
         String newSource = typeConverterBuilder.getSource();
-        Log.finest(JavaTypeConverterFactory.class, newSource);
+        LOG.finest(newSource);
         return (TypeConverter<S, D>)SourceLoader.create(newClass, newSource);
     }
     
@@ -113,8 +115,7 @@ public class JavaTypeConverterFactory implements TypeConverterFactory {
                         String read = convertJava(builder, method, currentContext + "." + name, input, sourceType, targetType);
                         method.add(method.apply(setterTemplate, method.getResult(), read));
                     } else {
-						Log.warn(JavaTypeConverterFactory.class,
-								"No setter for " + currentContext + "." + name + ", skipping");
+						LOG.warning("No setter for " + currentContext + "." + name + ", skipping");
                     }
                 }
             }
