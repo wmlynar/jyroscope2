@@ -49,7 +49,7 @@ import com.github.jy2.log.NodeNameManager;
 
 public class JyroscopeDi implements PubSubClient {
 
-	private final LogSeldom LOG = JyroscopeDi.getLog();
+	private static final LogSeldom LOG = new Jy2DiLog(JyroscopeDi.class);
 
 	private static final TimeProvider TIME_PROVIDER = new TimeProvider();
 	private static final Yaml YAML = new Yaml();
@@ -202,21 +202,20 @@ public class JyroscopeDi implements PubSubClient {
 			});
 			// install file monitor
 			for (ParameterFromFileReference ref : parameterFromFileReferences) {
-				try {
-					if (ref.watch) {
-						Object value = getParameter(ref.parameterName);
-						if (value == null) {
-							value = ref.defaultValue;
-						}
-						String fileName = value.toString();
-						if (fileName.isEmpty()) {
-							LOG.info(
-									"Empty parameter: " + ref.parameterName + ", skipping registering file monitor");
-							continue;
-						}
-						if (monitor == null) {
-							monitor = new FileChangeMonitor();
-						}
+				if (ref.watch) {
+					Object value = getParameter(ref.parameterName);
+					if (value == null) {
+						value = ref.defaultValue;
+					}
+					String fileName = value.toString();
+					if (fileName.isEmpty()) {
+						LOG.info("Empty parameter: " + ref.parameterName + ", skipping registering file monitor");
+						continue;
+					}
+					if (monitor == null) {
+						monitor = new FileChangeMonitor();
+					}
+					try {
 						monitor.addFileListener(fileName, new Runnable() {
 							@Override
 							public void run() {
@@ -225,9 +224,9 @@ public class JyroscopeDi implements PubSubClient {
 								publisher.publish(true);
 							}
 						});
+					} catch (IOException e) {
+						LOG.error("Exception caught while adding file listener " + fileName, e);
 					}
-				} catch (IllegalArgumentException | IOException e) {
-					e.printStackTrace();
 				}
 			}
 		}

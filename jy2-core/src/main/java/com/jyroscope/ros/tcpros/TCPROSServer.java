@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
@@ -16,6 +18,8 @@ import com.jyroscope.server.xmlrpc.XMLRPCArray;
 
 public class TCPROSServer implements RosTransport {
     
+	private static final Logger LOG = Logger.getLogger(TCPROSServer.class.getCanonicalName());
+	
     private static final String NAMESPACE = "/";
     private static final int SHUTDOWN_TIME = 5000;
     
@@ -121,11 +125,10 @@ public class TCPROSServer implements RosTransport {
                             }
                             started = false;
                             stopped = false;
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                        	System.err.println("Unable to listen on interface " + hostname);
-                            e.printStackTrace();
-                        }
+						} catch (IOException e) {
+							LOG.log(Level.SEVERE,
+									"TCPROS server unable to listen on interface " + hostname, e);
+						}
                     }
 //                });
 				}, "TCPROSServer").start();

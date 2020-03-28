@@ -5,19 +5,19 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.3</version>
+		<version>0.0.4</version>
 	</parent>
 	<artifactId>jy2-core</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-base</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-messages</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.classgraph</groupId>

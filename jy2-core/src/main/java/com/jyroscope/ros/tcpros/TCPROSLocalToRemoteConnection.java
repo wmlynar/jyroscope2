@@ -6,17 +6,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayDeque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.github.jy2.di.LogSeldom;
+import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.Link;
-import com.jyroscope.Log;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.RosMessage;
 import com.jyroscope.ros.RosTopic;
+import com.jyroscope.ros.RosTopicConnector;
 import com.jyroscope.types.ConversionException;
 
 public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 
+	private static final Logger LOG = Logger.getLogger(TCPROSLocalToRemoteConnection.class.getCanonicalName());
+	
     private TCPROSServer server;
     private Socket socket;
     private InputStream is;
@@ -73,7 +79,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 								typeName = topic.getRosType();
 								md5 = RosTypeConverters.getMd5(typeName);
 							} catch (ConversionException e) {
-					            Log.exception(this, e, "Unknown type for topic " + topicName);
+								LOG.log(Level.SEVERE, "Unknown type " + typeName + " for topic " + topicName, e);
 								typeName = null;
 							}
 						}
@@ -95,12 +101,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 							reply.render(buffer);
                             buffer.writeOut(os);
                             os.flush();
-                            try {
-                                topic.addRemoteSubscriber(this);
-                            } catch (ConversionException ce) {
-                                Log.exception(this, ce, "Cannot convert ROS message to subscriber types");
-                                throw new RuntimeException(ce);
-                            }
+                            topic.addRemoteSubscriber(this);
                             // Successful connection established!
                             // Process messages
                             messageLoop();
@@ -114,7 +115,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                     reply.putHeader("error", error);
                     reply.render(buffer);
                     buffer.writeOut(os);
-                    Log.msg(this, error);
+                    LOG.info("Replying with error to TCPROS socket: " + error);
                     socket.close();
 
                 } else {
@@ -126,14 +127,14 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                 socket.close();
             }
         } catch (SystemException se) {
-            Log.exception(this, se, "Could not connect to publisher while communicating with TCPROS client");
+        	LOG.log(Level.SEVERE, "Could not connect to publisher while communicating with TCPROS client", se);
         } catch (IOException e) {
-            Log.warn(this, "Error while communicating with TCPROS client, disconnecting");
+        	LOG.log(Level.WARNING, "Error while communicating with TCPROS client, disconnecting", e);
             topic.removeRemoteSubscriber(this);
             try {
                 socket.close();
             } catch (IOException ioe2) {
-                Log.exception(this, ioe2, "Error while closing socket");
+            	LOG.log(Level.SEVERE, "Error while closing socket", ioe2);
             }
         }
     }
@@ -163,7 +164,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
             }
         } catch (IOException ioe) {
 //            Log.exception(this, ioe, "Error while communicating with TCPROS client");
-            Log.warn(this, "Error while communicating with TCPROS client, disconnecting");
+        	LOG.log(Level.WARNING, "Error while communicating with TCPROS client, disconnecting", ioe);
         }
         
         topic.removeRemoteSubscriber(this);
@@ -171,7 +172,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
         try {
             socket.close();
         } catch (IOException ioe) {
-            Log.exception(this, ioe, "Error while closing socket");
+        	LOG.log(Level.SEVERE, "Error while closing socket", ioe);
         }
     }
 

@@ -14,8 +14,10 @@ import java.util.function.Predicate;
 
 import com.github.jy2.Subscriber;
 import com.github.jy2.di.JyroscopeDi;
+import com.github.jy2.di.LogSeldom;
 import com.github.jy2.di.annotations.Repeat;
 import com.github.jy2.di.annotations.Subscribe;
+import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.types.ConversionException;
 
@@ -23,6 +25,8 @@ import go.jyroscope.ros.introspection_msgs.Member;
 import go.jyroscope.ros.introspection_msgs.Node;
 
 public class IntrospectionClient {
+
+	private static final LogSeldom LOG = new Jy2DiLog(IntrospectionClient.class);
 
 	private JyroscopeDi jy2;
 	private HashMap<String, Member> members = new HashMap<>();
@@ -79,7 +83,7 @@ public class IntrospectionClient {
 				try {
 					RosTypeConverters.precompileByRosName(typeName);
 				} catch (ConversionException e) {
-					e.printStackTrace();
+					LOG.error("Cannot find java class for type: " + typeName, e);
 					return null;
 				}
 				Class<?> clazz = RosTypeConverters.getRosType(typeName);
@@ -359,7 +363,7 @@ public class IntrospectionClient {
 			String host = uri.getHost();
 			return InetAddress.getByName(host);
 		} catch (UnknownHostException | URISyntaxException e) {
-			e.printStackTrace();
+			LOG.error("Unknown host: " + member, e);
 		}
 		return null;
 	}

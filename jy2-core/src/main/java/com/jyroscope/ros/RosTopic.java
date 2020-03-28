@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
 import com.jyroscope.FormatException;
 import com.jyroscope.Link;
-import com.jyroscope.Log;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
 import com.jyroscope.local.Topic;
@@ -25,6 +26,8 @@ import com.jyroscope.types.LinkManager;
 // TODO see if the synchronization locks can be freed up a bit
 public class RosTopic<T> implements Topic<T> {
     
+	private static final Logger LOG = Logger.getLogger(RosTopic.class.getCanonicalName());
+	
     private Class<? extends T> messageType;
     
     private final Name<RosTopic> name;
@@ -101,7 +104,7 @@ public class RosTopic<T> implements Topic<T> {
 		return RosTypeConvertersSerializationWrapper.getJavaType(messageType);
 	}
     
-    public synchronized void addRemoteSubscriber(Link<RosMessage> subscriber) throws ConversionException {
+    public synchronized void addRemoteSubscriber(Link<RosMessage> subscriber) {
         remoteSubscribers.add(subscriber);
         links.subscribe(subscriber, false);
     }
@@ -261,11 +264,7 @@ public class RosTopic<T> implements Topic<T> {
         for (URI uri : uris) {
             if (!remotePublishers.containsKey(uri)) {
                 RosNode remote = new RosNode(null, uri, slave);
-                try {
-                    remote.connect(this);
-                } catch (ConversionException ce) {
-                    Log.exception(this, ce, "Cannot convert ROS message to registered subscribers");
-                }
+                remote.connect(this);
                 remotePublishers.put(uri, remote);
             }
         }
@@ -303,8 +302,7 @@ public class RosTopic<T> implements Topic<T> {
 			publisherUpdate(publishers);
 
 		} catch (IOException | XMLRPCException | FormatException | SystemException | ConversionException e) {
-			// TODO better handle this error
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Exception caught while registering as subscriber", e);
 		}
     }
 
@@ -320,12 +318,11 @@ public class RosTopic<T> implements Topic<T> {
 					new Object[] { slave.getCallerId(), name.toNameString(), slave.getSlaveURI().toASCIIString() }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
 			if ((Integer) resultList.get(0) != 1)
-				Log.msg(this, "Unregister subscriber failed on server for topic " + name.toNameString());
+				LOG.info("Unregister subscriber failed on server for topic " + name.toNameString());
 			else
 				isRegisteredSubscriber = false;
 		} catch (IOException | XMLRPCException e) {
-			// TODO better handle this error
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Exception caught while unregistering as subscriber", e);
 		}
     }
     
@@ -354,7 +351,7 @@ public class RosTopic<T> implements Topic<T> {
 
 		} catch (IOException | XMLRPCException | SystemException | ConversionException e) {
 			// TODO better handle this error
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Exception caught while registering as publisher", e);
 		}
     }
     
@@ -371,13 +368,13 @@ public class RosTopic<T> implements Topic<T> {
 					new Object[] { slave.getCallerId(), name.toNameString(), slave.getSlaveURI().toASCIIString() }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
 			if ((Integer) resultList.get(0) != 1)
-				Log.msg(this, "Unregister publisher failed on server for topic " + name.toNameString());
+				LOG.info("Unregister publisher failed on server for topic " + name.toNameString());
 
 			// TODO better handle a failed unregister
 
 		} catch (IOException | XMLRPCException e) {
 			// TODO better handle this error
-			e.printStackTrace();
+			LOG.log(Level.WARNING, "Exception caught while unregistering as publisher", e);
 		}
     }
     
@@ -435,7 +432,7 @@ public class RosTopic<T> implements Topic<T> {
         return publisher;
     }
     
-	public Link<RosMessage> getRemotePublisher() throws ConversionException {
+	public Link<RosMessage> getRemotePublisher() {
 		return links.getPublisher(RosMessage.class, false, false);
     }
     
@@ -505,4 +502,11 @@ public class RosTopic<T> implements Topic<T> {
 		links.skipLocalMessages(skip);
 	}
 
+	@Override
+	public String toString() {
+		return "RosTopic [name=" + name + ", messageType=" + messageType + ", latched=" + latched
+				+ ", isRegisteredPublisher=" + isRegisteredPublisher + ", isRegisteredSubscriber="
+				+ isRegisteredSubscriber + ", slave=" + slave + "]";
+	}
+	
 }

@@ -6,11 +6,13 @@ import java.io.OutputStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
-import com.jyroscope.Log;
 import com.jyroscope.ros.types.RosStringType;
 
 public final class RosMessage {
+	
+	private static final Logger LOG = Logger.getLogger(RosMessage.class.getCanonicalName());
     
     private static final int DEFAULT_INITIAL_SIZE = 256;
     
@@ -607,7 +609,7 @@ public final class RosMessage {
         while (position < length) {
             int count = is.read(buffer, position, length - position);
             if (count < 0) {
-                Log.warn(this, "Unexpected end of input stream while reading ROS message");
+            	LOG.warning("Unexpected end of input stream while reading ROS message");
                 return false;
             }
             position += count;
