@@ -2,16 +2,12 @@ package com.github.jy2.serialization.fst;
 
 import org.nustaq.serialization.FSTConfiguration;
 
-import com.github.jy2.JyroscopeCore;
-import com.github.jy2.di.LogSeldom;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.types.TypeConverter;
 
 import go.jyroscope.ros.jy2_msgs.JavaObject;
 
 public class FstRosToJavaConverter<S extends D, D> extends TypeConverter<S, D> {
-
-	private final LogSeldom log = JyroscopeCore.getLog();
 
 	static TypeConverter rosToJavaConverter;
 	static FSTConfiguration configuration;
