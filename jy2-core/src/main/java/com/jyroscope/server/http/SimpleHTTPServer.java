@@ -55,7 +55,7 @@ public class SimpleHTTPServer {
                             }).start();
                         }
                     } catch (IOException ioe) {
-                    	LOG.log(Level.SEVERE, "Unable to listen on interface " + host, ioe);
+                    	LOG.log(Level.SEVERE, "Http server unable to listen on interface " + host, ioe);
                     }
                 }
 			}, "SimpleHTTPServer");
@@ -63,7 +63,7 @@ public class SimpleHTTPServer {
                 thread.setDaemon(true);
             thread.start();
         } catch (IOException ioe) {
-        	LOG.log(Level.SEVERE, "Unable to listen on interface " + host, ioe);
+        	LOG.log(Level.SEVERE, "Http server unable to listen on interface " + host, ioe);
         }
     }
     
