@@ -23,7 +23,7 @@ public class SerializationRosToJavaConverter<S extends D, D> extends TypeConvert
 			ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 			ByteArrayInputStream byis = new ByteArrayInputStream(obj.data);
 			ObjectInputStream ois;
-			if(classLoader!=null) {
+			if (classLoader != null) {
 				ois = new CustomObjectInputStream(classLoader, byis);
 			} else {
 				ois = new ObjectInputStream(byis);
