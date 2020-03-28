@@ -332,17 +332,17 @@ public class IntrospectionClient {
 			nodeSet.addAll(nodes);
 		}
 
-		ArrayList<String> result = new ArrayList<>();
-		for (String n : nodeSet) {
-			result.add(n);
-		}
-
 		synchronized (mutex) {
 			for (Entry<String, Member> m : members.entrySet()) {
 				for (Node n : m.getValue().nodes) {
 					nodeSet.add(n.name);
 				}
 			}
+		}
+
+		ArrayList<String> result = new ArrayList<>();
+		for (String n : nodeSet) {
+			result.add(n);
 		}
 
 		return result;
