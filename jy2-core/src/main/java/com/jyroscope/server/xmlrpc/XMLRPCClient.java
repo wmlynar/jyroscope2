@@ -54,7 +54,7 @@ public class XMLRPCClient {
             
             return response;
         } catch (IOException ie) {
-            throw new IOException("Cannot connect to " + server, ie);
+            throw new IOException("XML-RPC client cannot connect to " + server, ie);
         } catch (TransformerException te) {
             throw new IOException(te);
         } catch (SAXException se) {
