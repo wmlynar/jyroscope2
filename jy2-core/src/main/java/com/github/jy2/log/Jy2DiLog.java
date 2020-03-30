@@ -60,7 +60,7 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public boolean isWarnEnabled() {
-		return logger.isLoggable(Level.FINEST);
+		return logger.isLoggable(Level.WARNING);
 	}
 
 	@Override
