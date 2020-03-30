@@ -2,6 +2,11 @@
 
 ![Java CI with Maven](https://github.com/wmlynar/jyroscope2/workflows/Java%20CI%20with%20Maven/badge.svg)
 
+This project derives from and combines following work
+* https://github.com/bjau/Jyroscope
+* https://github.com/bponsler/rosjava_roslaunch
+* https://github.com/nickarmstrongcrews/rosjava-tf
+
 In order to remove the warning message caused by the FST serialization
 ```
 WARNING: An illegal reflective access operation has occurred

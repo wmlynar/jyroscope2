@@ -2,6 +2,7 @@ package com.jyroscope.local;
 
 import com.github.jy2.MasterClient;
 import com.github.jy2.ParameterClient;
+import com.github.jy2.SlaveClient;
 
 public interface TopicProvider<T> {
 
@@ -10,5 +11,6 @@ public interface TopicProvider<T> {
 	public void shutdown();
 	public ParameterClient getParameterClient();
 	public MasterClient getMasterClient();
+	public SlaveClient getSlaveClient(String name);
     
 }
