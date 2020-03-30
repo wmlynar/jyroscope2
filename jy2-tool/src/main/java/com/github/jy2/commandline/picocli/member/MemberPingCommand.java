@@ -1,5 +1,7 @@
 package com.github.jy2.commandline.picocli.member;
 
+import com.github.jy2.SlaveClient;
+import com.github.jy2.commandline.picocli.Main;
 import com.github.jy2.commandline.picocli.member.completion.MemberNameCompletionCandidates;
 
 import picocli.CommandLine.Command;
@@ -21,9 +23,14 @@ public class MemberPingCommand implements Runnable {
 		System.out.println("Pinging member: " + memberName);
 		System.out.println("Press Crtl-C to stop");
 		
+		SlaveClient slaveClient = Main.di.getSlaveClient(memberName);
+		
 		runPing = true;
 		while(runPing) {
-			System.out.println("ping");
+			long time = System.nanoTime();
+			int pid = slaveClient.getPid();
+			double dt = (System.nanoTime() - time) * 1e-6;
+			System.out.println("Ping to " + memberName + " " + dt + "ms");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
