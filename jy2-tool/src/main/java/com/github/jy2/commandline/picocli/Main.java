@@ -16,6 +16,7 @@ import org.jline.terminal.TerminalBuilder;
 
 import com.github.jy2.commandline.common.Deserializer;
 import com.github.jy2.commandline.common.Serializer;
+import com.github.jy2.commandline.picocli.member.MemberPingCommand;
 import com.github.jy2.commandline.picocli.topic.TopicEchoCommand;
 import com.github.jy2.commandline.picocli.topic.TopicPubCommand;
 import com.github.jy2.di.JyroscopeDi;
@@ -77,7 +78,7 @@ public class Main {
 				CommandLine.run(commands, args);
 				reader.getTerminal().flush();
 				// prevent from exiting when topic echo from command line
-				if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null) {
+				if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null || MemberPingCommand.runPing) {
 					Thread.sleep(Long.MAX_VALUE);
 				}
 				System.exit(0);
@@ -88,11 +89,11 @@ public class Main {
 			while (true) {
 				try {
 					String prompt1 = prompt;
-					if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null) {
+					if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null || MemberPingCommand.runPing) {
 						prompt1 = "";
 					}
 					line = reader.readLine(prompt1, rightPrompt, (MaskingCallback) null, null);
-					if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null) {
+					if (TopicEchoCommand.subscriber != null || TopicPubCommand.thread != null || MemberPingCommand.runPing) {
 						// ignore commands when subscribed to topic
 						terminal.writer().println("Press Crtl-C to stop");
 						continue;
@@ -110,6 +111,7 @@ public class Main {
 						TopicPubCommand.thread.interrupt();
 						TopicPubCommand.thread = null;
 					}
+					MemberPingCommand.runPing = false;
 					// ignore
 				} catch (EndOfFileException e) {
 					System.exit(0);

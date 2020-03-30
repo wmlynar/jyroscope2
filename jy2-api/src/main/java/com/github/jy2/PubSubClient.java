@@ -17,6 +17,8 @@ public interface PubSubClient {
 
 	MasterClient getMasterClient();
 
+	SlaveClient getSlaveClient(String name);
+
 	void shutdown();
 
 	default <D> Publisher<D> createPublisher(String topicName, Class<D> topicType) {
@@ -35,5 +37,4 @@ public interface PubSubClient {
 			int maxExecutionTime) {
 		return createSubscriber(topicName, topicType, queueSize, maxExecutionTime, false);
 	}
-
 }

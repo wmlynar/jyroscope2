@@ -22,6 +22,7 @@ import com.github.jy2.ParameterClient;
 import com.github.jy2.ParameterListener;
 import com.github.jy2.PubSubClient;
 import com.github.jy2.Publisher;
+import com.github.jy2.SlaveClient;
 import com.github.jy2.Subscriber;
 import com.github.jy2.di.annotations.Init;
 import com.github.jy2.di.annotations.Inject;
@@ -538,6 +539,12 @@ public class JyroscopeDi implements PubSubClient {
 	public ParameterClient getParameterClient() {
 		return JyroscopeDiSingleton.jy2.getParameterClient();
 	}
+	
+	@Override
+	public SlaveClient getSlaveClient(String name) {
+		return JyroscopeDiSingleton.jy2.getSlaveClient(name);
+	}
+
 
 	private void executeInitializer(Initializer initializer) {
 		makeAccessible(initializer.method);
