@@ -10,4 +10,6 @@ public interface MasterClient {
 
 	ArrayList<ArrayList<ArrayList<Object>>> getSystemState();
 
+	void memberCleanup();
+
 }

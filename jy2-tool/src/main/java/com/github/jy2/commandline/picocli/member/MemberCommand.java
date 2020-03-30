@@ -8,7 +8,7 @@ import picocli.CommandLine.ParentCommand;
 
 @Command(name = "member", description = "Member operations", subcommands = { MemberListCommand.class,
 		MemberInfoCommand.class, MemberKillCommand.class, MemberKillallCommand.class, MemberKilllocalCommand.class,
-		MemberStacktraceCommand.class, MemberPingCommand.class }, sortOptions = true)
+		MemberStacktraceCommand.class, MemberPingCommand.class, MemberCleanupCommand.class }, sortOptions = true)
 public class MemberCommand implements Runnable {
 
 	@ParentCommand

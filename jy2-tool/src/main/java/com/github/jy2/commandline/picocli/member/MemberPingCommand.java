@@ -30,7 +30,7 @@ public class MemberPingCommand implements Runnable {
 			long time = System.nanoTime();
 			int pid = slaveClient.getPid();
 			double dt = (System.nanoTime() - time) * 1e-6;
-			System.out.println("Ping to " + memberName + " " + dt + "ms");
+			System.out.println("xmlrpc reply from "+ memberName + "\ttime=" + dt + "ms");
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
