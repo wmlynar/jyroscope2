@@ -21,7 +21,7 @@ public class RosSlaveClient implements SlaveClient {
 		this.slave = slave;
 		String address = masterClient.lookupNode(name);
 		if (address == null) {
-			throw new RuntimeException("Uneble to find member " + name);
+			throw new RuntimeException("Unable to find member " + name);
 		}
 		try {
 			slaveClient = new XMLRPCClient(new URI(address));
