@@ -1,12 +1,16 @@
 package com.jyroscope.ros;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.github.jy2.MasterClient;
+import com.github.jy2.SlaveClient;
 import com.jyroscope.SystemException;
 import com.jyroscope.local.TopicProvider;
 import com.jyroscope.ros.master.RosMasterClient;
+import com.jyroscope.ros.master.RosSlaveClient;
 import com.jyroscope.ros.parameters.RosParameterClient;
+import com.jyroscope.server.xmlrpc.XMLRPCClient;
 
 public class RosTopicProvider implements TopicProvider {
 
@@ -56,5 +60,10 @@ public class RosTopicProvider implements TopicProvider {
 	@Override
 	public MasterClient getMasterClient() {
 		return masterClient;
+	}
+
+	@Override
+	public SlaveClient getSlaveClient(String name) {
+		return new RosSlaveClient(masterClient, slave, name);
 	}
 }

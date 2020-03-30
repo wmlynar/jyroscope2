@@ -122,7 +122,7 @@ public class JyroscopeCore implements PubSubClient {
 			return provider.getParameterClient();
 		}
 		// No provider found
-		throw new IllegalArgumentException("Could not find an topic provider");
+		throw new IllegalStateException("Could not find topic provider");
 	}
 
 	@Override
@@ -132,7 +132,17 @@ public class JyroscopeCore implements PubSubClient {
 			return provider.getMasterClient();
 		}
 		// No provider found
-		throw new IllegalArgumentException("Could not find an topic provider");
+		throw new IllegalStateException("Could not find topic provider");
+	}
+
+	@Override
+	public SlaveClient getSlaveClient(String name) {
+		// TODO: resolve multiple masters...
+		for (TopicProvider<?> provider : providers) {
+			return provider.getSlaveClient(name);
+		}
+		// No provider found
+		throw new IllegalStateException("Could not find topic provider");
 	}
 
 	@Override

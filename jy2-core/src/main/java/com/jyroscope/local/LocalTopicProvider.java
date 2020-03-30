@@ -1,6 +1,7 @@
 package com.jyroscope.local;
 
 import com.github.jy2.MasterClient;
+import com.github.jy2.SlaveClient;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.parameters.RosParameterClient;
@@ -41,6 +42,11 @@ public class LocalTopicProvider<T> implements TopicProvider<T> {
 
 	@Override
 	public MasterClient getMasterClient() {
+		return null;
+	}
+
+	@Override
+	public SlaveClient getSlaveClient(String name) {
 		return null;
 	}
 

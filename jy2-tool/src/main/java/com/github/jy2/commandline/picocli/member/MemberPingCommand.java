@@ -20,6 +20,7 @@ public class MemberPingCommand implements Runnable {
 	public void run() {
 		System.out.println("Pinging member: " + memberName);
 		System.out.println("Press Crtl-C to stop");
+		
 		runPing = true;
 		while(runPing) {
 			System.out.println("ping");
