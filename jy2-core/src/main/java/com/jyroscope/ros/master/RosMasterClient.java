@@ -119,7 +119,7 @@ public class RosMasterClient implements MasterClient {
 		}
 	}
 
-	private void unregisterPublisher(String node, String nodeApi, String topic) {
+	private boolean unregisterPublisher(String node, String nodeApi, String topic) {
 //      Do.later(new Runnable() {
 //          @Override
 //          public void run() {
@@ -127,21 +127,20 @@ public class RosMasterClient implements MasterClient {
 //      });
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
-			Object result = master.call("unregisterPublisher",
-					new XMLRPCArray(new Object[] { node, topic, nodeApi }));
+			Object result = master.call("unregisterPublisher", new XMLRPCArray(new Object[] { node, topic, nodeApi }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
-			if ((Integer) resultList.get(0) != 1)
-				LOG.info("Unregister publisher " + nodeApi + " failed on server for topic " + topic);
-
-			// TODO better handle a failed unregister
-
+			if ((Integer) resultList.get(0) == 1) {
+				return true;
+			}
+			LOG.info("Unregister publisher " + nodeApi + " failed on server for topic " + topic);
 		} catch (IOException | XMLRPCException e) {
 			// TODO better handle this error
 			LOG.warn("Exception caught while unregistering as publisher", e);
 		}
+		return false;
 	}
 
-	private void unregisterSubscriber(String node, String nodeApi, String topic) {
+	private boolean unregisterSubscriber(String node, String nodeApi, String topic) {
 //      Do.later(new Runnable() {
 //          @Override
 //          public void run() {
@@ -149,14 +148,16 @@ public class RosMasterClient implements MasterClient {
 //      });
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
-			Object result = master.call("unregisterSubscriber",
-					new XMLRPCArray(new Object[] { node, topic, nodeApi }));
+			Object result = master.call("unregisterSubscriber", new XMLRPCArray(new Object[] { node, topic, nodeApi }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
-			if ((Integer) resultList.get(0) != 1)
-				LOG.info("Unregister subscriber " + nodeApi + " failed on server for topic " + topic);
+			if ((Integer) resultList.get(0) == 1) {
+				return true;
+			}
+			LOG.info("Unregister subscriber " + nodeApi + " failed on server for topic " + topic);
 		} catch (IOException | XMLRPCException e) {
 			LOG.warn("Exception caught while unregistering as subscriber", e);
 		}
+		return false;
 	}
 
 }
