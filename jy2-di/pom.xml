@@ -5,19 +5,19 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.5-SNAPSHOT</version>
+		<version>0.0.5-node-ping-SNAPSHOT</version>
 	</parent>
 	<artifactId>jy2-di</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-core</artifactId>
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.0.5-node-ping-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-messages</artifactId>
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.0.5-node-ping-SNAPSHOT</version>
 		</dependency>
 		<!-- Reading yaml with jackson -->
 		<dependency>
