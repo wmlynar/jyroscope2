@@ -42,6 +42,7 @@
 					<!-- flat layout for shorter classpath string -->
 					<repositoryLayout>flat</repositoryLayout>
 					<maxMemorySize>256M</maxMemorySize>
+					<useTimestampInSnapshotFileName>false</useTimestampInSnapshotFileName>
 				</configuration>
 				<executions>
 					<execution>

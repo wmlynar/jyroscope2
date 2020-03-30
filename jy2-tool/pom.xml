@@ -63,6 +63,7 @@
 					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
 					<repositoryLayout>${jy2.assemble.repository.layout}</repositoryLayout>
 					<maxMemorySize>${jy2.assemble.max.memory}</maxMemorySize>
+					<useTimestampInSnapshotFileName>false</useTimestampInSnapshotFileName>
 				</configuration>
 				<executions>
 					<execution>
