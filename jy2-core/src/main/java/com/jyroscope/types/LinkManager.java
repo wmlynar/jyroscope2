@@ -75,6 +75,16 @@ public class LinkManager {
 							}
 //							TypeConverter converter = TypeConverter.get(fromType, entry.getKey());
 							TypeConverter converter = RosTypeConvertersSerializationWrapper.get(fromType, toType);
+							if (converter == null) {
+								String toTypeStr = "null";
+								if (toType != null) {
+									toTypeStr = toType.getCanonicalName();
+								}
+								LOG.error("Unable to convert message from " + fromType.getCanonicalName() + " to "
+										+ toTypeStr + ", remote ros type " + remoteRosType + ", remote java type  "
+										+ remoteJavaType);
+								return;
+							}
 							if(message instanceof RosMessage) {
 								// make sure that when ros message is handled for the second time
 								// the buffer will be at start position
@@ -360,14 +370,24 @@ public class LinkManager {
 							r.computeRemoteTypeWithoutLock();
 							to = r.remoteToType;
 						}
+						
 						// TODO: this should be moved to message converter code generator
 						if (r.latchedValue instanceof RosMessage) {
 							// make sure that when ros message is handled for the second time
 							// the buffer will be at start position
 							((RosMessage) r.latchedValue).reset();
 						}
-
 						TypeConverter converter = RosTypeConvertersSerializationWrapper.get(r.fromType, to);
+						if (converter == null) {
+							String toTypeStr = "null";
+							if (to != null) {
+								toTypeStr = to.getCanonicalName();
+							}
+							LOG.error("Unable to convert message from " + r.fromType.getCanonicalName() + " to "
+									+ toTypeStr + ", remote ros type " + r.remoteRosType + ", remote java type  "
+									+ r.remoteJavaType);
+							continue;
+						}
 						Object converted = converter.convert(r.latchedValue);
 						latched.add((D) converted);
 					} catch (Exception e) {
