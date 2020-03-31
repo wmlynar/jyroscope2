@@ -34,7 +34,7 @@
 				<configuration>
 					<programs>
 						<program>
-							<id>jylogs</id>
+							<id>jysmlibui</id>
 							<mainClass>com.github.jy2.sm.monitor.SmLibMonitorMain</mainClass>
 						</program>
 					</programs>
