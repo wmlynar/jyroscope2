@@ -59,6 +59,7 @@
 		<!-- flat layout for shorter classpath string -->
 		<jy2.assemble.repository.layout>flat</jy2.assemble.repository.layout>
 		<jy2.assemble.max.memory>256M</jy2.assemble.max.memory>
+		<jy2.assemble.use.timestamp>false</jy2.assemble.use.timestamp>
 	</properties>
 	<dependencies>
 		<!-- testing -->

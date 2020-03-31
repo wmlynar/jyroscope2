@@ -40,9 +40,9 @@
 					</programs>
 					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
 					<!-- flat layout for shorter classpath string -->
-					<repositoryLayout>flat</repositoryLayout>
-					<maxMemorySize>256M</maxMemorySize>
-					<useTimestampInSnapshotFileName>false</useTimestampInSnapshotFileName>
+					<repositoryLayout>${jy2.assemble.repository.layout}</repositoryLayout>
+					<maxMemorySize>${jy2.assemble.max.memory}</maxMemorySize>
+					<useTimestampInSnapshotFileName>${jy2.assemble.use.timestamp}</useTimestampInSnapshotFileName>
 				</configuration>
 				<executions>
 					<execution>
