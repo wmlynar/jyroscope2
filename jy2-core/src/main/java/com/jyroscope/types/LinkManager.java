@@ -113,7 +113,7 @@ public class LinkManager {
 			try {
 				if (!fromType.equals(RosMessage.class)) {
 					remoteToType = fromType;
-				} else if (isLatched && latchedValue != null) {
+				} else {
 					RosTypeConverters.precompileByRosName(remoteRosType);
 					remoteToType = RosTypeConverters.getRosType(remoteRosType);
 					if (remoteJavaType != null) {
