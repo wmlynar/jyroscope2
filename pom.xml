@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wmlynar</groupId>
 	<artifactId>jy2-parent</artifactId>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<packaging>pom</packaging>
 	<name>Jyroscope2</name>
 	<description>Next version of Jyroscope ROS Java client.</description>
@@ -59,6 +59,7 @@
 		<!-- flat layout for shorter classpath string -->
 		<jy2.assemble.repository.layout>flat</jy2.assemble.repository.layout>
 		<jy2.assemble.max.memory>256M</jy2.assemble.max.memory>
+		<jy2.assemble.use.timestamp>false</jy2.assemble.use.timestamp>
 	</properties>
 	<dependencies>
 		<!-- testing -->

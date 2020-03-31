@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.5</version>
+		<version>0.0.6</version>
 	</parent>
 	<artifactId>jy2-sm-lib-ui</artifactId>
 	<dependencies>
@@ -17,12 +17,12 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-sm-lib-messages</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.6</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -34,14 +34,14 @@
 				<configuration>
 					<programs>
 						<program>
-							<id>jylogs</id>
+							<id>jysmlibui</id>
 							<mainClass>com.github.jy2.sm.monitor.SmLibMonitorMain</mainClass>
 						</program>
 					</programs>
 					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
-					<!-- flat layout for shorter classpath string -->
-					<repositoryLayout>flat</repositoryLayout>
-					<maxMemorySize>256M</maxMemorySize>
+					<repositoryLayout>${jy2.assemble.repository.layout}</repositoryLayout>
+					<maxMemorySize>${jy2.assemble.max.memory}</maxMemorySize>
+					<useTimestampInSnapshotFileName>${jy2.assemble.use.timestamp}</useTimestampInSnapshotFileName>
 				</configuration>
 				<executions>
 					<execution>
