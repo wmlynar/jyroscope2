@@ -24,7 +24,7 @@ public class ClasspathUtils {
 		}
 	}
 
-	private static ArrayList<URL> expandClasspath(String classpathVar) {
+	public static ArrayList<URL> expandClasspath(String classpathVar) {
 		// String separator = System.getProperty("path.separator");
 		String[] classpathJars = classpathVar.split(",");
 		ArrayList<URL> urls = new ArrayList<>();
