@@ -29,21 +29,22 @@ public class TopicEchoCommand implements Runnable {
 	public void run() {
 		System.out.println("Subscribed to topic: " + topicName);
 		System.out.println("Press Crtl-C to stop");
-		Class type = Main.introspector.getTopicType(topicName);
-		TopicInfo ti = Main.introspector.getTopicInfo(topicName);
-		if (ti.reportedJavaType != null) {
-			try {
-				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-				if (classLoader != null) {
-					type = Class.forName(ti.reportedJavaType, false, classLoader);
-				} else {
-					type = Class.forName(ti.reportedJavaType);
-				}
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		subscriber = Main.di.createSubscriber(topicName, type, 5, 50);
+//		Class type = Main.introspector.getTopicType(topicName);
+//		TopicInfo ti = Main.introspector.getTopicInfo(topicName);
+//		if (ti.reportedJavaType != null) {
+//			try {
+//				ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+//				if (classLoader != null) {
+//					type = Class.forName(ti.reportedJavaType, false, classLoader);
+//				} else {
+//					type = Class.forName(ti.reportedJavaType);
+//				}
+//			} catch (ClassNotFoundException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		subscriber = Main.di.createSubscriber(topicName, type, 5, 50);
+		subscriber = Main.di.createSubscriber(topicName, null, 5, 50);
 		subscriber.addMessageListener(new Consumer<Object>() {
 
 			private volatile int counter = 0;

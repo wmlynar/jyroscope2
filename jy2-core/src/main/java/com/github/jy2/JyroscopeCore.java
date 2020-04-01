@@ -242,6 +242,17 @@ public class JyroscopeCore implements PubSubClient {
 							dt = 0;
 						}
 						if (dt >= timeout) {
+							if(link.firstTimeWarning) {
+								if (method != null) {
+									log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
+											+ method.toGenericString());
+
+								} else {
+									log.info("Stopped receiving message on topic " + topic.getName() + ", in consumer "
+											+ consumer.getClass().getName());
+								}
+							}
+							link.firstTimeWarning = false;
 							dt = 0;
 							try {
 								consumer.accept(null);
@@ -320,6 +331,7 @@ public class JyroscopeCore implements PubSubClient {
 			public int maxExecutionTime;
 			public Method method;
 			public boolean enabled = true;
+			public boolean firstTimeWarning = false;
 
 			private LinkImplementation(Consumer<D> consumer) {
 				this.consumer = consumer;
@@ -334,6 +346,7 @@ public class JyroscopeCore implements PubSubClient {
 			public void handle(Object message) {
 				long before = System.currentTimeMillis();
 				lastMessageTime = before;
+				firstTimeWarning = true;
 				try {
 					consumer.accept((D) message);
 				} catch (Throwable e) {

@@ -16,6 +16,7 @@ import java.util.jar.Manifest;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ros.rosjava.roslaunch.logging.PrintLog;
 
+import com.github.jy2.classpath.ClasspathUtils;
 import com.github.jy2.log.NodeNameManager;
 
 public class JarUtilsCollected {
@@ -49,12 +50,21 @@ public class JarUtilsCollected {
 	}
 
 	private static URLClassLoader createUrlClassloaderWithJars(ArrayList<JarWithParams> jars) {
+		ArrayList<URL> list = new ArrayList<>();
 		try {
 			int size = jars.size();
-			URL[] urls = new URL[size];
 			for (int i = 0; i < size; i++) {
-				urls[i] = new URL("file://" + jars.get(i).fileName);
+				URL url = new File(jars.get(i).fileName).toURI().toURL();
+				list.add(url);
 			}
+			String classpathVar = System.getenv("ROS_CLASSPATH");
+			if (classpathVar != null) {
+				ArrayList<URL> expandedClasspathJars = ClasspathUtils.expandClasspath(classpathVar);
+				list.addAll(expandedClasspathJars);
+			} else {
+				System.out.println("ROS_CLASSPATH environment variable not set");
+			}
+			URL[] urls = list.toArray(new URL[0]);
 			return new URLClassLoader(urls, JarUtilsCollected.class.getClassLoader());
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
