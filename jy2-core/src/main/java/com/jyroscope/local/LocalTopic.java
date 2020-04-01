@@ -166,4 +166,9 @@ public class LocalTopic<T> implements Topic<T> {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public Name<LocalTopic> getName() {
+		return name;
+	}
+
 }
