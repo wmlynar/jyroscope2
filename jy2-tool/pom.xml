@@ -5,20 +5,20 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.7</version>
+		<version>0.0.8</version>
 	</parent>
 	<artifactId>jy2-tool</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.7</version>
+			<version>0.0.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-tf-lib</artifactId>
-			<version>0.0.7</version>
+			<version>0.0.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -60,10 +60,10 @@
 							<mainClass>com.github.jy2.commandline.picocli.Main</mainClass>
 						</program>
 					</programs>
-					<assembleDirectory>${jy2.assemble.directory}</assembleDirectory>
-					<repositoryLayout>${jy2.assemble.repository.layout}</repositoryLayout>
-					<maxMemorySize>${jy2.assemble.max.memory}</maxMemorySize>
-					<useTimestampInSnapshotFileName>${jy2.assemble.use.timestamp}</useTimestampInSnapshotFileName>
+					<assembleDirectory>${jy2.assembler.directory}</assembleDirectory>
+					<repositoryLayout>${jy2.assembler.repository.layout}</repositoryLayout>
+					<useTimestampInSnapshotFileName>${jy2.assembler.use.timestamp}</useTimestampInSnapshotFileName>
+					<extraJvmArguments>-Xmx256m</extraJvmArguments>
 				</configuration>
 				<executions>
 					<execution>

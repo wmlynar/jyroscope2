@@ -150,7 +150,7 @@ public class TfManager {
 	 * @param mat  Output matrix where transform will be stored
 	 * @return <code>true</code> when transform was found
 	 */
-	public boolean getTransformSemi(String from, String to, double time, Matrix4d mat) {
+	public boolean getTransformSemi(String from, String to, double time, double semiTimeout, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
 			return true;
@@ -160,7 +160,7 @@ public class TfManager {
 			if (path == null || path.indexes.length == 0) {
 				return false;
 			}
-			return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, mat);
+			return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, semiTimeout, mat);
 		}
 	}
 
@@ -200,7 +200,7 @@ public class TfManager {
 	 * @param mat  Output matrix where transform will be stored
 	 * @return <code>true</code> when transform was found
 	 */
-	public boolean getTransformSemiLatest(String from, String to, Matrix4d mat) {
+	public boolean getTransformSemiLatest(String from, String to, double semiTimeout, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
 			return true;
@@ -213,7 +213,7 @@ public class TfManager {
 			if (!getSemiLatestTime(path.indexes, latestTime)) {
 				return false;
 			}
-			return multiplyMatricesInPathSemi(path.indexes, path.inverted, latestTime.time, mat);
+			return multiplyMatricesInPathSemi(path.indexes, path.inverted, latestTime.time, semiTimeout, mat);
 		}
 	}
 
@@ -280,7 +280,7 @@ public class TfManager {
 	 * @return <code>true</code> when transform was found, <code>true</code> when
 	 *         transform does not exist.
 	 */
-	public boolean waitForTransformSemi(TimeProvider timeProvider, String from, String to, double time, Matrix4d mat) {
+	public boolean waitForTransformSemi(TimeProvider timeProvider, String from, String to, double time, double semiTimeout, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
 			return true;
@@ -307,13 +307,13 @@ public class TfManager {
 			sleep(SMALL_TIMEOUT_MS);
 		}
 		// System.out.println(String.format("waited %.3f\n", now-start));
-		return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, mat);
+		return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, semiTimeout, mat);
 	}
 
 	/**
 	 * Get the transform composed from individually latest transforms. WARNING! use
 	 * with care, it can cause strange effects when used incorrectly. Especially
-	 * NEVER publish computations based on this again to TfManager, only publish for
+	 * NEVER publish computations based on this back to TfManager, only publish for
 	 * example as odometry or pose.
 	 * 
 	 * @param from      Parent transform
@@ -350,7 +350,7 @@ public class TfManager {
 	/**
 	 * Get the transform composed from individually latest transforms. WARNING! use
 	 * with care, it can cause strange effects when used incorrectly. Especially
-	 * NEVER publish computations based on this again to TfManager, only publish for
+	 * NEVER publish computations based on this back to TfManager, only publish for
 	 * example as odometry or pose.
 	 * 
 	 * @param from   Parent transform
@@ -451,20 +451,13 @@ public class TfManager {
 	}
 
 	private TransformBuffer getTransformBuffer(TransformStamped transform) {
-		boolean isStaticTransform = transform.childFrameId.contains(staticTransformKeyword);
-//				|| transform.type == Transform.STATIC;
 		stringPair.set(transform.header.frameId, transform.childFrameId);
 		TransformBuffer tb = transformBufferMap.get(stringPair);
 		if (tb == null) {
+			boolean isStaticTransform = transform.childFrameId.contains(staticTransformKeyword);
 			tb = createTransformBuffer(transform.header.frameId, transform.childFrameId, isStaticTransform);
-		} else if (tb.isStaticTransform != isStaticTransform) {
-			// throw new IllegalArgumentException("Transform cannot change status of
-			// isStaticTransform");
-			// static transform keyword changed - clear transform buffer
-			tb = createTransformBuffer(transform.header.frameId, transform.childFrameId, isStaticTransform);
+			tb.isSemiStatic = transform.childFrameId.contains(semiTransformKeyword);
 		}
-//		tb.isSemiStatic = transform.type == Transform.SEMI;
-		tb.isSemiStatic = transform.childFrameId.contains(semiTransformKeyword);
 		return tb;
 	}
 
@@ -544,36 +537,44 @@ public class TfManager {
 		return true;
 	}
 
-	private boolean multiplyMatricesInPathSemi(int[] path, boolean inverted, double time, Matrix4d matrix) {
-		if (transformBufferList.get(path[0]).isSemiStatic) {
-			if (!transformBufferList.get(path[0]).getTransformLatest(matrix)) {
-				LOG.warnSeldom("Missing latest transform in transfrom buffer: " + transformBufferList.get(path[0]).from
-						+ "->" + transformBufferList.get(path[0]).to);
+	private boolean multiplyMatricesInPathSemi(int[] path, boolean inverted, double time, double semiTimeout,
+			Matrix4d matrix) {
+		TransformBuffer tb = transformBufferList.get(path[0]);
+		if (tb.isSemiStatic) {
+			if (!tb.getTransformLatest(matrix)) {
+				LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb.from + "->" + tb.to);
+				return false;
+			}
+			tb.getLatestTime(latestTime);
+			if (latestTime.time < time - semiTimeout) {
+				LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb.from + "->" + tb.to);
 				return false;
 			}
 		} else {
-			if (!transformBufferList.get(path[0]).getTransform(time, matrix)) {
+			if (!tb.getTransform(time, matrix)) {
 				LOG.warnSeldom("Missing transform in transfrom buffer at specific time " + String.format("%.4f", time)
-						+ ": " + transformBufferList.get(path[0]).from + "->" + transformBufferList.get(path[0]).to);
+						+ ": " + tb.from + "->" + tb.to);
 				return false;
 			}
-
 		}
 		for (int i = 1; i < path.length; i++) {
-			if (transformBufferList.get(path[i]).isSemiStatic) {
-				if (!transformBufferList.get(path[i]).getTransformLatest(mat)) {
-					LOG.warnSeldom("Missing latest transform in transfrom buffer: "
-							+ transformBufferList.get(path[i]).from + "->" + transformBufferList.get(path[i]).to);
+			TransformBuffer tb2 = transformBufferList.get(path[i]);
+			if (tb2.isSemiStatic) {
+				if (!tb2.getTransformLatest(mat)) {
+					LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
 			} else {
-				if (!transformBufferList.get(path[i]).getTransform(time, mat)) {
+				if (!tb2.getTransform(time, mat)) {
 					LOG.warnSeldom("Missing transform in transfrom buffer at specific time "
-							+ String.format("%.4f", time) + ": " + transformBufferList.get(path[i]).from + "->"
-							+ transformBufferList.get(path[i]).to);
+							+ String.format("%.4f", time) + ": " + tb2.from + "->" + tb2.to);
 					return false;
 				}
-
+				tb2.getLatestTime(latestTime);
+				if (latestTime.time < time - semiTimeout) {
+					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
+					return false;
+				}
 			}
 			matrix.mul(mat);
 		}
