@@ -1,7 +1,13 @@
 package com.github.jy2.di.internal;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.function.Consumer;
 
 import com.github.jy2.JyroscopeCore;
@@ -21,9 +27,9 @@ import go.jyroscope.ros.introspection_msgs.Node;
 public class JyroscopeDiSingleton {
 
 	private final LogSeldom LOG = JyroscopeDi.getLog();
-	
+
 	public static JyroscopeCore jy2;
-	
+
 	private static JyroscopeDiSingleton singleton;
 	private static boolean isShutdown;
 
@@ -53,15 +59,18 @@ public class JyroscopeDiSingleton {
 
 	@Parameter("/min_pubsub_hiccup_to_publish_ms")
 	private double minPubSubHiccupToPublish = 0.5;
-	
+
 	@Publish("/introspection")
 	private Publisher<Member> introspectionPublisher;
 
 	public JyroscopeDiSingleton(HashMap<String, String> specialParameters, String name, JyroscopeDi jy2Di) {
 		memberName = name;
-		
+
 		// parse ip,hostname
 		String host = "127.0.0.1";
+
+		// parse master
+		String master = "http://127.0.0.1:11311";
 
 		String rosIp = System.getenv("ROS_IP");
 		if (rosIp != null && !rosIp.isEmpty()) {
@@ -71,6 +80,38 @@ public class JyroscopeDiSingleton {
 		if (rosHostname != null && !rosHostname.isEmpty()) {
 			host = rosHostname;
 		}
+		String rosMasterUri = System.getenv("ROS_MASTER_URI");
+		if (rosMasterUri != null && !rosMasterUri.isEmpty()) {
+			master = rosMasterUri;
+		}
+		InputStream is = null;
+		Properties prop = null;
+		try {
+			prop = new Properties();
+			String homeFolder = System.getProperty("user.home");
+			if (homeFolder == null) {
+				homeFolder = "/";
+			}
+			is = new FileInputStream(new File(homeFolder + "/ros.properties"));
+			prop.load(is);
+			String propertyParameterValue = prop.getProperty("ros.ip");
+			if (propertyParameterValue != null && !propertyParameterValue.isEmpty()) {
+				host = propertyParameterValue;
+			}
+			propertyParameterValue = prop.getProperty("ros.hostname");
+			if (propertyParameterValue != null && !propertyParameterValue.isEmpty()) {
+				host = propertyParameterValue;
+			}
+			propertyParameterValue = prop.getProperty("ros.master.uri");
+			if (propertyParameterValue != null) {
+				master = propertyParameterValue;
+			}
+		} catch (FileNotFoundException e) {
+			// ignore
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		String specialParameterValue = specialParameters.get("ip");
 		if (specialParameterValue != null && !specialParameterValue.isEmpty()) {
 			host = specialParameterValue;
@@ -78,14 +119,6 @@ public class JyroscopeDiSingleton {
 		specialParameterValue = specialParameters.get("hostname");
 		if (specialParameterValue != null && !specialParameterValue.isEmpty()) {
 			host = specialParameterValue;
-		}
-
-		// parse master
-		String master = "http://127.0.0.1:11311";
-
-		String rosMasterUri = System.getenv("ROS_MASTER_URI");
-		if (rosMasterUri != null && !rosMasterUri.isEmpty()) {
-			master = rosMasterUri;
 		}
 		specialParameterValue = specialParameters.get("master");
 		if (specialParameterValue != null) {
@@ -102,16 +135,17 @@ public class JyroscopeDiSingleton {
 		}
 	}
 
-	public static synchronized void initialize(HashMap<String, String> specialParameters, String name, JyroscopeDi jy2Di) {
+	public static synchronized void initialize(HashMap<String, String> specialParameters, String name,
+			JyroscopeDi jy2Di) {
 		nodes.add(jy2Di);
-		if(singleton!=null) {
+		if (singleton != null) {
 			return;
 		}
 		singleton = new JyroscopeDiSingleton(specialParameters, name, jy2Di);
 	}
 
 	public static synchronized void shutdown() {
-		if(isShutdown) {
+		if (isShutdown) {
 			return;
 		}
 		jy2.shutdown();
@@ -183,17 +217,17 @@ public class JyroscopeDiSingleton {
 			});
 		}
 	}
-	
+
 	@Repeat(interval = 1000)
 	public void publishIntrospection() {
-		if(introspectionPublisher.getNumberOfMessageListeners()<1) {
+		if (introspectionPublisher.getNumberOfMessageListeners() < 1) {
 			return;
 		}
 		Member m = new Member();
 		m.name = memberName;
 		int s = nodes.size();
 		m.nodes = new Node[s];
-		for(int i=0; i<s; i++) {
+		for (int i = 0; i < s; i++) {
 			m.nodes[i] = new Node();
 			JyroscopeDi di = nodes.get(i);
 			m.nodes[i].name = di.getName();
