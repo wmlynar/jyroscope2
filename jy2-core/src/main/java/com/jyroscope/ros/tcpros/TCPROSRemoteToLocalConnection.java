@@ -61,8 +61,8 @@ public class TCPROSRemoteToLocalConnection {
 		request.putHeader("callerid", callerid);
 		request.putHeader("topic", topic);
 		String md5;
-		if ("*".equals(topic)) {
-			md5 = "";
+		if ("*".equals(typeName)) {
+			md5 = "*";
 		} else {
 			md5 = RosTypeConverters.getMd5(typeName);
 			if (md5 == null) {
