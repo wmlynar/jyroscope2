@@ -86,14 +86,16 @@ public class JyroscopeDiSingleton {
 		}
 		InputStream is = null;
 		Properties prop = null;
+		String homeFolder = System.getProperty("user.home");
+		if (homeFolder == null) {
+			homeFolder = "/";
+		}
+		String fileName = homeFolder + "/ros.properties";
 		try {
 			prop = new Properties();
-			String homeFolder = System.getProperty("user.home");
-			if (homeFolder == null) {
-				homeFolder = "/";
-			}
-			is = new FileInputStream(new File(homeFolder + "/ros.properties"));
+			is = new FileInputStream(new File(fileName));
 			prop.load(is);
+			System.out.println("Loading " + fileName);
 			String propertyParameterValue = prop.getProperty("ros.ip");
 			if (propertyParameterValue != null && !propertyParameterValue.isEmpty()) {
 				host = propertyParameterValue;
@@ -107,8 +109,7 @@ public class JyroscopeDiSingleton {
 				master = propertyParameterValue;
 			}
 		} catch (FileNotFoundException e) {
-			// ignore
-			e.printStackTrace();
+			System.out.println(fileName + " not found");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
