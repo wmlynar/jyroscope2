@@ -81,11 +81,11 @@ public class JyroscopeCore implements PubSubClient {
 			e.printStackTrace();
 		}
 		Logger logger = Logger.getLogger("");
-		// remove handlers configured by the user
-		Handler[] handlers = logger.getHandlers();
-		for (Handler h : handlers) {
-			logger.removeHandler(h);
-		}
+// leave logging handlers as configured by the user
+//		Handler[] handlers = logger.getHandlers();
+//		for (Handler h : handlers) {
+//			logger.removeHandler(h);
+//		}
 		logger.addHandler(new ConsoleHandler());
 		logger.addHandler(new RosoutHandler());
 	}
