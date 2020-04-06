@@ -125,7 +125,7 @@ public class RosTopicConnector {
 		        LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
 		    }
 		} catch (IOException e) {
-			LOG.log(Level.SEVERE, "Exception while reading from connection to topic " + topic, e);
+			LOG.log(Level.WARNING, "Exception while reading from connection to topic " + topic, e);
 		} catch (Exception e) {
 	        // added try-catch for null pointers when missing type converter etc.
 			LOG.log(Level.SEVERE, "Exception while reading from connection to topic " + topic, e);
