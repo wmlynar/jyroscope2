@@ -13,6 +13,8 @@ import org.xml.sax.*;
 
 public class XMLRPCClient {
     
+    private static final int TIMEOUT_TIME = 5000;
+    
     URI server;
     
     public XMLRPCClient(URI server) {
@@ -29,6 +31,7 @@ public class XMLRPCClient {
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "text/xml");
+        connection.setConnectTimeout(TIMEOUT_TIME);
         
         try {
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
