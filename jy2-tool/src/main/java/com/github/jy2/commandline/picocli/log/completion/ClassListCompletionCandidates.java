@@ -1,7 +1,10 @@
 package com.github.jy2.commandline.picocli.log.completion;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import com.google.common.reflect.ClassPath;
 
 import picocli.AutoComplete;
 import picocli.CommandLine.Model.CommandSpec;
@@ -13,13 +16,26 @@ public class ClassListCompletionCandidates implements Iterable<String> {
 	@Override
 	public Iterator<String> iterator() {
 		ArrayList<String> list = new ArrayList<>();
-		if (AutoComplete.argIndex != getTfChildIndex() + 1) {
+		if (AutoComplete.argIndex != getClassNameIndex()) {
 			return list.iterator();
 		}
+
+		// String className = getClassName();
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		try {
+			for (final ClassPath.ClassInfo info : ClassPath.from(loader).getTopLevelClasses()) {
+				// if (info.getName().startsWith(className)) {
+				list.add(info.getName());
+				// }
+			}
+		} catch (IOException e) {
+		}
+
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 
-	private int getTfChildIndex() {
+	private int getClassNameIndex() {
 		if (AutoComplete.tentativeMatch == null) {
 			return -1;
 		}
@@ -28,7 +44,7 @@ public class ClassListCompletionCandidates implements Iterable<String> {
 			if (obj instanceof CommandSpec) { // subcommand
 			} else if (obj instanceof OptionSpec) { // option
 				OptionSpec opt = (OptionSpec) obj;
-				if ("--node".equals(opt.longestName())) {
+				if ("--class".equals(opt.longestName())) {
 					return i;
 				}
 			} else if (obj instanceof PositionalParamSpec) { // positional

@@ -18,7 +18,9 @@ public class TopicNameCompletionCandidates implements Iterable<String> {
 			return new ArrayList<String>().iterator();
 		}
 		
-		return Main.introspector.getTopicList().iterator();
+		ArrayList<String> list = Main.introspector.getTopicList();
+		list.sort(String::compareToIgnoreCase);
+		return list.iterator();
 	}
 
 	private int getTopicNameIndex() {
