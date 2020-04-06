@@ -34,6 +34,7 @@ public class ParameterValueCompletionCandidates implements Iterable<String> {
 //				list.add("true");
 //			}
 		}
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 
