@@ -7,7 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.jy2.mapper.RosTypeConverters;
-import com.jyroscope.FormatException;
 import com.jyroscope.Link;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.tcpros.TCPROSRemoteToLocalConnection;
@@ -124,13 +123,6 @@ public class RosTopicConnector {
 		        subscriber.close();
 		    } catch (IOException ioe) {
 		        LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
-		    }
-		} catch (FormatException fe) {
-			LOG.log(Level.SEVERE, "Format exception while reading from connection to topic " + topic, fe);
-		    try {
-		        subscriber.close();
-		    } catch (IOException ioe) {
-		    	LOG.log(Level.SEVERE, "Error while closing connection to topic " + topic, ioe);
 		    }
 		} catch (IOException e) {
 			LOG.log(Level.SEVERE, "Exception while reading from connection to topic " + topic, e);

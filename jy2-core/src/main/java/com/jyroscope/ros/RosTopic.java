@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
-import com.jyroscope.FormatException;
 import com.jyroscope.Link;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
@@ -248,7 +247,7 @@ public class RosTopic<T> implements Topic<T> {
 //        return rval;
 //    }
     
-    public synchronized void publisherUpdate(XMLRPCArray slaves) throws FormatException, SystemException {
+    public synchronized void publisherUpdate(XMLRPCArray slaves) throws SystemException {
         HashSet<URI> uris = new HashSet<>();
         for (Object value : slaves)
             try {
@@ -256,7 +255,7 @@ public class RosTopic<T> implements Topic<T> {
                 if (!slave.getSlaveURI().equals(uri)) // Ignore notifications about myself
                     uris.add(uri);
             } catch (URISyntaxException use) {
-                throw new FormatException("Bad URI format: " + String.valueOf(value));
+                throw new RuntimeException("Bad URI format: " + String.valueOf(value));
             }
         
 
@@ -301,7 +300,7 @@ public class RosTopic<T> implements Topic<T> {
 			XMLRPCArray publishers = (XMLRPCArray) resultList.get(2);
 			publisherUpdate(publishers);
 
-		} catch (IOException | XMLRPCException | FormatException | SystemException | ConversionException e) {
+		} catch (IOException | XMLRPCException | SystemException | ConversionException e) {
 			LOG.log(Level.WARNING, "Exception caught while registering as subscriber", e);
 		}
     }

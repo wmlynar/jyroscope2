@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.logging.Logger;
 
 import com.github.jy2.mapper.RosTypeConverters;
-import com.jyroscope.FormatException;
 import com.jyroscope.ros.RosMessage;
 
 public class TCPROSRemoteToLocalConnection {
@@ -93,7 +92,7 @@ public class TCPROSRemoteToLocalConnection {
             return false;
     }
     
-    public boolean read(RosMessage buffer) throws IOException, FormatException {
+    public boolean read(RosMessage buffer) throws IOException {
         return buffer.readIn(is);
     }
     
