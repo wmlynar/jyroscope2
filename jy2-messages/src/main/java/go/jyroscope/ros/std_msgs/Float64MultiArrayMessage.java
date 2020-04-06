@@ -7,6 +7,6 @@ import com.jyroscope.annotations.Primitive;
 public class Float64MultiArrayMessage {
 
 	public MultiArrayLayoutMessage layout;
-	double[] data;
+	public double[] data;
 
 }
