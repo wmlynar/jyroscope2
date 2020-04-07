@@ -236,13 +236,13 @@ public class JyroscopeCore implements PubSubClient {
 						long time = System.currentTimeMillis();
 						long dt = time - link.lastMessageTime;
 						if (dt < 0) {
-							log.error(
+							log.warn(
 									"Subscriber timeout: something wrong with time in the system (usually because of time synchronization), dt="
 											+ dt);
 							dt = 0;
 						}
 						if (dt >= timeout) {
-							if(link.firstTimeWarning) {
+							if (link.firstTimeWarning) {
 								if (method != null) {
 									log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
 											+ method.toGenericString());
