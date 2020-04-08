@@ -35,6 +35,7 @@ public class TopicMessageCompletionCandidates implements Iterable<String> {
 				throw new RuntimeException(e);
 			}
 		}
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 

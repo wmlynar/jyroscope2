@@ -102,7 +102,7 @@ public class XMLRPCSlave {
     //publisherUpdate(caller_id, topic, publishers)
     //  Returns (int, str, int)
     //  (code, statusMessage, ignore) 
-    public Object publisherUpdate(String caller_id, String topic, XMLRPCArray publishers) throws FormatException, SystemException {
+    public Object publisherUpdate(String caller_id, String topic, XMLRPCArray publishers) throws SystemException {
         try {
             RosTopic rostopic = slave.getTopic(NAMESPACE, caller_id, topic);
             rostopic.publisherUpdate(publishers);

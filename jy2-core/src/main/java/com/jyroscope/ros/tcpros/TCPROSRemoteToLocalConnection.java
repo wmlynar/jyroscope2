@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 import com.github.jy2.mapper.RosTypeConverters;
-import com.jyroscope.FormatException;
 import com.jyroscope.ros.RosMessage;
 
 public class TCPROSRemoteToLocalConnection {
     
+	private static final Logger LOG = Logger.getLogger(TCPROSRemoteToLocalConnection.class.getCanonicalName());
+	
     private String host;
     private int port;
     
@@ -57,7 +59,16 @@ public class TCPROSRemoteToLocalConnection {
 		TCPROSHeader request = new TCPROSHeader();
 		request.putHeader("callerid", callerid);
 		request.putHeader("topic", topic);
-		request.putHeader("md5sum", RosTypeConverters.getMd5(typeName));
+		String md5;
+		if ("*".equals(typeName)) {
+			md5 = "*";
+		} else {
+			md5 = RosTypeConverters.getMd5(typeName);
+			if (md5 == null) {
+				LOG.severe("Unable to compute md5 for type: " + typeName + " , callerId=" + callerid);
+			}
+		}
+		request.putHeader("md5sum", md5);
 		request.putHeader("type", typeName);
 		if (tcpNoDelay)
 			request.putHeader("tcp_nodelay", "1");
@@ -81,7 +92,7 @@ public class TCPROSRemoteToLocalConnection {
             return false;
     }
     
-    public boolean read(RosMessage buffer) throws IOException, FormatException {
+    public boolean read(RosMessage buffer) throws IOException {
         return buffer.readIn(is);
     }
     

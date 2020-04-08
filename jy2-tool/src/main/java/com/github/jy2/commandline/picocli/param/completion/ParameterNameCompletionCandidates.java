@@ -18,7 +18,9 @@ public class ParameterNameCompletionCandidates implements Iterable<String> {
 			return new ArrayList<String>().iterator();
 		}
 		
-		return Main.di.getParameterClient().getParameterNames().iterator();
+		ArrayList<String> list = Main.di.getParameterClient().getParameterNames();
+		list.sort(String::compareToIgnoreCase);
+		return list.iterator();
 	}
 
 	private int getParameterNameIndex() {

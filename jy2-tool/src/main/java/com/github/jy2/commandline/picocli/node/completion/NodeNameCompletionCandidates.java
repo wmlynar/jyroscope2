@@ -18,7 +18,9 @@ public class NodeNameCompletionCandidates implements Iterable<String> {
 			return new ArrayList<String>().iterator();
 		}
 		
-		return Main.introspector.getNodeList().iterator();
+		ArrayList<String> list = Main.introspector.getNodeList();
+		list.sort(String::compareToIgnoreCase);
+		return list.iterator();
 	}
 
 	private int getNodeNameIndex() {

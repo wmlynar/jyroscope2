@@ -18,7 +18,9 @@ public class MemberNameCompletionCandidates implements Iterable<String> {
 			return new ArrayList<String>().iterator();
 		}
 		
-		return Main.introspector.getMemberList().iterator();
+		ArrayList<String> list = Main.introspector.getMemberList();
+		list.sort(String::compareToIgnoreCase);
+		return list.iterator();
 	}
 
 	private int getMemberNameIndex() {

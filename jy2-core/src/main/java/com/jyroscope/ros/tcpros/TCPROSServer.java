@@ -150,4 +150,9 @@ public class TCPROSServer implements RosTransport {
         return "tcpros:" + hostname + ":" + port;
     }
 
+	@Override
+	public String toString() {
+		return "TCPROSServer [hostname=" + hostname + ", port=" + port + ", started=" + started + ", stopped=" + stopped
+				+ "]";
+	}    
 }

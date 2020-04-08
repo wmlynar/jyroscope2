@@ -31,6 +31,7 @@ public class ClassNameCompletionCandidates implements Iterable<String> {
 		} catch (IOException e) {
 		}
 
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 

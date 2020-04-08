@@ -42,6 +42,7 @@ public class TopicTypeCompletionCandidates implements Iterable<String> {
 				list.add(type.getCanonicalName());
 			}
 		}
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 

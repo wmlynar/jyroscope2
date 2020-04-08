@@ -89,4 +89,10 @@ public class RosSlave {
 	public void setParameterClient(RosParameterClient parameterServer) {
 		this.parameterClient = parameterServer;
 	}
+	
+	@Override
+	public String toString() {
+		return "RosSlave [masterURI=" + masterURI + ", slaveURI=" + slaveURI + ", callerId=" + callerId + ", tcpros="
+				+ tcpros + "]";
+	}
 }

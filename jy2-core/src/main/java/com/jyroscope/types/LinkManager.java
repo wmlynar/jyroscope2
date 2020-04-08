@@ -133,6 +133,7 @@ public class LinkManager {
 						} else {
 							remoteToType = Class.forName(remoteJavaType);
 						}
+						RosTypeConvertersSerializationWrapper.precompile(remoteToType);						
 					}
 				}
 			} catch (Exception e) {

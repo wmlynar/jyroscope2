@@ -13,13 +13,13 @@ public class NodeLineCompletionCandidates implements Iterable<String> {
 	@Override
 	public Iterator<String> iterator() {
 		ArrayList<String> list = new ArrayList<>();
-		if (AutoComplete.argIndex != getTfChildIndex() + 1) {
+		if (AutoComplete.argIndex != getLineIndex() + 1) {
 			return list.iterator();
 		}
 		return list.iterator();
 	}
 
-	private int getTfChildIndex() {
+	private int getLineIndex() {
 		if (AutoComplete.tentativeMatch == null) {
 			return -1;
 		}
@@ -28,7 +28,7 @@ public class NodeLineCompletionCandidates implements Iterable<String> {
 			if (obj instanceof CommandSpec) { // subcommand
 			} else if (obj instanceof OptionSpec) { // option
 				OptionSpec opt = (OptionSpec) obj;
-				if ("--class".equals(opt.longestName())) {
+				if ("--line".equals(opt.longestName())) {
 					return i;
 				}
 			} else if (obj instanceof PositionalParamSpec) { // positional

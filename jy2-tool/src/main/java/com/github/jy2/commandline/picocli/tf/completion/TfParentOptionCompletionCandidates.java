@@ -53,6 +53,7 @@ public class TfParentOptionCompletionCandidates implements Iterable<String> {
 				subscriber.removeAllMessageListeners();
 			}
 		}
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 

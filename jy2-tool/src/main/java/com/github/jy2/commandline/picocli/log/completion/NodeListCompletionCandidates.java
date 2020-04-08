@@ -3,6 +3,8 @@ package com.github.jy2.commandline.picocli.log.completion;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.github.jy2.commandline.picocli.Main;
+
 import picocli.AutoComplete;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
@@ -12,14 +14,16 @@ public class NodeListCompletionCandidates implements Iterable<String> {
 
 	@Override
 	public Iterator<String> iterator() {
-		ArrayList<String> list = new ArrayList<>();
-		if (AutoComplete.argIndex != getTfChildIndex() + 1) {
-			return list.iterator();
+		if (AutoComplete.argIndex != getNodeNameIndex()) {
+			return new ArrayList<String>().iterator();
 		}
+		
+		ArrayList<String> list = Main.introspector.getNodeList();
+		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}
 
-	private int getTfChildIndex() {
+	private int getNodeNameIndex() {
 		if (AutoComplete.tentativeMatch == null) {
 			return -1;
 		}
@@ -28,7 +32,7 @@ public class NodeListCompletionCandidates implements Iterable<String> {
 			if (obj instanceof CommandSpec) { // subcommand
 			} else if (obj instanceof OptionSpec) { // option
 				OptionSpec opt = (OptionSpec) obj;
-				if ("--class".equals(opt.longestName())) {
+				if ("--node".equals(opt.longestName())) {
 					return i;
 				}
 			} else if (obj instanceof PositionalParamSpec) { // positional
