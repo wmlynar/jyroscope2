@@ -30,6 +30,13 @@ public class MainLogging {
 		
 		LogSeldom log = JyroscopeCore.getLog();
 		log.info("aaa");
+		
+		try {
+			throw new RuntimeException("bbb");
+		} catch(Exception e) {
+			log.error("ccc",e);
+		}
+		Thread.sleep(1000);
 	}
 
 }
