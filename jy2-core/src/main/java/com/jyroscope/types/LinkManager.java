@@ -149,7 +149,9 @@ public class LinkManager {
         private final ArrayList<Link<D>> remote;
 		private HashMap<Link<D>, Consumer<D>> localConsumers;
 //		private HashMap<Link<D>, Consumer<D>> remoteConsumers;
-        
+
+	    private ReadWriteLock lock = new ReentrantReadWriteLock();
+		
         private Deliver(Class<? extends D> to) {
 //            this.to = to;
 //            this.local = new ArrayList<>();
@@ -159,6 +161,8 @@ public class LinkManager {
         }
         
 		private void add(Link<D> link, boolean isLocal, int queueSize) {
+			lock.writeLock().lock();
+			try {
             if (isLocal) {
     			Consumer<D> consumer = new Consumer<>(link, queueSize);
 //                local.add(link);
@@ -168,9 +172,14 @@ public class LinkManager {
             else
                 remote.add(link);
 //				remoteConsumers.put(link, consumer);
+			} finally {
+				lock.writeLock().unlock();
+			}
         }
         
         private void remove(Link<D> link) {
+			lock.writeLock().lock();
+			try {
 //            local.remove(link);
             remote.remove(link);
 			Consumer<D> consumer = localConsumers.remove(link);
@@ -181,20 +190,35 @@ public class LinkManager {
 //			if (consumer != null) {
 //				consumer.stop();
 //			}
+			} finally {
+				lock.writeLock().unlock();
+			}
         }
         
         private boolean hasLocalClients() {
+			lock.readLock().lock();
+			try {
 //            return local.size() > 0;
 			return localConsumers.size() > 0;
+			} finally {
+				lock.readLock().unlock();
+			}
         }
         
         private boolean hasClients(boolean forMessageFromLocal) {
+			lock.readLock().lock();
+			try {
 //            return local.size() > 0 || (forMessageFromLocal && remote.size() > 0);
 //			return localConsumers.size() > 0 || (forMessageFromLocal && remoteConsumers.size() > 0);
 			return localConsumers.size() > 0 || (forMessageFromLocal && remote.size() > 0);
+			} finally {
+				lock.readLock().unlock();
+			}
         }
         
         private void handle(D message, boolean isLocal) {
+			lock.readLock().lock();
+			try {
 //            if (local.size() > 0)
 //                for (Link<D> link : local)
 //                    link.handle(message);
@@ -215,12 +239,20 @@ public class LinkManager {
 			if (isLocal && remote.size() > 0)
 				for (Link<D> link : remote)
 					link.handle(message);
+			} finally {
+				lock.readLock().unlock();
+			}
         }
 
         private boolean isEmpty() {
+			lock.readLock().lock();
+			try {
 //            return local.isEmpty() && remote.isEmpty();
 //			return localConsumers.isEmpty() && remoteConsumers.isEmpty();
 			return localConsumers.isEmpty() && remote.isEmpty();
+			} finally {
+				lock.readLock().unlock();
+			}
         }
 
 		private class Consumer<D> {
