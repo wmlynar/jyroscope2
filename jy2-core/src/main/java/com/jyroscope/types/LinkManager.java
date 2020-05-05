@@ -104,6 +104,10 @@ public class LinkManager {
 
 		@Override
 		public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
+			if("*".equals(remoteRosType)) {
+				// skip connections to jy tool
+				return;
+			}
             lock.writeLock().lock();
             try {
 				Receive.this.isLatched = isLatched;
