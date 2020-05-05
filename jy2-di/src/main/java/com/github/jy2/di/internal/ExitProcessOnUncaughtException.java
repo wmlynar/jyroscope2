@@ -15,6 +15,8 @@ import com.github.jy2.di.LogSeldom;
 public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler {
 
 	public static final LogSeldom LOG = JyroscopeDi.getLog();
+	
+	public static final int LOG_PUBLISH_TIME = 2000;
 
 	static public void register() {
 		Thread.setDefaultUncaughtExceptionHandler(new ExitProcessOnUncaughtException());
@@ -30,6 +32,11 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		try {
 			LOG.error("Uncaught exception caught in thread " + t, e);
 			printFullCoreDump();
+			// give logging system time to publish the logs
+			try {
+				Thread.sleep(LOG_PUBLISH_TIME);
+			} catch (InterruptedException e1) {
+			}
 		} finally {
 			Runtime.getRuntime().halt(1);
 		}

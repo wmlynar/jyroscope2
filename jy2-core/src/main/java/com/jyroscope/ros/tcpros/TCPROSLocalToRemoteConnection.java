@@ -128,9 +128,13 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
             }
         } catch (SystemException se) {
         	LOG.log(Level.SEVERE, "Could not connect to publisher while communicating with TCPROS client", se);
-        } catch (IOException e) {
-        	LOG.log(Level.WARNING, "Error while communicating with TCPROS client, disconnecting", e);
-            topic.removeRemoteSubscriber(this);
+		} catch (IOException e) {
+			LOG.log(Level.WARNING, "Error while communicating with TCPROS client, disconnecting", e);
+			try {
+				topic.removeRemoteSubscriber(this);
+			} catch (Exception e2) {
+				LOG.log(Level.WARNING, "Problem with removing remote subscriber", e2);
+			}
             try {
                 socket.close();
             } catch (IOException ioe2) {

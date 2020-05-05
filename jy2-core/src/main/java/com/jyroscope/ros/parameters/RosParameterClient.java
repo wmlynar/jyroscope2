@@ -98,7 +98,7 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	@Override
-	public Object addParameterListener(String key, ParameterListener consumer) {
+	public synchronized Object addParameterListener(String key, ParameterListener consumer) {
 		if (!key.endsWith("/")) {
 			key = key + "/";
 		}
@@ -113,7 +113,7 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	@Override
-	public boolean removeParameterListener(Object id) {
+	public synchronized boolean removeParameterListener(Object id) {
 		ParameterId pid = (ParameterId) id;
 		ArrayList<ParameterListener> list = consumers.get(pid.key);
 		if (list == null) {
@@ -126,7 +126,7 @@ public class RosParameterClient implements ParameterClient {
 		return removed;
 	}
 
-	public boolean handleParameterUpdate(String key, Object value) {
+	public synchronized boolean handleParameterUpdate(String key, Object value) {
 		for (Entry<String, ArrayList<ParameterListener>> c : consumers.entrySet()) {
 			if (!key.startsWith(c.getKey())) {
 				continue;

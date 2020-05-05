@@ -1,7 +1,9 @@
 package com.jyroscope.ros;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.github.jy2.MasterClient;
 import com.github.jy2.SlaveClient;
@@ -10,7 +12,6 @@ import com.jyroscope.local.TopicProvider;
 import com.jyroscope.ros.master.RosMasterClient;
 import com.jyroscope.ros.master.RosSlaveClient;
 import com.jyroscope.ros.parameters.RosParameterClient;
-import com.jyroscope.server.xmlrpc.XMLRPCClient;
 
 public class RosTopicProvider implements TopicProvider {
 
@@ -46,9 +47,14 @@ public class RosTopicProvider implements TopicProvider {
 
 	@Override
 	public void shutdown() {
-		parameterClient.shutdown();
+		ExecutorService service = Executors.newFixedThreadPool(100);
+		service.execute(() -> parameterClient.shutdown());
 		for (RosTopic t : slave.getTopics().payloads()) {
-			t.shutdown();
+			service.execute(() -> t.shutdown());
+		}
+		try {
+			service.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
 		}
 	}
 
