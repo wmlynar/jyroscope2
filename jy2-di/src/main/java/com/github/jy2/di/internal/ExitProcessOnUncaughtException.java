@@ -1,10 +1,17 @@
 package com.github.jy2.di.internal;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.Thread.State;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +24,9 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 	public static final LogSeldom LOG = JyroscopeDi.getLog();
 
 	public static final int LOG_PUBLISH_TIME = 2000;
+
+	public static String logFolder = "/tmp";
+	public static String memberName = "unknown";
 
 	static public void register() {
 		Thread.setDefaultUncaughtExceptionHandler(new ExitProcessOnUncaughtException());
@@ -32,10 +42,30 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		try {
 			LOG.fatal("Uncaught exception caught in thread " + t, e);
 			printFullCoreDump();
+			saveCrashLog(t, e);
 			// give logging system time to publish the logs
 			unconditionalSleep(LOG_PUBLISH_TIME);
 		} finally {
 			Runtime.getRuntime().halt(1);
+		}
+	}
+
+	private void saveCrashLog(Thread t, Throwable e) {
+		String stamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+		String fileName = logFolder + "/crash_" + memberName.replace('/', '_') + "_" + stamp + ".txt";
+
+		// get stack trace
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		e.printStackTrace(printWriter);
+
+		String content = "Uncaught exception caught in thread " + t + "\n" + stringWriter + "\nAll Stack Traces:\n"
+				+ getAllStackTraces() + "\n" + "Heap:\n" + getHeapInfo();
+
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+			writer.write(content);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 	}
 
@@ -82,7 +112,7 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 			long used = usage.getUsed();
 			long max = usage.getMax();
 			int pctUsed = (int) (used * 100 / max);
-			ret += " " + name + " total: " + (max / 1000) + "K, " + pctUsed + "% used\n";
+			ret += " " + name + " total: " + (max / 1024) + "K, used: " + (used / 1024) + "K, " + pctUsed + "% used\n";
 		}
 		return ret;
 	}
