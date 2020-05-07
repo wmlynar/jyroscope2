@@ -41,9 +41,9 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		// avoid getting into infinite loop if it gets another out of memory error
 		Thread.setDefaultUncaughtExceptionHandler(null);
 		try {
+			saveCrashLog(t, e);
 			LOG.fatal("Uncaught exception caught in thread " + t, e);
 			printFullCoreDump();
-			saveCrashLog(t, e);
 			// give logging system time to publish the logs
 			unconditionalSleep(LOG_PUBLISH_TIME);
 		} finally {
@@ -65,9 +65,9 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 
 		File f = new File(fileName);
 		if (f.getParentFile() != null) {
-		  f.getParentFile().mkdirs();
+			f.getParentFile().mkdirs();
 		}
-		
+
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
 			writer.write(content);
 		} catch (IOException e1) {
@@ -85,7 +85,7 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 			}
 			try {
 				Thread.sleep(dt);
-			} catch (InterruptedException e1) {
+			} catch (InterruptedException e) {
 			}
 		}
 	}
