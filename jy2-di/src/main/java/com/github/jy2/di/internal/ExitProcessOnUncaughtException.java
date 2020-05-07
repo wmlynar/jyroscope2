@@ -1,6 +1,7 @@
 package com.github.jy2.di.internal;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -62,6 +63,11 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		String content = "Uncaught exception caught in thread " + t + "\n" + stringWriter + "\nAll Stack Traces:\n"
 				+ getAllStackTraces() + "\n" + "Heap:\n" + getHeapInfo();
 
+		File f = new File(fileName);
+		if (f.getParentFile() != null) {
+		  f.getParentFile().mkdirs();
+		}
+		
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
 			writer.write(content);
 		} catch (IOException e1) {
