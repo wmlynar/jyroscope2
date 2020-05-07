@@ -53,7 +53,7 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 
 	private void saveCrashLog(Thread t, Throwable e) {
 		String stamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-		String fileName = logFolder + "/crash_" + memberName.replace('/', '_') + "_" + stamp + ".txt";
+		String fileName = logFolder + "/crash-" + memberName.replace('/', '_') + "-" + stamp + ".txt";
 
 		// get stack trace
 		StringWriter stringWriter = new StringWriter();
