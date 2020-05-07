@@ -43,7 +43,7 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		try {
 			saveCrashLog(t, e);
 			LOG.fatal("Uncaught exception caught in thread " + t, e);
-			printFullCoreDump();
+			LOG.fatal("All Stack Traces:\n" + getAllStackTraces() + "\n" + "Heap:\n" + getHeapInfo());
 			// give logging system time to publish the logs
 			unconditionalSleep(LOG_PUBLISH_TIME);
 		} finally {
@@ -88,10 +88,6 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 			} catch (InterruptedException e) {
 			}
 		}
-	}
-
-	public static void printFullCoreDump() {
-		LOG.error("All Stack Traces:\n" + getAllStackTraces() + "\n" + "Heap:\n" + getHeapInfo());
 	}
 
 	public static String getAllStackTraces() {
