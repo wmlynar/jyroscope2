@@ -1,5 +1,6 @@
 package com.github.jy2.commandline.picocli.param;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.github.jy2.commandline.picocli.Main;
@@ -18,7 +19,13 @@ public class ParamListCommand implements Runnable {
 	String grep;
 
 	public void run() {
-		ArrayList<String> list = Main.di.getParameterClient().getParameterNames();
+		ArrayList<String> list;
+		try {
+			list = Main.di.getParameterClient().getParameterNames();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		list.sort(String::compareToIgnoreCase);
 		for (String s : list) {
 			if (grep != null) {

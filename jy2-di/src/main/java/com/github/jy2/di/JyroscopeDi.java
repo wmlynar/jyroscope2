@@ -142,7 +142,11 @@ public class JyroscopeDi implements PubSubClient {
 
 		// process parameters from command line
 		for (Entry<String, String> parameter : parameters.entrySet()) {
-			setParameter(parameter.getKey(), parameter.getValue());
+			try {
+				setParameter(parameter.getKey(), parameter.getValue());
+			} catch (IOException e) {
+				LOG.error("Unable to set parameter on server" + parameter.getKey() + " " + parameter.getValue(), e);
+			}
 		}
 	}
 
@@ -204,7 +208,12 @@ public class JyroscopeDi implements PubSubClient {
 			// install file monitor
 			for (ParameterFromFileReference ref : parameterFromFileReferences) {
 				if (ref.watch) {
-					Object value = getParameter(ref.parameterName);
+					Object value = null;
+					try {
+						value = getParameter(ref.parameterName);
+					} catch (IOException e1) {
+						LOG.error("Exception while getting parameter " + ref.parameterName, e1);
+					}
 					if (value == null) {
 						value = ref.defaultValue;
 					}
@@ -297,7 +306,11 @@ public class JyroscopeDi implements PubSubClient {
 
 		// remove parameter change callback
 		if (parameterListenerId != null) {
-			JyroscopeDiSingleton.jy2.getParameterClient().removeParameterListener(parameterListenerId);
+			try {
+				JyroscopeDiSingleton.jy2.getParameterClient().removeParameterListener(parameterListenerId);
+			} catch (IOException e) {
+				LOG.warn("Unable to remove parameter client", e);
+			}
 			parameterListenerId = null;
 		}
 
@@ -539,12 +552,11 @@ public class JyroscopeDi implements PubSubClient {
 	public ParameterClient getParameterClient() {
 		return JyroscopeDiSingleton.jy2.getParameterClient();
 	}
-	
+
 	@Override
 	public SlaveClient getSlaveClient(String name) {
 		return JyroscopeDiSingleton.jy2.getSlaveClient(name);
 	}
-
 
 	private void executeInitializer(Initializer initializer) {
 		makeAccessible(initializer.method);
@@ -938,30 +950,34 @@ public class JyroscopeDi implements PubSubClient {
 	}
 
 	private void processParameterReference(ParameterReference ref) {
-		Object value = getParameter(ref.parameterName);
-		if (value == null) {
-			LOG.info("Unset parameter: " + ref.parameterName + ", getting default value");
-			publishParameter(ref.object, ref.field, ref.parameterName);
-		} else {
-			setParameterValueFromServer(ref.object, ref.field, ref.parameterName, value);
+		try {
+			Object value = getParameter(ref.parameterName);
+			if (value == null) {
+				LOG.info("Unset parameter: " + ref.parameterName + ", getting default value");
+				publishParameter(ref.object, ref.field, ref.parameterName);
+			} else {
+				setParameterValueFromServer(ref.object, ref.field, ref.parameterName, value);
+			}
+		} catch (IOException e) {
+			LOG.error("Unable to get parameter: " + ref.parameterName + ", getting default value");
 		}
 	}
 
 	private void processParameterFromFileReference(ParameterFromFileReference ref) {
-		Object value = getParameter(ref.parameterName);
-		if (value == null) {
-			LOG.info("Unset parameter: " + ref.parameterName + ", getting default value: " + ref.defaultValue);
-			value = ref.defaultValue;
-		}
-
-		String fileName = value.toString();
-		if (fileName.isEmpty()) {
-			LOG.info("Empty parameter: " + ref.parameterName + ", skipping reading parameter from file");
-			return;
-		}
-
 		Class<?> type = ref.field.getType();
 		try {
+			Object value = getParameter(ref.parameterName);
+			if (value == null) {
+				LOG.info("Unset parameter: " + ref.parameterName + ", getting default value: " + ref.defaultValue);
+				value = ref.defaultValue;
+			}
+
+			String fileName = value.toString();
+			if (fileName.isEmpty()) {
+				LOG.info("Empty parameter: " + ref.parameterName + ", skipping reading parameter from file");
+				return;
+			}
+
 			Object obj;
 			if (fileName.endsWith(".json")) {
 				// read json
@@ -977,11 +993,11 @@ public class JyroscopeDi implements PubSubClient {
 		}
 	}
 
-	private Object getParameter(String name) {
+	private Object getParameter(String name) throws IOException {
 		return JyroscopeDiSingleton.jy2.getParameterClient().getParameter(name);
 	}
 
-	private <T> void setParameter(String name, T value) {
+	private <T> void setParameter(String name, T value) throws IOException {
 		JyroscopeDiSingleton.jy2.getParameterClient().setParameter(name, value);
 	}
 
@@ -1027,8 +1043,8 @@ public class JyroscopeDi implements PubSubClient {
 					setParameter(parameterName, "");
 				}
 			}
-		} catch (IllegalArgumentException | IllegalAccessException e) {
-			LOG.info("Error getting parameter value: " + parameterName, e);
+		} catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+			LOG.info("Error publishing parameter value: " + parameterName, e);
 		}
 	}
 
@@ -1084,13 +1100,17 @@ public class JyroscopeDi implements PubSubClient {
 	}
 
 	private void registerParameterChangeCallback() {
-		parameterListenerId = JyroscopeDiSingleton.jy2.getParameterClient().addParameterListener("/",
-				new ParameterListener() {
-					@Override
-					public void onParameterUpdated(String name, Object value) {
-						onParameterChanged(name, value);
-					}
-				});
+		try {
+			parameterListenerId = JyroscopeDiSingleton.jy2.getParameterClient().addParameterListener("/",
+					new ParameterListener() {
+						@Override
+						public void onParameterUpdated(String name, Object value) {
+							onParameterChanged(name, value);
+						}
+					});
+		} catch (IOException e) {
+			LOG.error("Unable to register parameter change callback", e);
+		}
 	}
 
 	private synchronized void onParameterChanged(String name, Object value) {

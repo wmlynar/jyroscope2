@@ -24,20 +24,20 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	@Override
-	public boolean setParameter(String key, Object value) {
+	public boolean setParameter(String key, Object value) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("setParam", new XMLRPCArray(new Object[] { slave.getCallerId(), key, value }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
 			return (Integer) resultList.get(0) == 1;
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 
 	}
 
 	@Override
-	public Object getParameter(String key) {
+	public Object getParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("getParam", new XMLRPCArray(new Object[] { slave.getCallerId(), key }));
@@ -48,25 +48,25 @@ public class RosParameterClient implements ParameterClient {
 				return resultList.get(2);
 			}
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 	}
 
 	@Override
-	public boolean deleteParameter(String key) {
+	public boolean deleteParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("deleteParam", new XMLRPCArray(new Object[] { slave.getCallerId(), key }));
 			XMLRPCArray resultList = (XMLRPCArray) result;
 			return (Integer) resultList.get(0) == 1;
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 
 	}
 
 	@Override
-	public boolean hasParameter(String key) {
+	public boolean hasParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("hasParam", new XMLRPCArray(new Object[] { slave.getCallerId(), key }));
@@ -77,12 +77,12 @@ public class RosParameterClient implements ParameterClient {
 				return (boolean) resultList.get(2);
 			}
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 	}
 
 	@Override
-	public ArrayList<String> getParameterNames() {
+	public ArrayList<String> getParameterNames() throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("getParamNames", new XMLRPCArray(new Object[] { slave.getCallerId() }));
@@ -93,12 +93,12 @@ public class RosParameterClient implements ParameterClient {
 				return (ArrayList<String>) resultList.get(2);
 			}
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 	}
 
 	@Override
-	public synchronized Object addParameterListener(String key, ParameterListener consumer) {
+	public synchronized Object addParameterListener(String key, ParameterListener consumer) throws IOException {
 		if (!key.endsWith("/")) {
 			key = key + "/";
 		}
@@ -113,7 +113,7 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	@Override
-	public synchronized boolean removeParameterListener(Object id) {
+	public synchronized boolean removeParameterListener(Object id) throws IOException {
 		ParameterId pid = (ParameterId) id;
 		ArrayList<ParameterListener> list = consumers.get(pid.key);
 		if (list == null) {
@@ -142,12 +142,16 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	public void shutdown() {
-		if(isSubscribed) {
-			unsubscribeParameter("/");
+		if (isSubscribed) {
+			try {
+				unsubscribeParameter("/");
+			} catch (IOException e) {
+				// ignore
+			}
 		}
 	}
 
-	private Object subscribeParameter(String key) {
+	private Object subscribeParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("subscribeParam",
@@ -160,11 +164,11 @@ public class RosParameterClient implements ParameterClient {
 				return resultList.get(2);
 			}
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 	}
 
-	private int unsubscribeParameter(String key) {
+	private int unsubscribeParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("unsubscribeParam",
@@ -176,7 +180,7 @@ public class RosParameterClient implements ParameterClient {
 				return (int) resultList.get(2);
 			}
 		} catch (IOException | XMLRPCException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e);
 		}
 	}
 }

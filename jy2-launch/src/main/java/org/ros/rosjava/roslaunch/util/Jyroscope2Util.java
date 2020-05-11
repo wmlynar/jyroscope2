@@ -1,15 +1,14 @@
 package org.ros.rosjava.roslaunch.util;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.ros.rosjava.roslaunch.parsing.RosParamTag;
 import org.ros.rosjava.roslaunch.xmlrpc.ObjectToXml;
 
 import com.github.jy2.JyroscopeCore;
 import com.github.jy2.ParameterClient;
-import com.github.jy2.di.internal.JyroscopeDiSingleton;
 
 public class Jyroscope2Util {
 
@@ -17,9 +16,9 @@ public class Jyroscope2Util {
 	private static ParameterClient parameterClient;
 
 	public static void createInstance(String[] args) {
-		
+
 		HashMap<String, String> specialParameters = new HashMap<>();
-		
+
 		// parse ip,hostname
 		String host = "127.0.0.1";
 
@@ -52,8 +51,8 @@ public class Jyroscope2Util {
 			master = specialParameterValue;
 		}
 
-		//disable it, now lazy loaded
-		//RosTypeConverters.scanAnnotationsAndInitialize();
+		// disable it, now lazy loaded
+		// RosTypeConverters.scanAnnotationsAndInitialize();
 
 		jy2 = new JyroscopeCore();
 		jy2.addRemoteMaster(master, host, "jylaunch");
@@ -61,11 +60,19 @@ public class Jyroscope2Util {
 	}
 
 	public static void setParameter(String name, Object value) {
-		parameterClient.setParameter(name, value);
+		try {
+			parameterClient.setParameter(name, value);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void deleteParameter(String name) {
-		parameterClient.deleteParameter(name);
+		try {
+			parameterClient.deleteParameter(name);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
