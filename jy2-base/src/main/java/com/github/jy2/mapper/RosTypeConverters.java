@@ -89,6 +89,9 @@ public class RosTypeConverters {
 		return size;
 	}
 
+	// WARNING: consider also adding synchronized here
+	// - for now only called from within synchronized precompile / precompileByRosName
+	//   which is already synchronized
 	public static <A, B> void register(String rosTypeName, Class<?> type, TypeConverter from, TypeConverter to,
 			String md5, int size, String definition) {
 		fromRosName.put(rosTypeName, from);
@@ -102,6 +105,9 @@ public class RosTypeConverters {
 		sizeMap.put(rosTypeName, size);
 	}
 
+	// WARNING: consider also adding synchronized here
+	// - for now only called from within synchronized precompile / precompileByRosName
+	//   which is already synchronized
 	public static <A, B> void registerPrimitive(String rosTypeName, Class<?> type, TypeConverter from,
 			TypeConverter to) {
 		fromRosClass.put(type, from);
@@ -109,7 +115,9 @@ public class RosTypeConverters {
 		classToTopic.put(type, rosTypeName);
 	}
 
-	public static <A> void precompile(Class<A> type) throws ConversionException {
+	// trying to solve issue "Unable to convert message from com.jyroscope.ros.RosMessage to go.jyroscope.ros.tf2_msgs.TFMessage, remote ros type tf2_msgs/TFMessage, remote java type  null"
+	// by adding synchronized to prevent concurrent modification of hashmaps
+	public static synchronized <A> void precompile(Class<A> type) throws ConversionException {
 		if (isInitializedClassMap.get(type) != null) {
 			return;
 		}
@@ -129,7 +137,9 @@ public class RosTypeConverters {
 		}
 	}
 
-	public static void precompileByRosName(String typeName) throws ConversionException {
+	// trying to solve issue "Unable to convert message from com.jyroscope.ros.RosMessage to go.jyroscope.ros.tf2_msgs.TFMessage, remote ros type tf2_msgs/TFMessage, remote java type  null"
+	// by adding synchronized to prevent concurrent modification of hashmaps
+	public static synchronized void precompileByRosName(String typeName) throws ConversionException {
 		if (isInitializedRosMap.get(typeName) != null) {
 			return;
 		}
