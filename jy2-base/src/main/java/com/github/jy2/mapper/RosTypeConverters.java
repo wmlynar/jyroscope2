@@ -90,7 +90,7 @@ public class RosTypeConverters {
 	}
 
 	// WARNING: consider also adding synchronized here
-	// - for now only called from within synchronized precompile / precompileByRosName
+	// - for now only called from within precompile / precompileByRosName
 	//   which is already synchronized
 	public static <A, B> void register(String rosTypeName, Class<?> type, TypeConverter from, TypeConverter to,
 			String md5, int size, String definition) {
@@ -106,7 +106,7 @@ public class RosTypeConverters {
 	}
 
 	// WARNING: consider also adding synchronized here
-	// - for now only called from within synchronized precompile / precompileByRosName
+	// - for now only called from within precompile / precompileByRosName
 	//   which is already synchronized
 	public static <A, B> void registerPrimitive(String rosTypeName, Class<?> type, TypeConverter from,
 			TypeConverter to) {
