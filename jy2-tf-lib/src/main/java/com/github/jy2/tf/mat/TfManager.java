@@ -34,15 +34,19 @@ public class TfManager {
 	public final static double DEAFULT_TIMEOUT_S = 0.5d;
 	public final static int SMALL_TIMEOUT_MS = 50;
 
-	// for checking if TfManager needs to be reset because of transform back in
-	// time (looped logs)
-	private final static double SECONDS_BACK_IN_TIME_TO_RESET = 5;
-
 	@Parameter("/static_transform_keyword")
 	public String staticTransformKeyword = "static";
 
 	@Parameter("/semi_transform_keyword")
 	public String semiTransformKeyword = "semi";
+
+	@Parameter("/tf_enable_reset")
+	public boolean enableReset = false;
+
+	// for checking if TfManager needs to be reset because of transform back in
+	// time (looped logs)
+	@Parameter("/tf_seconds_back_in_time_to_reset")
+	public double secondsBackInTimeToReset = 5;
 
 	// structures to access transform buffers (transforms sorted over time)
 	private final ArrayList<TransformBuffer> transformBufferList = new ArrayList<>();
@@ -441,7 +445,11 @@ public class TfManager {
 	}
 
 	private void checkIfShouldReset(double time) {
-		if (time + SECONDS_BACK_IN_TIME_TO_RESET < lastTime) {
+		if(!enableReset) {
+			return;
+		}
+		
+		if (time + secondsBackInTimeToReset < lastTime) {
 			for (TransformBuffer tb : transformBufferList) {
 				tb.reset(time);
 			}
