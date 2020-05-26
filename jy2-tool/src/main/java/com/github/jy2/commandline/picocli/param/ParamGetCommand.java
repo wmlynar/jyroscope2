@@ -1,5 +1,7 @@
 package com.github.jy2.commandline.picocli.param;
 
+import java.io.IOException;
+
 import com.github.jy2.commandline.picocli.Main;
 import com.github.jy2.commandline.picocli.param.completion.ParameterNameCompletionCandidates;
 
@@ -17,7 +19,13 @@ public class ParamGetCommand implements Runnable {
 	String parameterName;
 
 	public void run() {
-		Object paramValue = Main.di.getParameterClient().getParameter(parameterName);
+		Object paramValue;
+		try {
+			paramValue = Main.di.getParameterClient().getParameter(parameterName);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		System.out.println(paramValue.toString());
 	}
 }

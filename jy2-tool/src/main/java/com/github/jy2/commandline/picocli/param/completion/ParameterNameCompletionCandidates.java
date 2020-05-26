@@ -1,5 +1,6 @@
 package com.github.jy2.commandline.picocli.param.completion;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,7 +19,13 @@ public class ParameterNameCompletionCandidates implements Iterable<String> {
 			return new ArrayList<String>().iterator();
 		}
 		
-		ArrayList<String> list = Main.di.getParameterClient().getParameterNames();
+		ArrayList<String> list;
+		try {
+			list = Main.di.getParameterClient().getParameterNames();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ArrayList<String>().iterator();
+		}
 		list.sort(String::compareToIgnoreCase);
 		return list.iterator();
 	}

@@ -66,6 +66,15 @@ public class JyroscopeDiSingleton {
 	public JyroscopeDiSingleton(HashMap<String, String> specialParameters, String name, JyroscopeDi jy2Di) {
 		memberName = name;
 
+		ExitProcessOnUncaughtException.memberName = memberName;
+		
+		String rosCrashlogFolder = System.getenv("ROS_CRASH_LOG_FOLDER");
+		if (rosCrashlogFolder != null && !rosCrashlogFolder.isEmpty()) {
+			ExitProcessOnUncaughtException.logFolder = rosCrashlogFolder;
+		} else {
+			System.out.println("ROS_CRASH_LOG_FOLDER environment variable not found");
+		}
+		
 		// parse ip,hostname
 		String host = "127.0.0.1";
 

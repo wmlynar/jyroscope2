@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.10</version>
+		<version>0.0.11</version>
 	</parent>
 	<artifactId>jy2-base</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-api</artifactId>
-			<version>0.0.10</version>
+			<version>0.0.11</version>
 		</dependency>
 	</dependencies>
 </project>

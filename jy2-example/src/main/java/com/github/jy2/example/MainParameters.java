@@ -1,18 +1,17 @@
 package com.github.jy2.example;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import com.github.jy2.JyroscopeCore;
 import com.github.jy2.ParameterClient;
 import com.github.jy2.ParameterListener;
-import com.github.jy2.mapper.RosTypeConverters;
 
 public class MainParameters {
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 //		RosTypeConverters.scanAnnotationsAndInitialize();
 		JyroscopeCore jy2 = new JyroscopeCore();
 		jy2.addRemoteMaster("http://localhost:11311", "localhost", "/jy2" + new Random().nextInt());
@@ -20,7 +19,7 @@ public class MainParameters {
 		ParameterClient ps = jy2.getParameterClient();
 
 		ps.addParameterListener("/", new ParameterListener() {
-			
+
 			@Override
 			public void onParameterUpdated(String name, Object value) {
 				System.out.println(name + " " + value);

@@ -66,7 +66,12 @@ public class JyroscopeCore implements PubSubClient {
 	}
 
 	private void configureLogging(RosTopicProvider topicProvider) {
-		Object param = topicProvider.getParameterClient().getParameter("/logging");
+		Object param = null;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/logging");
+		} catch (IOException e1) {
+			throw new RuntimeException("Unable to get parameter /logging", e1);
+		}
 		String configuration;
 		if (param != null) {
 			configuration = param.toString();
