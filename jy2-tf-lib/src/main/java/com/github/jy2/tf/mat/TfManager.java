@@ -34,10 +34,10 @@ public class TfManager {
 	public final static double DEAFULT_TIMEOUT_S = 0.5d;
 	public final static int SMALL_TIMEOUT_MS = 50;
 
-	@Parameter("/static_transform_keyword")
+	@Parameter("/tf_static_transform_keyword")
 	public String staticTransformKeyword = "static";
 
-	@Parameter("/semi_transform_keyword")
+	@Parameter("/tf_semi_transform_keyword")
 	public String semiTransformKeyword = "semi";
 
 	@Parameter("/tf_enable_reset")
