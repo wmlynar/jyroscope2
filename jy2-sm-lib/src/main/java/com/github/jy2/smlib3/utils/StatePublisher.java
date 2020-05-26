@@ -15,7 +15,7 @@ public class StatePublisher {
 
 	private com.github.jy2.Publisher<SmStructure> smStructurePublisher;
 	private com.github.jy2.Publisher<SmState> smStatePublisher;
-	
+
 	private int interval;
 	private boolean shutdown = false;
 	private Thread thread;
@@ -43,23 +43,35 @@ public class StatePublisher {
 		this.smStatePublisher = jyDi.createPublisher("/" + name + "/sm_state", SmState.class);
 
 		this.thread = new Thread(() -> {
-			while (!shutdown) {
-				smStructurePublisher.publish(stateMachine.getSmStructure());
-				smStatePublisher.publish(stateMachine.getSmState());
+			try {
+				while (!shutdown) {
+					try {
+						smStructurePublisher.publish(stateMachine.getSmStructure());
+						smStatePublisher.publish(stateMachine.getSmState());
+					} catch (Throwable t1) {
+						LOG.error("Uncaught exception in state publisher", t1);
+					}
+
+					try {
+						Thread.sleep(interval);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
+				}
+
+				try {
+					smStatePublisher.publish(stateMachine.getSmState());
+				} catch (Throwable t2) {
+					LOG.error("Uncaught exception in state publisher", t2);
+				}
 
 				try {
 					Thread.sleep(interval);
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}
-			}
-
-			smStatePublisher.publish(stateMachine.getSmState());
-
-			try {
-				Thread.sleep(interval);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+			} catch (Throwable e) {
+				LOG.error("Uncaught exception in state publisher", e);
 			}
 
 		});
