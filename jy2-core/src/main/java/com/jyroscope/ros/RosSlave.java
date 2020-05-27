@@ -1,6 +1,9 @@
 package com.jyroscope.ros;
 
 import java.net.URI;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 
 import com.jyroscope.CompatibilityException;
@@ -18,6 +21,7 @@ public class RosSlave {
 	private static final Logger LOG = Logger.getLogger(RosSlave.class.getCanonicalName());
 	
     private final Name<RosTopic> topics;
+    private Object topicsMutex = new Object();
     private final URI masterURI;
     private final URI slaveURI;
     private final String callerId;
@@ -28,7 +32,7 @@ public class RosSlave {
         this.masterURI = masterURI;
         this.callerId = callerId;
         topics = new Name<>(name -> new RosTopic(name, this));
-        tcpros = new TCPROSServer(topics, localhostname);
+        tcpros = new TCPROSServer(this, localhostname);
         
         XMLRPCSlave rpc = new XMLRPCSlave(this);
         SimpleHTTPServer server = new SimpleHTTPServer(localhostname, new XMLRPCService(new ReflectedAPI(rpc), true), false);
@@ -43,10 +47,6 @@ public class RosSlave {
     
     public String getCallerId() {
         return callerId;
-    }
-    
-    public Name<RosTopic> getTopics() {
-        return topics;
     }
     
     public boolean parameterUpdate(String key, Object value) {
@@ -64,9 +64,27 @@ public class RosSlave {
         // TODO propagate this to the rest of the system
     }
     
-    public RosTopic getTopic(String namespace, String node, String topic) throws SystemException {
-        Name<RosTopic> name = topics.parse(namespace).parse(node, topic);
-        return (RosTopic)name.get();
+	public RosTopic getOrCreateTopic(String name) throws SystemException {
+		synchronized (topicsMutex) {
+			return topics.parse(name).get();
+		}
+	}
+    
+    public RosTopic getOrCreateTopic(String namespace, String node, String topic) {
+		synchronized (topicsMutex) {
+			Name<RosTopic> name = topics.parse(namespace).parse(node, topic);
+			return (RosTopic) name.get();
+		}
+    }
+    
+    public RosTopic findTopic(String namespace, String caller_id, String topicName) throws SystemException {
+		synchronized (topicsMutex) {
+			Name<RosTopic> topic = topics.parse(namespace).parse(caller_id, topicName, false);
+			if (topic == null)
+				return null;
+			else
+				return topic.get();
+		}
     }
     
     public RosTransport requestTopic(String caller_id, RosTopic rostopic, XMLRPCArray protocols) throws CompatibilityException, SystemException {
@@ -94,5 +112,11 @@ public class RosSlave {
 	public String toString() {
 		return "RosSlave [masterURI=" + masterURI + ", slaveURI=" + slaveURI + ", callerId=" + callerId + ", tcpros="
 				+ tcpros + "]";
+	}
+
+	public void shutdownTopics(ExecutorService service) {
+		for (RosTopic t : topics.payloads()) {
+			service.execute(() -> t.shutdown());
+		}
 	}
 }

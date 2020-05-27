@@ -104,7 +104,7 @@ public class XMLRPCSlave {
     //  (code, statusMessage, ignore) 
     public Object publisherUpdate(String caller_id, String topic, XMLRPCArray publishers) throws SystemException {
         try {
-            RosTopic rostopic = slave.getTopic(NAMESPACE, caller_id, topic);
+            RosTopic rostopic = slave.getOrCreateTopic(NAMESPACE, caller_id, topic);
             rostopic.publisherUpdate(publishers);
             return result(SUCCESS, "publishers updated", 0);
         } catch (SystemException se) {
@@ -117,7 +117,7 @@ public class XMLRPCSlave {
     //  (code, statusMessage, protocolParams)
     public Object requestTopic(String caller_id, String topic, XMLRPCArray protocols) {
         try {
-            RosTopic rostopic = slave.getTopic(NAMESPACE, caller_id, topic);
+            RosTopic rostopic = slave.getOrCreateTopic(NAMESPACE, caller_id, topic);
             RosTransport transport = slave.requestTopic(caller_id, rostopic, protocols);
             return result(SUCCESS, "ready on " + transport.toConnectionString(), transport.getConnectionInformation());
         } catch (CompatibilityException ce) {

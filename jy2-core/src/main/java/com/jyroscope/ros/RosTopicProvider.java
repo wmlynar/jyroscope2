@@ -38,7 +38,7 @@ public class RosTopicProvider implements TopicProvider {
     @Override
     public RosTopic getTopic(String name) {
         try {
-            return slave.getTopics().parse(name).get();
+            return slave.getOrCreateTopic(name);
         } catch (SystemException se) {
             // This should never occur
             throw new RuntimeException(se);
@@ -49,9 +49,7 @@ public class RosTopicProvider implements TopicProvider {
 	public void shutdown() {
 		ExecutorService service = Executors.newFixedThreadPool(100);
 		service.execute(() -> parameterClient.shutdown());
-		for (RosTopic t : slave.getTopics().payloads()) {
-			service.execute(() -> t.shutdown());
-		}
+		slave.shutdownTopics(service);
 		try {
 			service.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {

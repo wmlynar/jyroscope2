@@ -23,12 +23,7 @@ public class LocalTopicProvider<T> implements TopicProvider<T> {
 
     @Override
     public Topic<T> getTopic(String name) {
-        try {
-            return names.parse(name).get();
-        } catch (SystemException se) {
-            // This should never occur
-            throw new RuntimeException(se);
-        }
+        return names.parse(name).get();
     }
 
 	@Override
