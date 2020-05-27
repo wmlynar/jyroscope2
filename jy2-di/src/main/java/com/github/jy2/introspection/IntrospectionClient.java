@@ -129,7 +129,12 @@ public class IntrospectionClient {
 				}
 			}
 
-			ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+		}
+			
+		ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+			
+		synchronized (mutex) {
+				
 			ArrayList<ArrayList<Object>> publishers = state.get(0);
 			// ArrayList<ArrayList<Object>> subscribers = state.get(1);
 			// ArrayList<ArrayList<Object>> services = state.get(2);
