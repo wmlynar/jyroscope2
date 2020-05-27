@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
 import com.jyroscope.ros.RosNode;
+import com.jyroscope.ros.RosSlave;
 import com.jyroscope.ros.RosTopic;
 import com.jyroscope.ros.RosTransport;
 import com.jyroscope.server.xmlrpc.XMLRPCArray;
@@ -28,7 +29,7 @@ public class TCPROSServer implements RosTransport {
     private volatile boolean started;
     private volatile boolean stopped;
     
-    private Name<RosTopic> root;
+    private RosSlave slave;
     private ServerSocket serverSocket;
     private HashMap<Registration, RosNode> registrations;
     
@@ -56,8 +57,8 @@ public class TCPROSServer implements RosTransport {
         }
     }
     
-    public TCPROSServer(Name<RosTopic> root, String hostname) {
-        this.root = root;
+    public TCPROSServer(RosSlave slave, String hostname) {
+        this.slave = slave;
         this.hostname = hostname;
         this.started = false;
         this.registrations = new HashMap<TCPROSServer.Registration, RosNode>();
@@ -79,11 +80,7 @@ public class TCPROSServer implements RosTransport {
 //    }
     
     public RosTopic findTopic(String caller_id, String topicName) throws SystemException {
-        Name<RosTopic> topic = root.parse(NAMESPACE).parse(caller_id, topicName, false);
-        if (topic == null)
-            return null;
-        else
-            return topic.get();
+    	return slave.findTopic(NAMESPACE, caller_id, topicName);
     }
     
 //    public RosNode getRegisteredPublisher(String caller_id, RosTopic topic) {

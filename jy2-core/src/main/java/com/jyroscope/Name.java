@@ -98,7 +98,7 @@ public class Name<P> {
         return payload;
     }
     
-    public P get() throws SystemException {
+    public P get() {
         P result = payload;
         if (result == null)
             result = set(null, root.factory.newInstance(this));
