@@ -130,11 +130,11 @@ public class IntrospectionClient {
 			}
 
 		}
-			
+
 		ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
-			
+
 		synchronized (mutex) {
-				
+
 			ArrayList<ArrayList<Object>> publishers = state.get(0);
 			// ArrayList<ArrayList<Object>> subscribers = state.get(1);
 			// ArrayList<ArrayList<Object>> services = state.get(2);
@@ -172,8 +172,12 @@ public class IntrospectionClient {
 					}
 				}
 			}
+		}
 
-			ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+		ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+
+		synchronized (mutex) {
+
 //			ArrayList<ArrayList<Object>> publishers = state.get(0);
 			ArrayList<ArrayList<Object>> subscribers = state.get(1);
 //			ArrayList<ArrayList<Object>> services = state.get(2);
@@ -210,10 +214,14 @@ public class IntrospectionClient {
 					}
 				}
 			}
+		}
+		
+		// when not found get publishers from roscore
 
-			// when not found get publishers from roscore
+		ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
 
-			ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+		synchronized (mutex) {
+
 			ArrayList<ArrayList<Object>> publishers = state.get(0);
 			// ArrayList<ArrayList<Object>> subscribers = state.get(1);
 			// ArrayList<ArrayList<Object>> services = state.get(2);
@@ -246,9 +254,13 @@ public class IntrospectionClient {
 				}
 			}
 
-			// when not found get subscribers from roscore
+		}
+		// when not found get subscribers from roscore
 
-			ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+		ArrayList<ArrayList<ArrayList<Object>>> state = jy2.getMasterClient().getSystemState();
+
+		synchronized (mutex) {
+
 			// ArrayList<ArrayList<Object>> publishers = state.get(0);
 			ArrayList<ArrayList<Object>> subscribers = state.get(1);
 			// ArrayList<ArrayList<Object>> services = state.get(2);
