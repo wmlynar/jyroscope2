@@ -31,7 +31,7 @@ import go.jyroscope.ros.jy2_msgs.JavaObject;
 
 public class JyroscopeCore implements PubSubClient {
 
-	private static final int SHUTDOWN_TIMEOUT = 2;
+	private static final int SHUTDOWN_TIMEOUT = 5;
 
 	public static RosoutPublisher ROSOUT_PUBLISHER;
 
