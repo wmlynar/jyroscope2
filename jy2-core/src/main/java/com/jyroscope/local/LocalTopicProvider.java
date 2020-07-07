@@ -1,5 +1,7 @@
 package com.jyroscope.local;
 
+import java.util.concurrent.ExecutorService;
+
 import com.github.jy2.MasterClient;
 import com.github.jy2.SlaveClient;
 import com.jyroscope.Name;
@@ -27,7 +29,7 @@ public class LocalTopicProvider<T> implements TopicProvider<T> {
     }
 
 	@Override
-	public void shutdown() {
+	public void shutdown(ExecutorService service) {
 	}
 
 	@Override
