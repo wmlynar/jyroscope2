@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -27,6 +30,8 @@ import com.jyroscope.types.ConversionException;
 import go.jyroscope.ros.jy2_msgs.JavaObject;
 
 public class JyroscopeCore implements PubSubClient {
+
+	private static final int SHUTDOWN_TIMEOUT = 5;
 
 	public static RosoutPublisher ROSOUT_PUBLISHER;
 
@@ -152,8 +157,14 @@ public class JyroscopeCore implements PubSubClient {
 
 	@Override
 	public void shutdown() {
+		ExecutorService service = Executors.newFixedThreadPool(100);
 		for (TopicProvider<?> p : providers) {
-			p.shutdown();
+			p.shutdown(service);
+		}
+		service.shutdown();
+		try {
+			service.awaitTermination(SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
 		}
 	}
 

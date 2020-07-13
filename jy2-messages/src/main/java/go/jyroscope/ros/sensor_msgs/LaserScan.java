@@ -32,7 +32,7 @@ public class LaserScan {
     	rangeMin = min;
     	rangeMax = max;
     	angleMin = startAngle;
-    	angleMin = endAngle;
+    	angleMax = endAngle;
     	angleIncrement = angleIncrement2;
     	ranges = ranges2;
 	}

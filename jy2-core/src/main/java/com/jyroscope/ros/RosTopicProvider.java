@@ -46,14 +46,9 @@ public class RosTopicProvider implements TopicProvider {
     }
 
 	@Override
-	public void shutdown() {
-		ExecutorService service = Executors.newFixedThreadPool(100);
+	public void shutdown(ExecutorService service) {
 		service.execute(() -> parameterClient.shutdown());
 		slave.shutdownTopics(service);
-		try {
-			service.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-		}
 	}
 
 	@Override

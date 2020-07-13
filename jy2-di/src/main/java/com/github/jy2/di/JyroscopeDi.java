@@ -1114,7 +1114,7 @@ public class JyroscopeDi implements PubSubClient {
 	}
 
 	private synchronized void onParameterChanged(String name, Object value) {
-		LOG.info("Parameter callback: " + name + ":=" + value.toString());
+		LOG.debug("Parameter callback: " + name + ":=" + value.toString());
 		ParameterReference ref = parameterReferenceMap.get(name);
 		if (ref == null) {
 			LOG.debug("Unknown parameter, skipping: " + name);
