@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.14</version>
+		<version>0.0.15-SNAPSHOT</version>
 	</parent>
 	<artifactId>jy2-sm-lib</artifactId>
 	<dependencies>
@@ -18,12 +18,12 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.14</version>
+			<version>0.0.15-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-sm-lib-messages</artifactId>
-			<version>0.0.14</version>
+			<version>0.0.15-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
