@@ -45,12 +45,16 @@ public class SimpleHTTPServer {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    processRequest(s, service);
                                     try {
-                                        s.close();
-                                    } catch (IOException ioe) {
-                                    	LOG.log(Level.SEVERE, "Could not close connection with client", ioe);
-                                    }
+										processRequest(s, service);
+	                                    try {
+	                                        s.close();
+	                                    } catch (IOException ioe) {
+	                                    	LOG.log(Level.SEVERE, "Could not close connection with client", ioe);
+	                                    }
+									} catch (Throwable e) {
+                                    	LOG.log(Level.SEVERE, "Exception caught while processing request", e);
+									}
                                 }
                             }).start();
                         }
