@@ -47,14 +47,16 @@ public class SimpleHTTPServer {
                                 public void run() {
                                     try {
 										processRequest(s, service);
-	                                    try {
-	                                        s.close();
-	                                    } catch (IOException ioe) {
-	                                    	LOG.log(Level.SEVERE, "Could not close connection with client", ioe);
-	                                    }
 									} catch (Throwable e) {
                                     	LOG.log(Level.SEVERE, "Exception caught while processing request", e);
 									}
+                                    try {
+                                        s.close();
+                                    } catch (IOException ioe) {
+                                    	LOG.log(Level.SEVERE, "Could not close connection with client", ioe);
+									} catch (Throwable e) {
+                                    	LOG.log(Level.SEVERE, "Exception caught while closing connection", e);
+                                    }
                                 }
                             }).start();
                         }
