@@ -20,12 +20,14 @@ import com.github.jy2.di.annotations.Parameter;
 import com.github.jy2.di.annotations.Publish;
 import com.github.jy2.di.annotations.Repeat;
 import com.github.jy2.di.exceptions.CreationException;
+import com.github.jy2.di.ros.TimeProvider;
 
 import go.jyroscope.ros.introspection_msgs.Member;
 import go.jyroscope.ros.introspection_msgs.Node;
 
 public class JyroscopeDiSingleton {
 
+	public static final TimeProvider TIME_PROVIDER = new TimeProvider();
 	private final LogSeldom LOG = JyroscopeDi.getLog();
 
 	public static JyroscopeCore jy2;
@@ -140,6 +142,7 @@ public class JyroscopeDiSingleton {
 
 		try {
 			jy2Di.inject(this);
+			jy2Di.inject(TIME_PROVIDER);
 		} catch (CreationException e) {
 			throw new RuntimeException(e);
 		}

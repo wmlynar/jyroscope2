@@ -52,7 +52,6 @@ public class JyroscopeDi implements PubSubClient {
 
 	private static final LogSeldom LOG = new Jy2DiLog(JyroscopeDi.class);
 
-	private static final TimeProvider TIME_PROVIDER = new TimeProvider();
 	private static final Yaml YAML = new Yaml();
 
 	private HashMap<String, String> parameters = new HashMap<>();
@@ -121,7 +120,7 @@ public class JyroscopeDi implements PubSubClient {
 		NodeNameManager.setNodeName(this.name);
 
 		JyroscopeDiSingleton.initialize(specialParameters, this.name, this);
-
+		
 		// parse regular parameters and remappings
 		for (int i = 0; i < args.length; i++) {
 			if (!args[i].contains(":=")) {
@@ -177,7 +176,7 @@ public class JyroscopeDi implements PubSubClient {
 	}
 
 	public TimeProvider getTimeProvider() {
-		return TIME_PROVIDER;
+		return JyroscopeDiSingleton.TIME_PROVIDER;
 	}
 
 	public synchronized void start() throws CreationException {
@@ -673,11 +672,11 @@ public class JyroscopeDi implements PubSubClient {
 
 	private <T> void injectTimeProvider(Field field, T object, Class<?> clazz)
 			throws IllegalAccessException, CreationException, IllegalArgumentException {
-		// inject ros log
+		// inject ros time provider
 		RosTimeProvider rosLog = field.getAnnotation(RosTimeProvider.class);
 		if (rosLog != null) {
 			makeAccessible(field);
-			field.set(object, TIME_PROVIDER);
+			field.set(object, JyroscopeDiSingleton.TIME_PROVIDER);
 		}
 	}
 
