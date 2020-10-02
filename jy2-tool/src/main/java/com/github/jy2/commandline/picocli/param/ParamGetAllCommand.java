@@ -35,7 +35,11 @@ public class ParamGetAllCommand implements Runnable {
 			}
 			try {
 				Object paramValue = Main.di.getParameterClient().getParameter(s);
-				System.out.println("\t" + s + "\t" + paramValue.toString());
+				if (paramValue == null) {
+					System.out.println("\t" + s + "\t" + "Parameter not set");
+				} else {
+					System.out.println("\t" + s + "\t" + paramValue.toString());
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
