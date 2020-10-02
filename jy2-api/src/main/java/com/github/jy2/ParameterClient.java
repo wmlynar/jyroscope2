@@ -7,7 +7,7 @@ public interface ParameterClient {
 
 	boolean setParameter(String key, Object value) throws IOException;
 
-	Object getParameter(String key) throws IOException;
+	String getParameter(String key) throws IOException;
 
 	boolean deleteParameter(String key) throws IOException;
 
