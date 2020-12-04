@@ -157,7 +157,9 @@ public class StateMachine<Input, Output> {
 			message = message + ", attributes:\n" + serialized;
 		}
 
-		if (level == TransitionLevel.INFO) {
+		if (level == TransitionLevel.DEBUG) {
+			LOG.debug(message);
+		} else if (level == TransitionLevel.INFO) {
 			LOG.info(message);
 		} else if (level == TransitionLevel.WARNING) {
 			LOG.warn(message);
@@ -167,7 +169,9 @@ public class StateMachine<Input, Output> {
 	}
 
 	private void logSameStateChange(String reason, TransitionLevel level) {
-		if (level == TransitionLevel.INFO) {
+		if (level == TransitionLevel.DEBUG) {
+			LOG.debug(reason);
+		} else if (level == TransitionLevel.INFO) {
 			LOG.infoSeldom(reason);
 		} else if (level == TransitionLevel.WARNING) {
 			LOG.warnSeldom(reason);
