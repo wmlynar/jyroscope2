@@ -28,6 +28,7 @@ public class StateMachine<Input, Output> {
 	private boolean isInitialized;
 	private double time;
 	private double startTime;
+	private TransitionLevel defaultTransitionLevel;
 
 	private SmStructure structure;
 
@@ -38,18 +39,41 @@ public class StateMachine<Input, Output> {
 		this.log = JyroscopeDi.getLog();
 		this.startState = startState;
 		this.structure = new StructureGenerator().getStructure(startState);
+		this.defaultTransitionLevel = TransitionLevel.INFO;
 	}
 
-	public StateMachine(State<Input, Output> startState, String loggingClass) {
+	public StateMachine(State<Input, Output> startState, TransitionLevel defaultTransitionLevel) {
+		this.log = JyroscopeDi.getLog();
+		this.startState = startState;
+		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
+	}
+
+	public StateMachine(State<Input, Output> startState, String loggingClass, TransitionLevel defaultTransitionLevel) {
 		this.log = JyroscopeDi.getLog(loggingClass);
 		this.startState = startState;
 		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
 	}
 
-	public StateMachine(State<Input, Output> startState, Class<?> loggingClass) {
+	public StateMachine(State<Input, Output> startState, Class<?> loggingClass,
+			TransitionLevel defaultTransitionLevel) {
 		this.log = JyroscopeDi.getLog(loggingClass);
 		this.startState = startState;
 		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -65,7 +89,7 @@ public class StateMachine<Input, Output> {
 			timeOfStateChange = time;
 			isInitialized = true;
 
-			logNewStateChange(startState, "start state", TransitionLevel.INFO);
+			logNewStateChange(startState, "start state", defaultTransitionLevel);
 		}
 		this.time = time;
 		for (int i = 0; i < MAX_NEXT_STATE_ITERATIONS; i++) {
@@ -172,6 +196,10 @@ public class StateMachine<Input, Output> {
 			message = message + ", attributes:\n" + serialized;
 		}
 
+		if (level == TransitionLevel.DEFAULT) {
+			level = defaultTransitionLevel;
+		}
+
 		if (level == TransitionLevel.DEBUG) {
 			log.debug(message);
 		} else if (level == TransitionLevel.INFO) {
@@ -184,6 +212,10 @@ public class StateMachine<Input, Output> {
 	}
 
 	private void logSameStateChange(String reason, TransitionLevel level) {
+		if (level == TransitionLevel.DEFAULT) {
+			level = defaultTransitionLevel;
+		}
+
 		if (level == TransitionLevel.DEBUG) {
 			log.debug(reason);
 		} else if (level == TransitionLevel.INFO) {

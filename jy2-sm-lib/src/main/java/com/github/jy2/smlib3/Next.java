@@ -35,7 +35,7 @@ public class Next {
 	public Next(@Nonnull String reason) {
 		this.nextState = null;
 		this.reason = reason;
-		this.level = TransitionLevel.INFO;
+		this.level = TransitionLevel.DEFAULT;
 	}
 
 	public Next(@Nonnull String reason, TransitionLevel level) {
