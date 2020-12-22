@@ -5,6 +5,8 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+
 import com.github.jy2.smlib3.annotations.DontSerialize;
 
 public class Serializer {
@@ -19,7 +21,8 @@ public class Serializer {
 		return sb.toString();
 	}
 
-	//TODO: zabezpieczyc przed stackoverflow jezeli uzyta jest klasa RosJavaLog (teraz zabezpieczylem, ze nie sa serializowane statyczne pola
+	// TODO: zabezpieczyc przed stackoverflow jezeli uzyta jest klasa Log
+	// (teraz zabezpieczylem, ze nie sa serializowane statyczne pola
 	public String serialize(StringBuilder sb, String prefix, Object object) throws IllegalAccessException {
 
 		Field[] fields = object.getClass().getDeclaredFields();
@@ -27,10 +30,13 @@ public class Serializer {
 			if (field.getName().startsWith("$jacocoData")) {
 				continue;
 			}
-			if(Modifier.isStatic(field.getModifiers())) {
+			if (Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
 			if (field.getAnnotation(DontSerialize.class) != null) {
+				continue;
+			}
+			if (Log.class.isAssignableFrom(field.getType())) {
 				continue;
 			}
 			if (!field.isAccessible()) {

@@ -1,5 +1,6 @@
 package com.github.jy2.di.ros;
 
+@Deprecated
 public class Time {
 
 	long time;

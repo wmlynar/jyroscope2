@@ -16,7 +16,7 @@ import com.github.jy2.smlib3.structure.StructureGenerator;
  */
 public class StateMachine<Input, Output> {
 
-	public static final LogSeldom LOG = JyroscopeDi.getLog();
+	public final LogSeldom log;
 
 	public static final int MAX_NEXT_STATE_ITERATIONS = 100;
 
@@ -28,6 +28,7 @@ public class StateMachine<Input, Output> {
 	private boolean isInitialized;
 	private double time;
 	private double startTime;
+	private TransitionLevel defaultTransitionLevel;
 
 	private SmStructure structure;
 
@@ -35,15 +36,52 @@ public class StateMachine<Input, Output> {
 	private Output lastOutput = null;
 
 	public StateMachine(State<Input, Output> startState) {
+		this.log = JyroscopeDi.getLog();
 		this.startState = startState;
 		this.structure = new StructureGenerator().getStructure(startState);
+		this.defaultTransitionLevel = TransitionLevel.INFO;
 	}
 
+	public StateMachine(State<Input, Output> startState, TransitionLevel defaultTransitionLevel) {
+		this.log = JyroscopeDi.getLog();
+		this.startState = startState;
+		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
+	}
+
+	public StateMachine(State<Input, Output> startState, String loggingClass, TransitionLevel defaultTransitionLevel) {
+		this.log = JyroscopeDi.getLog(loggingClass);
+		this.startState = startState;
+		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
+	}
+
+	public StateMachine(State<Input, Output> startState, Class<?> loggingClass,
+			TransitionLevel defaultTransitionLevel) {
+		this.log = JyroscopeDi.getLog(loggingClass);
+		this.startState = startState;
+		this.structure = new StructureGenerator().getStructure(startState);
+		if (defaultTransitionLevel == TransitionLevel.DEFAULT) {
+			this.defaultTransitionLevel = TransitionLevel.INFO;
+		} else {
+			this.defaultTransitionLevel = defaultTransitionLevel;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	public synchronized void process(double time, Input input, Output output) {
 		lastInput = input;
 		lastOutput = output;
 		if (time < this.time) {
-			LOG.error(String.format("New time %.4f < old time %.4f", time, this.time));
+			log.error(String.format("New time %.4f < old time %.4f", time, this.time));
 		}
 		if (!isInitialized) {
 			currentState = startState;
@@ -51,7 +89,7 @@ public class StateMachine<Input, Output> {
 			timeOfStateChange = time;
 			isInitialized = true;
 
-			logNewStateChange(startState, "start state", TransitionLevel.INFO);
+			logNewStateChange(startState, "start state", defaultTransitionLevel);
 		}
 		this.time = time;
 		for (int i = 0; i < MAX_NEXT_STATE_ITERATIONS; i++) {
@@ -72,7 +110,7 @@ public class StateMachine<Input, Output> {
 			}
 
 			if (next.getState().getClass().equals(currentState.getClass())) {
-				LOG.warnSeldom(
+				log.warnSeldom(
 						"State.next() should return null when not changing state, state: " + getCurrentStateName());
 				String message = "Exceptional reason for not changing state : "
 						+ currentState.getClass().getSimpleName() + ", reason: " + next.getReason();
@@ -84,7 +122,7 @@ public class StateMachine<Input, Output> {
 			try {
 				nextState = (State<Input, Output>) next.getState();
 			} catch (ClassCastException e) {
-				LOG.errorSeldom("Wrong value returned in State.next(), class cast error, state: "
+				log.errorSeldom("Wrong value returned in State.next(), class cast error, state: "
 						+ getCurrentStateName() + ", next: " + next.getState().getClass().getSimpleName(), e);
 				return;
 			}
@@ -94,9 +132,10 @@ public class StateMachine<Input, Output> {
 			logNewStateChange(next.getState(), next.getReason(), next.getLevel());
 
 		}
-		LOG.errorSeldom("Statemachine next state looped, continuing but please react, state: " + getCurrentStateName());
+		log.errorSeldom("Statemachine next state looped, continuing but please react, state: " + getCurrentStateName());
 	}
 
+	@SuppressWarnings("rawtypes")
 	public synchronized Class<? extends State> getCurrentState() {
 		if (currentState == null) {
 			return null;
@@ -139,7 +178,7 @@ public class StateMachine<Input, Output> {
 			smState.setLife(time - startTime);
 			smState.setDuration(time - timeOfStateChange);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			LOG.errorSeldom("Problem serializing state information", e);
+			log.errorSeldom("Problem serializing state information", e);
 		}
 		return smState;
 	}
@@ -149,7 +188,7 @@ public class StateMachine<Input, Output> {
 		try {
 			serialized = serializer.serialize(state);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			LOG.errorSeldom("Exception caught while serializing state: " + getCurrentStateName(), e);
+			log.errorSeldom("Exception caught while serializing state: " + getCurrentStateName(), e);
 		}
 
 		String message = "State change to : " + state.getClass().getSimpleName() + ", reason: " + reason;
@@ -157,22 +196,34 @@ public class StateMachine<Input, Output> {
 			message = message + ", attributes:\n" + serialized;
 		}
 
-		if (level == TransitionLevel.INFO) {
-			LOG.info(message);
+		if (level == TransitionLevel.DEFAULT) {
+			level = defaultTransitionLevel;
+		}
+
+		if (level == TransitionLevel.DEBUG) {
+			log.debug(message);
+		} else if (level == TransitionLevel.INFO) {
+			log.info(message);
 		} else if (level == TransitionLevel.WARNING) {
-			LOG.warn(message);
+			log.warn(message);
 		} else {
-			LOG.error(message);
+			log.error(message);
 		}
 	}
 
 	private void logSameStateChange(String reason, TransitionLevel level) {
-		if (level == TransitionLevel.INFO) {
-			LOG.infoSeldom(reason);
+		if (level == TransitionLevel.DEFAULT) {
+			level = defaultTransitionLevel;
+		}
+
+		if (level == TransitionLevel.DEBUG) {
+			log.debug(reason);
+		} else if (level == TransitionLevel.INFO) {
+			log.infoSeldom(reason);
 		} else if (level == TransitionLevel.WARNING) {
-			LOG.warnSeldom(reason);
+			log.warnSeldom(reason);
 		} else {
-			LOG.errorSeldom(reason);
+			log.errorSeldom(reason);
 		}
 	}
 

@@ -26,6 +26,10 @@ public class ParamGetCommand implements Runnable {
 			e.printStackTrace();
 			return;
 		}
-		System.out.println(paramValue.toString());
+		if (paramValue == null) {
+			System.out.println("Parameter not set");
+		} else {
+			System.out.println(paramValue.toString());
+		}
 	}
 }

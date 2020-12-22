@@ -1,5 +1,8 @@
 package com.github.jy2.smlib3;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -32,7 +35,7 @@ public class Next {
 	public Next(@Nonnull String reason) {
 		this.nextState = null;
 		this.reason = reason;
-		this.level = TransitionLevel.INFO;
+		this.level = TransitionLevel.DEFAULT;
 	}
 
 	public Next(@Nonnull String reason, TransitionLevel level) {
@@ -53,9 +56,29 @@ public class Next {
 		this.level = TransitionLevel.INFO;
 	}
 
+	public Next(@Nonnull State<?, ?> nextState, @Nonnull String reason, Throwable throwable) {
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		throwable.printStackTrace(printWriter);
+
+		this.nextState = nextState;
+		this.reason = reason + '\n' + stringWriter.toString();
+		this.level = TransitionLevel.INFO;
+	}
+
 	public Next(@Nonnull State<?, ?> nextState, @Nonnull String reason, TransitionLevel level) {
 		this.nextState = nextState;
 		this.reason = reason;
+		this.level = level;
+	}
+
+	public Next(@Nonnull State<?, ?> nextState, @Nonnull String reason, Throwable throwable, TransitionLevel level) {
+		StringWriter stringWriter = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(stringWriter);
+		throwable.printStackTrace(printWriter);
+
+		this.nextState = nextState;
+		this.reason = reason + '\n' + stringWriter.toString();
 		this.level = level;
 	}
 

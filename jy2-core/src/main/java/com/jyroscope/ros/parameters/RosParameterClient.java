@@ -37,7 +37,7 @@ public class RosParameterClient implements ParameterClient {
 	}
 
 	@Override
-	public Object getParameter(String key) throws IOException {
+	public String getParameter(String key) throws IOException {
 		try {
 			XMLRPCClient master = new XMLRPCClient(slave.getMasterURI());
 			Object result = master.call("getParam", new XMLRPCArray(new Object[] { slave.getCallerId(), key }));
@@ -45,7 +45,8 @@ public class RosParameterClient implements ParameterClient {
 			if ((Integer) resultList.get(0) != 1) {
 				return null;
 			} else {
-				return resultList.get(2);
+				// the value returned by xmlrpc is always string
+				return resultList.get(2).toString();
 			}
 		} catch (IOException | XMLRPCException e) {
 			throw new IOException(e);

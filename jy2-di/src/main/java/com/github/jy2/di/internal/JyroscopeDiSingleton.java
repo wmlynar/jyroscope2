@@ -20,12 +20,14 @@ import com.github.jy2.di.annotations.Parameter;
 import com.github.jy2.di.annotations.Publish;
 import com.github.jy2.di.annotations.Repeat;
 import com.github.jy2.di.exceptions.CreationException;
+import com.github.jy2.di.ros.TimeProvider;
 
 import go.jyroscope.ros.introspection_msgs.Member;
 import go.jyroscope.ros.introspection_msgs.Node;
 
 public class JyroscopeDiSingleton {
 
+	public static final TimeProvider TIME_PROVIDER = new TimeProvider();
 	private final LogSeldom LOG = JyroscopeDi.getLog();
 
 	public static JyroscopeCore jy2;
@@ -67,14 +69,14 @@ public class JyroscopeDiSingleton {
 		memberName = name;
 
 		ExitProcessOnUncaughtException.memberName = memberName;
-		
+
 		String rosCrashlogFolder = System.getenv("ROS_CRASH_LOG_FOLDER");
 		if (rosCrashlogFolder != null && !rosCrashlogFolder.isEmpty()) {
 			ExitProcessOnUncaughtException.logFolder = rosCrashlogFolder;
 		} else {
 			System.out.println("ROS_CRASH_LOG_FOLDER environment variable not found");
 		}
-		
+
 		// parse ip,hostname
 		String host = "127.0.0.1";
 
@@ -140,6 +142,7 @@ public class JyroscopeDiSingleton {
 
 		try {
 			jy2Di.inject(this);
+			jy2Di.inject(TIME_PROVIDER);
 		} catch (CreationException e) {
 			throw new RuntimeException(e);
 		}
@@ -230,8 +233,16 @@ public class JyroscopeDiSingleton {
 
 	@Repeat(interval = 1000)
 	public void publishIntrospection() {
-		if (introspectionPublisher.getNumberOfMessageListeners() < 1) {
-			return;
+		long start = System.currentTimeMillis();
+		try {
+			if (introspectionPublisher.getNumberOfMessageListeners() < 1) {
+				return;
+			}
+		} finally {
+			long time = System.currentTimeMillis() - start;
+			if (time > 100) {
+				LOG.warn("getNumberOfMessageListeners execution time: " + time);
+			}
 		}
 		Member m = new Member();
 		m.name = memberName;
