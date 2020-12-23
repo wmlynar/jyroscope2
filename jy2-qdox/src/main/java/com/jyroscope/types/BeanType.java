@@ -165,7 +165,6 @@ public class BeanType {
 			// get the annotation from reflection
 			// TODO: this too can cause problems when there are multiple methods with the
 			// same name. but we leave it as it is for now
-			JavaClass type = property.getType();
 			if (property.member instanceof JavaMember) {
 				JavaMember member = property.member;
 				JavaClass qdoxClass = member.getDeclaringClass();
