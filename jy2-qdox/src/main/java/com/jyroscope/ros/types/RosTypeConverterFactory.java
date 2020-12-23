@@ -236,7 +236,7 @@ public class RosTypeConverterFactory {
                     String value = method.apply(getterTemplate, method.getArg(0));
                     convertJava(builder, method, currentContext + "." + name, method.getArg(1), value, sourceType, field.getValue());
                 } else {
-                    Log.warn(RosTypeConverterFactory.class, "No setter for " + currentContext + "." + name + ", skipping");
+                    Log.warn(RosTypeConverterFactory.class, "No getter for " + currentContext + "." + name + ", skipping");
                     skipJava(method, method.getArg(1), field.getValue());
                 }
             }
