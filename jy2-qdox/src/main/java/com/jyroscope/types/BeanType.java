@@ -1,11 +1,17 @@
 package com.jyroscope.types;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.github.jy2.mapper.QdoxAnnotations;
+import com.jyroscope.annotations.Hide;
+import com.jyroscope.annotations.Name;
 import com.thoughtworks.qdox.model.JavaAnnotatedElement;
 import com.thoughtworks.qdox.model.JavaAnnotation;
 import com.thoughtworks.qdox.model.JavaClass;
@@ -153,7 +159,43 @@ public class BeanType {
             }
 			if (hide != null)
                 transients.add(property);
-        }
+			
+			// BUGFIX: when qdox gets class from classpath, for some reason it omits
+			// annotations. this causes problem when property is remapped. for workaround we
+			// get the annotation from reflection
+			// TODO: this too can cause problems when there are multiple methods with the
+			// same name. but we leave it as it is for now
+			if (property.member instanceof JavaMember) {
+				JavaMember member = property.member;
+				JavaClass qdoxClass = member.getDeclaringClass();
+				try {
+					Class<?> javaClass = Class.forName(qdoxClass.getCanonicalName());
+					AccessibleObject annotated2 = null;
+					try {
+						annotated2 = javaClass.getField(member.getName());
+					} catch (NoSuchFieldException e) {
+					}
+					// WARNING: nasty hack! - this may not work when multiple methods with the same
+					// names
+					Method[] methods = javaClass.getMethods();
+					for (Method m : methods) {
+						if (m.getName().equals(member.getName())) {
+							annotated2 = m;
+							break;
+						}
+					}
+					if (annotated2 != null) {
+						Name propertyName2 = annotated2.getAnnotation(Name.class);
+						if (propertyName2 != null) {
+							remapped.put(property.name, propertyName2.value());
+						}
+						if (annotated2.isAnnotationPresent(Hide.class))
+							transients.add(property);
+					}
+				} catch (ClassNotFoundException | SecurityException e) {
+				}
+			}
+		}
         List<Property> props = properties.get(property.name);
         if (props == null)
             properties.put(property.name, props = new ArrayList<>());

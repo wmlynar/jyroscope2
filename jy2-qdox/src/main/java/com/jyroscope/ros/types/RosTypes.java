@@ -1,9 +1,17 @@
 package com.jyroscope.ros.types;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,10 +21,12 @@ import com.jyroscope.Log;
 public class RosTypes {
     
 	private static final ArrayList<File> msgPaths;
+	private static final ArrayList<String> msgResourcePaths;
     private static final HashMap<String, RosType> types;
     
     static {
         msgPaths = new ArrayList<>();
+        msgResourcePaths = new ArrayList<>();
 
         // Pre-populate the types with primitives
         types = new HashMap<>();
@@ -29,6 +39,9 @@ public class RosTypes {
 		msgPaths.add(path);
     }
 
+	public static void addMsgResourceSearchPath(String path) {
+		msgResourcePaths.add(path);
+	}
 
     public static RosMessageType getMessageType(String typeName) {
         return (RosMessageType)getType(typeName);
@@ -60,6 +73,7 @@ public class RosTypes {
             typeName = "std_msgs/Header";
         if (!types.containsKey(typeName)) {
             try {
+            	String msg = null;
 				File file = getMsgFile(typeName);
 				if (file == null) {
 					if (context != null && context.contains("/")) {
@@ -68,15 +82,41 @@ public class RosTypes {
 						if (file != null)
 							typeName = prefixedName;
 					}
-					// still can't find a file?
-					if (file == null)
-						throw new FileNotFoundException(
-								"Msg definition for " + typeName + " not found in " + msgPaths.toString());
 				}
-
+				if (file != null) {
+					byte[] encoded = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+					msg = new String(encoded);
+				} else {
+					InputStream stream = getMsgResource(typeName);
+					if (stream == null) {
+						if (context != null && context.contains("/")) {
+							String prefixedName = context.substring(0, context.lastIndexOf("/") + 1) + typeName;
+							stream = getMsgResource(prefixedName);
+							if (stream != null)
+								typeName = prefixedName;
+						}
+					}
+					if (stream != null) {
+						ByteArrayOutputStream result = new ByteArrayOutputStream();
+						byte[] buffer = new byte[1024];
+						int length;
+						while ((length = stream.read(buffer)) != -1) {
+							result.write(buffer, 0, length);
+						}
+						// StandardCharsets.UTF_8.name() > JDK 7
+						msg = result.toString("UTF-8");
+					}
+				}
+				
+				// still can't find a file?
+				if (msg == null)
+					throw new FileNotFoundException(
+							"Msg definition for " + typeName + " not found in " + msgPaths.toString()
+									+ " or in resources in " + msgResourcePaths.toString());
+				
 				RosMessageType compound = new RosMessageType(typeName);
-				compound.parseMsgFile(new FileReader(file));
-				compound.readDefinition(file.getAbsolutePath());
+				compound.parseMsgFile(new StringReader(msg));
+				compound.setDefinition(msg);
 				types.put(typeName, compound);
             } catch (FormatException fe) {
                 Log.exception(RosTypes.class, fe, "Error parsing message definition for type " + typeName);
@@ -103,5 +143,22 @@ public class RosTypes {
         return null;
     }
 
+	private static InputStream getMsgResource(String typeName) {
+		for (String path : msgResourcePaths) {
+			InputStream stream = RosTypes.class.getResourceAsStream("/" + path + typeName + ".msg");
+			if (stream != null) {
+				return stream;
+			}
+			int slash = typeName.lastIndexOf('/');
+			if (slash != -1) {
+				stream = RosTypes.class.getResourceAsStream(
+						"/" + path + "/" + typeName.substring(0, slash) + "/msg" + typeName.substring(slash) + ".msg");
+				if (stream != null) {
+					return stream;
+				}
+			}
+		}
+		return null;
+	}
 }
 

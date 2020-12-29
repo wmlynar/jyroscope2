@@ -36,6 +36,9 @@ public class GeneratorMojo extends AbstractMojo {
 	@Parameter(property = "generate.messagesDirectory", defaultValue = "${project.basedir}/src/main/resources/msgs")
 	private File messagesDirectory;
 
+	@Parameter(property = "generate.messagesResourceDirectory", defaultValue = "msgs")
+	private String messagesResourceDirectory;
+
 	@Parameter(property = "generate.outputSourceDirectory", defaultValue = "${project.build.directory}/generated-sources")
 	private File outputSourceDirectory;
 
@@ -61,6 +64,7 @@ public class GeneratorMojo extends AbstractMojo {
 		String className = initializerClass.substring(idx + 1);
 
 		RosTypes.addMsgSearchPath(messagesDirectory);
+		RosTypes.addMsgResourceSearchPath(messagesResourceDirectory);
 
 		String code = "";
 		if (!packageName.trim().isEmpty()) {

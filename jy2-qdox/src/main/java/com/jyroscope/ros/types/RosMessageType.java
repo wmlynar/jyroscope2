@@ -178,20 +178,11 @@ public class RosMessageType implements RosType {
 
     private String definition;
     
-	public void readDefinition(String path) {
-		try {
-			this.definition = readFile(path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public void setDefinition(String msg) {
+		this.definition = msg;
 	}
 
 	public String getDefinition() {
 		return this.definition;
-	}
-
-	static String readFile(String path) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded);
 	}
 }
