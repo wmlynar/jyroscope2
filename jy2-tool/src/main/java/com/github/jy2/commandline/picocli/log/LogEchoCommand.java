@@ -101,7 +101,7 @@ public class LogEchoCommand implements Runnable {
 //						System.out.printf("%s %s %s %s\n", strLevel, strNode, strPlace, strMsg);
 //					}
 
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

@@ -562,7 +562,7 @@ public class JyroscopeDi implements PubSubClient {
 		long before = System.currentTimeMillis();
 		try {
 			initializer.method.invoke(initializer.object);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
 		}
 		long delta = System.currentTimeMillis() - before;
@@ -601,7 +601,7 @@ public class JyroscopeDi implements PubSubClient {
 								break;
 							}
 						}
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
 					}
 					try {

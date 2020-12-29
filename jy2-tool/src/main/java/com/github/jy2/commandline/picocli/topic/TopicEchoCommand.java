@@ -59,7 +59,7 @@ public class TopicEchoCommand implements Runnable {
 						}
 					}
 					System.out.println("" + counter++ + "\t" + t.getClass().getCanonicalName() + " '" + s + "'");
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

@@ -32,7 +32,7 @@ public class TfChildOptionCompletionCandidates implements Iterable<String> {
 				public void accept(TFMessage t) {
 					try {
 						tfManager.add(t);
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}

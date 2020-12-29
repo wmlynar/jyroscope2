@@ -102,11 +102,11 @@ public class Main {
 					// ignore
 				} catch (EndOfFileException e) {
 					System.exit(0);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					t.printStackTrace();
 				}
 			}
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			t.printStackTrace();
 		}
 		System.exit(0);

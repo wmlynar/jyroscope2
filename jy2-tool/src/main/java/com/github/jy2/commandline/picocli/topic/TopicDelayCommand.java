@@ -78,11 +78,6 @@ public class TopicDelayCommand implements Runnable {
 				double nowSeconds = System.currentTimeMillis() * 1e-3;
 				double deltaMillis = (nowSeconds - messagetimeSeconds) * 1000;
 				System.out.printf("Message delayed by %.3fms\n", deltaMillis);
-				try {
-
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
 			}
 		});
 	}

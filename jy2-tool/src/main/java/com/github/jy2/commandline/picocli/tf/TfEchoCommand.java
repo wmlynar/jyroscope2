@@ -62,7 +62,7 @@ public class TfEchoCommand implements Runnable {
 						System.out.println("\t" + TfSerializer.serialize(tr, format));
 					}
 					
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

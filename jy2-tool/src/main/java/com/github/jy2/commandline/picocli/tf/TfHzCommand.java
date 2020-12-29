@@ -83,7 +83,7 @@ public class TfHzCommand implements Runnable {
 							maxPeriod = Double.MIN_VALUE;
 						}
 					}
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

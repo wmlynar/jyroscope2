@@ -52,7 +52,7 @@ public class TfDelayCommand implements Runnable {
 						System.out.printf("\t%.3fms\n", deltaMillis);
 					}
 
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

@@ -272,7 +272,7 @@ public class JyroscopeCore implements PubSubClient {
 							dt = 0;
 							try {
 								consumer.accept(null);
-							} catch (Throwable e) {
+							} catch (Exception e) {
 								if (method != null) {
 									log.error("Exception caught while handling message in method "
 											+ method.toGenericString() + ", message: null", e);
@@ -365,7 +365,7 @@ public class JyroscopeCore implements PubSubClient {
 				firstTimeWarning = true;
 				try {
 					consumer.accept((D) message);
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					if (method != null) {
 						log.error("Exception caught while handling message in method " + method.toGenericString()
 								+ ", message: " + message, e);

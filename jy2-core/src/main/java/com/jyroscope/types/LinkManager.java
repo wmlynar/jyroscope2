@@ -92,7 +92,7 @@ public class LinkManager {
 							}
 							Object converted = converter.convert(message);
 							((Deliver) deliver).handle(converted, isLocal);
-						} catch (Throwable e) {
+						} catch (Exception e) {
 							LOG.error("Exception caught when handling message: " + message + ", type "
 									+ fromType.getCanonicalName() + ", remote ros type " + remoteRosType
 									+ ", remote java type  " + remoteJavaType, e);
