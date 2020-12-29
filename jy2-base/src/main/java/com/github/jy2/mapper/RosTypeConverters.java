@@ -131,6 +131,10 @@ public class RosTypeConverters {
 			isInitializedRosMap.put(typeName, true);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (Error.class.isAssignableFrom(cause.getClass())) {
+				throw new Error(cause);
+			}
 			throw new ConversionException("Cannot find ROS type for class " + type.getName());
 		} finally {
 			isInitializedClassMap.put(type, true);
@@ -153,6 +157,10 @@ public class RosTypeConverters {
 			isInitializedClassMap.put(c, true);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (Error.class.isAssignableFrom(cause.getClass())) {
+				throw new Error(cause);
+			}
 			throw new ConversionException("Cannot find initializer to ROS type " + typeName);
 		} finally {
 			isInitializedRosMap.put(typeName, true);

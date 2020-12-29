@@ -39,6 +39,10 @@ public class SubscriberRef {
 				try {
 					method.invoke(object, message);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					Throwable cause = e.getCause();
+					if (Error.class.isAssignableFrom(cause.getClass())) {
+						throw new Error(cause);
+					}
 					log.error("Exception caught while handling message in method " + method.toGenericString() + ", message: "
 							+ message, e);
 				}
