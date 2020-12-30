@@ -659,14 +659,14 @@ public class roslaunch
 					uuid, parsedArgs, launchFiles);
 
 			// Moved this here, before launching nodes instead of at the end of file
-			Runtime.getRuntime().addShutdownHook(new Thread() {
+			Runtime.getRuntime().addShutdownHook(new Thread("ShutdownHookThread") {
 				@Override
 				public void run() {
                     runner.stop();  // Kill the parent
 					// Clean up the entire process before exiting
 					cleanup();
 				}
-			}, "ShutdownHookThread");
+			});
 
 			// Otherwise, launch the configured nodes
 			try {
