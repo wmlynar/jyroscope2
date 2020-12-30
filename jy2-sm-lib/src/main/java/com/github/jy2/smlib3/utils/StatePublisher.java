@@ -74,7 +74,7 @@ public class StatePublisher {
 				LOG.error("Uncaught exception in state publisher", e);
 			}
 
-		});
+		}, "StatePublisherThread");
 		thread.start();
 
 	}

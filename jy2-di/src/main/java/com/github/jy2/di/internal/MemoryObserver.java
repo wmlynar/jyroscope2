@@ -12,7 +12,7 @@ public class MemoryObserver extends Thread {
 	private long lastTimeGc;
 
 	public MemoryObserver() {
-		super("Memory observer");
+		super("MemoryObserverThread");
 	}
 
 	public void run() {

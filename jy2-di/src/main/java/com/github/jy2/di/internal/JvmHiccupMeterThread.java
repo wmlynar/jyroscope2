@@ -23,7 +23,7 @@ public class JvmHiccupMeterThread extends Thread {
 	}
 
 	public JvmHiccupMeterThread(LongConsumer callback, int resolutionMs) {
-		super("jvm-hiccup-metter-thread");
+		super("JvmHiccupMeterThread");
 		this.callback = callback;
 		this.resolutionMs = resolutionMs;
 		setDaemon(true);

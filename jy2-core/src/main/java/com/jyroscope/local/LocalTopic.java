@@ -94,6 +94,11 @@ public class LocalTopic<T> implements Topic<T> {
 			public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
 				throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
 			}
+
+			@Override
+			public String getThreadName() {
+				throw new UnsupportedOperationException("No thread name");
+			}
         };
     }
 

@@ -666,7 +666,7 @@ public class roslaunch
 					// Clean up the entire process before exiting
 					cleanup();
 				}
-			});
+			}, "ShutdownHookThread");
 
 			// Otherwise, launch the configured nodes
 			try {

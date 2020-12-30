@@ -35,7 +35,7 @@ public class RosSlave {
         tcpros = new TCPROSServer(this, localhostname);
         
         XMLRPCSlave rpc = new XMLRPCSlave(this);
-        SimpleHTTPServer server = new SimpleHTTPServer(localhostname, new XMLRPCService(new ReflectedAPI(rpc), true), false);
+        SimpleHTTPServer server = new SimpleHTTPServer(localhostname, new XMLRPCService(new ReflectedAPI(rpc), true), false, "XmlRpcServer");
         slaveURI = server.getURI();
         
         // TODO add shutdown hooks

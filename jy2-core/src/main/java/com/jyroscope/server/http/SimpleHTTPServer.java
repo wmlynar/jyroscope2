@@ -19,11 +19,11 @@ public class SimpleHTTPServer {
     private String host;
     private volatile boolean running = true;
 
-    public SimpleHTTPServer(String host, HTTPService service, boolean isDaemon) {
-        this(host, -1, service, isDaemon);
+    public SimpleHTTPServer(String host, HTTPService service, boolean isDaemon, String name) {
+        this(host, -1, service, isDaemon, name);
     }
     
-    public SimpleHTTPServer(String host, int port, final HTTPService service, boolean isDaemon) {
+    public SimpleHTTPServer(String host, int port, final HTTPService service, boolean isDaemon, String name) {
         this.host = host;
         try {
             final ServerSocket ss;
@@ -58,13 +58,13 @@ public class SimpleHTTPServer {
                                     	LOG.log(Level.SEVERE, "Exception caught while closing connection", e);
                                     }
                                 }
-                            }).start();
+							}, name + "-accept-" + host + ":" + s.getPort()).start();
                         }
                     } catch (IOException ioe) {
                     	LOG.log(Level.SEVERE, "Http server unable to listen on interface " + host, ioe);
                     }
                 }
-			}, "SimpleHTTPServer");
+			}, name + "-" + host + ":" + this.port);
             if (isDaemon)
                 thread.setDaemon(true);
             thread.start();

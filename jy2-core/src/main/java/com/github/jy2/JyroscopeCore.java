@@ -38,7 +38,7 @@ public class JyroscopeCore implements PubSubClient {
 	private ArrayList<TopicProvider<?>> providers = new ArrayList<>();
 
 	public JyroscopeCore() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
+		Runtime.getRuntime().addShutdownHook(new Thread("ShutdownHook") {
 			public void run() {
 				shutdown();
 			}
@@ -244,6 +244,13 @@ public class JyroscopeCore implements PubSubClient {
 				return link;
 			}
 
+			String name;
+			if (method != null) {
+				name = "Method-" + method.toGenericString();
+			} else {
+				name = "Consumer-" + consumer.getClass().getName();
+			}
+
 			link.lastMessageTime = System.currentTimeMillis();
 			link.timeoutThread = new Thread(new Runnable() {
 				@Override
@@ -302,7 +309,7 @@ public class JyroscopeCore implements PubSubClient {
 						}
 					}
 				}
-			});
+			}, "TimeoutThread-" + name);
 			link.timeoutThread.start();
 
 			return link;
@@ -389,6 +396,16 @@ public class JyroscopeCore implements PubSubClient {
 			@Override
 			public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
 				throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
+			}
+
+			@Override
+			public String getThreadName() {
+				if (method != null) {
+					return "Listener-" + topic.getName() + "-" + method.toString();
+					// method.getDeclaringClass().getTypeName() + "." + method.getName();
+				} else {
+					return "Listener-" + topic.getName() + "-" + consumer.getClass().getName();
+				}
 			}
 		}
 	}

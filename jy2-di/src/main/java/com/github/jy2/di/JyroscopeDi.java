@@ -629,7 +629,7 @@ public class JyroscopeDi implements PubSubClient {
 					}
 				}
 			}
-		});
+		}, "Repeater-" + method.toString());
 		repeater.thread.start();
 		String name = repeat.name();
 		if (name != null && !name.isEmpty()) {

@@ -146,6 +146,11 @@ public class LinkManager {
 				LOG.error("Exception caught when converting message: " + fromType + " " + remoteRosType + " " + remoteJavaType, e);
 			}
 		}
+
+		@Override
+		public String getThreadName() {
+			throw new UnsupportedOperationException("No thread name");
+		}
     }
     
 	private class Deliver<D> {
@@ -271,7 +276,8 @@ public class LinkManager {
 				this.queue = new ArrayBlockingQueue<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
-				this.thread = new Thread("LinkManager.Consumer-" + typeName) {
+				String name = subscriber.getThreadName();
+				this.thread = new Thread(subscriber.getThreadName()) {
 					@Override
 					public void run() {
 						while (keepRunnning) {
