@@ -115,8 +115,10 @@ public class RosSlave {
 	}
 
 	public void shutdownTopics(ExecutorService service) {
-		for (RosTopic t : topics.payloads()) {
-			service.execute(() -> t.shutdown());
+		synchronized (topicsMutex) {
+			for (RosTopic t : topics.payloads()) {
+				service.execute(() -> t.shutdown());
+			}
 		}
 	}
 }
