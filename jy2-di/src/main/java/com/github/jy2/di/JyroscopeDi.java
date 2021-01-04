@@ -47,6 +47,7 @@ import com.github.jy2.di.utils.JsonMapper;
 import com.github.jy2.di.utils.YamlMapper;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
+import com.github.jy2.util.ExceptionUtil;
 
 public class JyroscopeDi implements PubSubClient {
 
@@ -563,10 +564,7 @@ public class JyroscopeDi implements PubSubClient {
 		try {
 			initializer.method.invoke(initializer.object);
 		} catch (Exception e) {
-			Throwable cause = e.getCause();
-			if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
-				throw new Error("Re-throwing exception as error", cause);
-			}
+			ExceptionUtil.rethrowErrorIfCauseIsError(e);
 			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
 		}
 		long delta = System.currentTimeMillis() - before;
@@ -606,10 +604,7 @@ public class JyroscopeDi implements PubSubClient {
 							}
 						}
 					} catch (Exception e) {
-						Throwable cause = e.getCause();
-						if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
-							throw new Error("Re-throwing exception as error", cause);
-						}
+						ExceptionUtil.rethrowErrorIfCauseIsError(e);
 						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
 					}
 					try {

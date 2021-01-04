@@ -10,6 +10,7 @@ import com.github.jy2.JyroscopeCore;
 import com.github.jy2.PubSubClient;
 import com.github.jy2.Subscriber;
 import com.github.jy2.di.LogSeldom;
+import com.github.jy2.util.ExceptionUtil;
 
 public class SubscriberRef {
 
@@ -39,10 +40,7 @@ public class SubscriberRef {
 				try {
 					method.invoke(object, message);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					Throwable cause = e.getCause();
-					if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
-						throw new Error("Re-throwing exception as error", cause);
-					}
+					ExceptionUtil.rethrowErrorIfCauseIsError(e);
 					log.error("Exception caught while handling message in method " + method.toGenericString() + ", message: "
 							+ message, e);
 				}

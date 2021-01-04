@@ -3,6 +3,8 @@ package com.jyroscope.server.xmlrpc;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import com.github.jy2.util.ExceptionUtil;
+
 public class ReflectedAPI implements API {
     
     private HashMap<String, Method> methods;
@@ -27,10 +29,7 @@ public class ReflectedAPI implements API {
                 try {
 					return method.invoke(target, params.toArray());
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					Throwable cause = e.getCause();
-					if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
-						throw new Error("Re-throwing exception as error", cause);
-					}
+					ExceptionUtil.rethrowErrorIfCauseIsError(e);
 					throw new RuntimeException("Exception caught while executing xml rpc method " + method.toGenericString(), e);
 				}
             }
