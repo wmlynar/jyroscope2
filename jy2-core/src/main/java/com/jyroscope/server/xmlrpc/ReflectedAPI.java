@@ -28,8 +28,8 @@ public class ReflectedAPI implements API {
 					return method.invoke(target, params.toArray());
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					Throwable cause = e.getCause();
-					if (Error.class.isAssignableFrom(cause.getClass())) {
-						throw new Error(cause);
+					if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
+						throw new Error("Re-throwing exception as error", cause);
 					}
 					throw new RuntimeException("Exception caught while executing xml rpc method " + method.toGenericString(), e);
 				}

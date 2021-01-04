@@ -564,8 +564,8 @@ public class JyroscopeDi implements PubSubClient {
 			initializer.method.invoke(initializer.object);
 		} catch (Exception e) {
 			Throwable cause = e.getCause();
-			if (Error.class.isAssignableFrom(cause.getClass())) {
-				throw new Error(cause);
+			if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
+				throw new Error("Re-throwing exception as error", cause);
 			}
 			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
 		}
@@ -607,8 +607,8 @@ public class JyroscopeDi implements PubSubClient {
 						}
 					} catch (Exception e) {
 						Throwable cause = e.getCause();
-						if (Error.class.isAssignableFrom(cause.getClass())) {
-							throw new Error(cause);
+						if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
+							throw new Error("Re-throwing exception as error", cause);
 						}
 						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
 					}

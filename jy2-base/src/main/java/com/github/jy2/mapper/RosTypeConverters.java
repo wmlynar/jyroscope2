@@ -133,7 +133,7 @@ public class RosTypeConverters {
 				| IllegalArgumentException | InvocationTargetException e) {
 			Throwable cause = e.getCause();
 			if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
-				throw new Error(cause);
+				throw new Error("Re-throwing exception as error", cause);
 			}
 			throw new ConversionException("Cannot find ROS type for class " + type.getName());
 		} finally {
@@ -158,8 +158,8 @@ public class RosTypeConverters {
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			if (Error.class.isAssignableFrom(cause.getClass())) {
-				throw new Error(cause);
+			if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
+				throw new Error("Re-throwing exception as error", cause);
 			}
 			throw new ConversionException("Cannot find initializer to ROS type " + typeName);
 		} finally {
