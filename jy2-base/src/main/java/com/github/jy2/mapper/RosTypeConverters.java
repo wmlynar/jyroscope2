@@ -55,12 +55,15 @@ public class RosTypeConverters {
 		if (fromType.equals(RosMessage.class)) {
 			if (toType.equals(RosMessage.class)) {
 				return IDENTITY_TYPE_CONVERTER;
-			} else {
+			}
+			else {
 				return RosTypeConverters.fromRosClass(toType);
 			}
-		} else if (toType.equals(RosMessage.class)) {
+		}
+		else if (toType.equals(RosMessage.class)) {
 			return RosTypeConverters.toRosClass(fromType);
-		} else {
+		}
+		else {
 			return IDENTITY_TYPE_CONVERTER;
 		}
 	}
@@ -93,7 +96,7 @@ public class RosTypeConverters {
 	// - for now only called from within precompile / precompileByRosName
 	//   which is already synchronized
 	public static <A, B> void register(String rosTypeName, Class<?> type, TypeConverter from, TypeConverter to,
-			String md5, int size, String definition) {
+	                                   String md5, int size, String definition) {
 		fromRosName.put(rosTypeName, from);
 		fromRosClass.put(type, from);
 		toRosName.put(rosTypeName, to);
@@ -109,7 +112,7 @@ public class RosTypeConverters {
 	// - for now only called from within precompile / precompileByRosName
 	//   which is already synchronized
 	public static <A, B> void registerPrimitive(String rosTypeName, Class<?> type, TypeConverter from,
-			TypeConverter to) {
+	                                            TypeConverter to) {
 		fromRosClass.put(type, from);
 		toRosClass.put(type, to);
 		classToTopic.put(type, rosTypeName);
@@ -132,7 +135,7 @@ public class RosTypeConverters {
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
 			Throwable cause = e.getCause();
-			if (Error.class.isAssignableFrom(cause.getClass())) {
+			if (cause != null && Error.class.isAssignableFrom(cause.getClass())) {
 				throw new Error(cause);
 			}
 			throw new ConversionException("Cannot find ROS type for class " + type.getName());
