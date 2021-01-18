@@ -121,7 +121,7 @@ public class JyroscopeDi implements PubSubClient {
 		NodeNameManager.setNodeName(this.name);
 
 		JyroscopeDiSingleton.initialize(specialParameters, this.name, this);
-		
+
 		// parse regular parameters and remappings
 		for (int i = 0; i < args.length; i++) {
 			if (!args[i].contains(":=")) {
@@ -1061,10 +1061,16 @@ public class JyroscopeDi implements PubSubClient {
 					field.set(object, Boolean.parseBoolean(value.toString()));
 				}
 			} else if (Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)) {
-				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())
-						|| Double.class.isAssignableFrom(value.getClass())
-						|| double.class.isAssignableFrom(value.getClass())) {
+				// NOTE: bug was here. int a = (int)(Double)b does not compile, int a =
+				// (int)(double)b does compile
+				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())) {
 					field.set(object, (int) value);
+				} else if (Long.class.isAssignableFrom(value.getClass())
+						|| long.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (long) value);
+				} else if (Double.class.isAssignableFrom(value.getClass())
+						|| double.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (double) value);
 				} else {
 					field.set(object, (int) Double.parseDouble(value.toString()));
 				}
