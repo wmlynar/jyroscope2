@@ -24,6 +24,7 @@ public class TCPROSHeader {
     }
     
     public void render(RosMessage buffer) throws IOException {
+    	buffer.reset();
         for (Map.Entry<String, String> entry : fields.entrySet())
             buffer.putString(entry.getKey() + "=" + entry.getValue());
         buffer.flip();
