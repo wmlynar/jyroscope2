@@ -525,7 +525,7 @@ public class JyroscopeDi implements PubSubClient {
 		return subscriber;
 	}
 
-	public <D> void deleteSubscriber(Subscriber<D> subscriber) {
+	public synchronized <D> void deleteSubscriber(Subscriber<D> subscriber) {
 		subscriber.removeAllMessageListeners();
 		subscribers.remove(subscriber);
 	}
