@@ -90,7 +90,8 @@ public class Main {
 					CommandLine.run(commands, arguments);
 				} catch (UserInterruptException e) {
 					if (TopicEchoCommand.subscriber != null) {
-						TopicEchoCommand.subscriber.removeAllMessageListeners();
+						//TopicEchoCommand.subscriber.removeAllMessageListeners();
+						Main.di.deleteSubscriber(TopicEchoCommand.subscriber);
 						TopicEchoCommand.subscriber = null;
 					}
 					if (TopicPubCommand.thread != null) {
