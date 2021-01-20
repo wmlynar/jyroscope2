@@ -47,6 +47,7 @@ import com.github.jy2.di.utils.JsonMapper;
 import com.github.jy2.di.utils.YamlMapper;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
+import com.github.jy2.util.ExceptionUtil;
 
 public class JyroscopeDi implements PubSubClient {
 
@@ -120,7 +121,7 @@ public class JyroscopeDi implements PubSubClient {
 		NodeNameManager.setNodeName(this.name);
 
 		JyroscopeDiSingleton.initialize(specialParameters, this.name, this);
-		
+
 		// parse regular parameters and remappings
 		for (int i = 0; i < args.length; i++) {
 			if (!args[i].contains(":=")) {
@@ -524,6 +525,11 @@ public class JyroscopeDi implements PubSubClient {
 		return subscriber;
 	}
 
+	public <D> void deleteSubscriber(Subscriber<D> subscriber) {
+		subscriber.removeAllMessageListeners();
+		subscribers.remove(subscriber);
+	}
+
 	public <T> T getInstance(Class<T> type) {
 		return getInstance(type, "", true);
 	}
@@ -563,10 +569,7 @@ public class JyroscopeDi implements PubSubClient {
 		try {
 			initializer.method.invoke(initializer.object);
 		} catch (Exception e) {
-			Throwable cause = e.getCause();
-			if (Error.class.isAssignableFrom(cause.getClass())) {
-				throw new Error(cause);
-			}
+			ExceptionUtil.rethrowErrorIfCauseIsError(e);
 			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
 		}
 		long delta = System.currentTimeMillis() - before;
@@ -606,10 +609,7 @@ public class JyroscopeDi implements PubSubClient {
 							}
 						}
 					} catch (Exception e) {
-						Throwable cause = e.getCause();
-						if (Error.class.isAssignableFrom(cause.getClass())) {
-							throw new Error(cause);
-						}
+						ExceptionUtil.rethrowErrorIfCauseIsError(e);
 						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
 					}
 					try {
@@ -1066,10 +1066,16 @@ public class JyroscopeDi implements PubSubClient {
 					field.set(object, Boolean.parseBoolean(value.toString()));
 				}
 			} else if (Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)) {
-				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())
-						|| Double.class.isAssignableFrom(value.getClass())
-						|| double.class.isAssignableFrom(value.getClass())) {
+				// NOTE: bug was here. int a = (int)(Double)b does not compile, int a =
+				// (int)(double)b does compile
+				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())) {
 					field.set(object, (int) value);
+				} else if (Long.class.isAssignableFrom(value.getClass())
+						|| long.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (long) value);
+				} else if (Double.class.isAssignableFrom(value.getClass())
+						|| double.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (double) value);
 				} else {
 					field.set(object, (int) Double.parseDouble(value.toString()));
 				}

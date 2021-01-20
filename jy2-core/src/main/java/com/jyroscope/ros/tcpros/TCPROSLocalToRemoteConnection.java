@@ -100,7 +100,6 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 							if (javaType != null) {
 								reply.putHeader("java_type", javaType);
 							}
-							buffer.reset();
 							reply.render(buffer);
                             buffer.writeOut(os);
                             os.flush();

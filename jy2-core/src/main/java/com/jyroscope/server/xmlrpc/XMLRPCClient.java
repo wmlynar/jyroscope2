@@ -66,7 +66,9 @@ public class XMLRPCClient {
             throw new IOException(pe);
         } catch (ParserConfigurationException pce) {
             throw new IOException(pce);
-        }
+		} catch (TransformerFactoryConfigurationError | FactoryConfigurationError | Exception e) {
+			throw new IOException(e);
+		}
     }
 
 }
