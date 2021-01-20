@@ -1,5 +1,6 @@
 package com.github.jy2.commandline.picocli;
 
+import java.io.IOError;
 import java.util.Random;
 
 import org.jline.reader.EndOfFileException;
@@ -104,6 +105,8 @@ public class Main {
 				} catch (EndOfFileException e) {
 					System.exit(0);
 				} catch (Exception t) {
+					t.printStackTrace();
+				} catch (IOError t) {
 					t.printStackTrace();
 				}
 			}
