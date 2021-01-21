@@ -32,7 +32,7 @@ public class TfParentOptionCompletionCandidates implements Iterable<String> {
 				public void accept(TFMessage t) {
 					try {
 						tfManager.add(t);
-					} catch (Throwable e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
@@ -43,14 +43,16 @@ public class TfParentOptionCompletionCandidates implements Iterable<String> {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			subscriber.removeAllMessageListeners();
+			//subscriber.removeAllMessageListeners();
+			Main.di.deleteSubscriber(subscriber);
 			ArrayList<TransformStamped> tfList = tfManager.getTransformList();
 			for (TransformStamped t : tfList) {
 				list.add(t.header.frameId);
 			}
 		} finally {
 			if (subscriber != null) {
-				subscriber.removeAllMessageListeners();
+				//subscriber.removeAllMessageListeners();
+				Main.di.deleteSubscriber(subscriber);
 			}
 		}
 		list.sort(String::compareToIgnoreCase);

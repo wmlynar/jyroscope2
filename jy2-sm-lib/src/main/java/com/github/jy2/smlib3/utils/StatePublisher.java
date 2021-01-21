@@ -48,7 +48,7 @@ public class StatePublisher {
 					try {
 						smStructurePublisher.publish(stateMachine.getSmStructure());
 						smStatePublisher.publish(stateMachine.getSmState());
-					} catch (Throwable t1) {
+					} catch (Exception t1) {
 						LOG.error("Uncaught exception in state publisher", t1);
 					}
 
@@ -61,7 +61,7 @@ public class StatePublisher {
 
 				try {
 					smStatePublisher.publish(stateMachine.getSmState());
-				} catch (Throwable t2) {
+				} catch (Exception t2) {
 					LOG.error("Uncaught exception in state publisher", t2);
 				}
 
@@ -70,11 +70,11 @@ public class StatePublisher {
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				LOG.error("Uncaught exception in state publisher", e);
 			}
 
-		});
+		}, "StatePublisherThread");
 		thread.start();
 
 	}

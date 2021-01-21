@@ -56,6 +56,8 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                     String topicName = header.getHeader("topic");
                     String md5sum = header.getHeader("md5sum");
                     String typeName = header.getHeader("type");
+                    
+                    Thread.currentThread().setName("Publisher-" + topicName + "-" + caller);
 
 					// final RosMessageType type = RosTypes.getMessageType(typeName);
 					String md5 = RosTypeConverters.getMd5(typeName);
@@ -98,7 +100,6 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 							if (javaType != null) {
 								reply.putHeader("java_type", javaType);
 							}
-							buffer.reset();
 							reply.render(buffer);
                             buffer.writeOut(os);
                             os.flush();
@@ -201,6 +202,11 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 	@Override
 	public void setRemoteAttributes(boolean isLatched, String remoteRosType, String remoteJavaType) {
 		throw new UnsupportedOperationException("Reserved for class Receive in LinkManager");
+	}
+
+	@Override
+	public String getThreadName() {
+		throw new UnsupportedOperationException("No thread name");
 	}
 
 }

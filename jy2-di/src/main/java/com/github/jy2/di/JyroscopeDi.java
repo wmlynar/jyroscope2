@@ -11,6 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,6 +48,7 @@ import com.github.jy2.di.utils.JsonMapper;
 import com.github.jy2.di.utils.YamlMapper;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
+import com.github.jy2.util.ExceptionUtil;
 
 public class JyroscopeDi implements PubSubClient {
 
@@ -76,8 +78,8 @@ public class JyroscopeDi implements PubSubClient {
 
 	private String name;
 
-	public ArrayList<String> publishedTopics = new ArrayList<>();
-	public ArrayList<String> subscribedTopics = new ArrayList<>();
+	public HashSet<String> publishedTopics = new HashSet<>();
+	public HashSet<String> subscribedTopics = new HashSet<>();
 
 	private Object parameterListenerId;
 
@@ -120,7 +122,7 @@ public class JyroscopeDi implements PubSubClient {
 		NodeNameManager.setNodeName(this.name);
 
 		JyroscopeDiSingleton.initialize(specialParameters, this.name, this);
-		
+
 		// parse regular parameters and remappings
 		for (int i = 0; i < args.length; i++) {
 			if (!args[i].contains(":=")) {
@@ -524,6 +526,11 @@ public class JyroscopeDi implements PubSubClient {
 		return subscriber;
 	}
 
+	public synchronized <D> void deleteSubscriber(Subscriber<D> subscriber) {
+		subscriber.removeAllMessageListeners();
+		subscribers.remove(subscriber);
+	}
+
 	public <T> T getInstance(Class<T> type) {
 		return getInstance(type, "", true);
 	}
@@ -562,7 +569,8 @@ public class JyroscopeDi implements PubSubClient {
 		long before = System.currentTimeMillis();
 		try {
 			initializer.method.invoke(initializer.object);
-		} catch (Throwable e) {
+		} catch (Exception e) {
+			ExceptionUtil.rethrowErrorIfCauseIsError(e);
 			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
 		}
 		long delta = System.currentTimeMillis() - before;
@@ -601,7 +609,8 @@ public class JyroscopeDi implements PubSubClient {
 								break;
 							}
 						}
-					} catch (Throwable e) {
+					} catch (Exception e) {
+						ExceptionUtil.rethrowErrorIfCauseIsError(e);
 						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
 					}
 					try {
@@ -621,7 +630,7 @@ public class JyroscopeDi implements PubSubClient {
 					}
 				}
 			}
-		});
+		}, "Repeater-" + method.toString());
 		repeater.thread.start();
 		String name = repeat.name();
 		if (name != null && !name.isEmpty()) {
@@ -1058,10 +1067,16 @@ public class JyroscopeDi implements PubSubClient {
 					field.set(object, Boolean.parseBoolean(value.toString()));
 				}
 			} else if (Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)) {
-				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())
-						|| Double.class.isAssignableFrom(value.getClass())
-						|| double.class.isAssignableFrom(value.getClass())) {
+				// NOTE: bug was here. int a = (int)(Double)b does not compile, int a =
+				// (int)(double)b does compile
+				if (Integer.class.isAssignableFrom(value.getClass()) || int.class.isAssignableFrom(value.getClass())) {
 					field.set(object, (int) value);
+				} else if (Long.class.isAssignableFrom(value.getClass())
+						|| long.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (long) value);
+				} else if (Double.class.isAssignableFrom(value.getClass())
+						|| double.class.isAssignableFrom(value.getClass())) {
+					field.set(object, (int) (double) value);
 				} else {
 					field.set(object, (int) Double.parseDouble(value.toString()));
 				}

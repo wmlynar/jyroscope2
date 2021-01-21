@@ -12,7 +12,7 @@ public class MemoryObserver extends Thread {
 	private long lastTimeGc;
 
 	public MemoryObserver() {
-		super("Memory observer");
+		super("MemoryObserverThread");
 	}
 
 	public void run() {
@@ -37,7 +37,7 @@ public class MemoryObserver extends Thread {
 				} catch (InterruptedException e) {
 					// do nothing
 				}
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				LOG.error("Exception caught", e);
 			}
 		}

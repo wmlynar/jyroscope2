@@ -69,9 +69,9 @@ public class XMLRPCService implements HTTPService {
             throw new HTTPException(400, "Bad Request", se);
         } catch (IOException ioe) {
             throw new HTTPException(500, "Internal Server Error", ioe);
-        } catch (Exception e) {
-            throw new HTTPException(500, "Internal Server Error", e);
-        }
+		} catch (TransformerFactoryConfigurationError | FactoryConfigurationError | Exception e) {
+			throw new HTTPException(500, "Internal Server Error", e);
+		}
     }
 
 }

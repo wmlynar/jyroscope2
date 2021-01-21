@@ -101,6 +101,7 @@ public class TCPROSServer implements RosTransport {
                             serverSocket = new ServerSocket(0, 0, InetAddress.getByName(hostname));
                             serverSocket.setSoTimeout(SHUTDOWN_TIME);
                             port = serverSocket.getLocalPort();
+							Thread.currentThread().setName("TCPROSServer-" + hostname + ":" + port);
                             while (!stopped) {
                                 try {
                                     final Socket socket = serverSocket.accept();
@@ -115,7 +116,7 @@ public class TCPROSServer implements RosTransport {
                                             conn.open();
                                         }
 //                                    });
-									}, "TCPROSConnection").start();
+									}, "Publisher").start();
                                 } catch (SocketTimeoutException ste) {
                                     // do nothing -- timeout is to check that the server hasn't been stopped
                                 }

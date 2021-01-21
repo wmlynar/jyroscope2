@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
+import com.github.jy2.util.ExceptionUtil;
 import com.jyroscope.annotations.Initializer;
 import com.jyroscope.local.types.IdentityTypeConverter;
 import com.jyroscope.ros.RosMessage;
@@ -131,6 +132,7 @@ public class RosTypeConverters {
 			isInitializedRosMap.put(typeName, true);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
+			ExceptionUtil.rethrowErrorIfCauseIsError(e);
 			throw new ConversionException("Cannot find ROS type for class " + type.getName());
 		} finally {
 			isInitializedClassMap.put(type, true);
@@ -153,6 +155,7 @@ public class RosTypeConverters {
 			isInitializedClassMap.put(c, true);
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
+			ExceptionUtil.rethrowErrorIfCauseIsError(e);
 			throw new ConversionException("Cannot find initializer to ROS type " + typeName);
 		} finally {
 			isInitializedRosMap.put(typeName, true);

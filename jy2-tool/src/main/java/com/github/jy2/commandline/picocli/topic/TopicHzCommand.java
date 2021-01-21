@@ -65,7 +65,7 @@ public class TopicHzCommand implements Runnable {
 						minPeriod = Double.MAX_VALUE;
 						maxPeriod = Double.MIN_VALUE;
 					}
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}

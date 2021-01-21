@@ -92,7 +92,7 @@ public class LinkManager {
 							}
 							Object converted = converter.convert(message);
 							((Deliver) deliver).handle(converted, isLocal);
-						} catch (Throwable e) {
+						} catch (Exception e) {
 							LOG.error("Exception caught when handling message: " + message + ", type "
 									+ fromType.getCanonicalName() + ", remote ros type " + remoteRosType
 									+ ", remote java type  " + remoteJavaType, e);
@@ -145,6 +145,11 @@ public class LinkManager {
 			} catch (Exception e) {
 				LOG.error("Exception caught when converting message: " + fromType + " " + remoteRosType + " " + remoteJavaType, e);
 			}
+		}
+
+		@Override
+		public String getThreadName() {
+			throw new UnsupportedOperationException("No thread name");
 		}
     }
     
@@ -271,7 +276,8 @@ public class LinkManager {
 				this.queue = new ArrayBlockingQueue<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
-				this.thread = new Thread("LinkManager.Consumer-" + typeName) {
+				String name = subscriber.getThreadName();
+				this.thread = new Thread(subscriber.getThreadName()) {
 					@Override
 					public void run() {
 						while (keepRunnning) {

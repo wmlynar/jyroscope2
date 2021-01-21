@@ -200,7 +200,7 @@ public class JyroscopeDiSingleton {
 			Publisher<Double> pubsubHiccupPublisher = jy2.createPublisher("/hiccup/pubsub", Double.class);
 
 			Publisher<Long> publisher = jy2.createPublisher("pubsubhiccup", Long.class);
-			new Thread() {
+			new Thread("PubSubHiccupThread") {
 				@Override
 				public void run() {
 					try {

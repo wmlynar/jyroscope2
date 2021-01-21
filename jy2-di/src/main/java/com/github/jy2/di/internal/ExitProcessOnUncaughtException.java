@@ -29,10 +29,12 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 	public static String logFolder = "/tmp";
 	public static String memberName = "unknown";
 
+//	private static com.sun.management.ThreadMXBean mxBean = (com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean();	
+
 	static public void register() {
 		Thread.setDefaultUncaughtExceptionHandler(new ExitProcessOnUncaughtException());
 	}
-
+	
 	private ExitProcessOnUncaughtException() {
 	}
 
@@ -127,7 +129,8 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		ret += " prio=" + thread.getPriority() + " tid=" + String.format("0x%08x", thread.getId());
 		if (stack.length > 0)
 			ret += " in " + stack[0].getClassName() + "." + stack[0].getMethodName() + "()";
-		ret += "\n   java.lang.Thread.State: " + thread.getState() + "\n";
+//		ret += "\n   allocated bytes: " + mxBean.getThreadAllocatedBytes(thread.getId());
+		ret += "\n   java.lang.Thread.state: " + thread.getState() + "\n";
 		ret += getStackTrace(stack);
 		return ret;
 	}

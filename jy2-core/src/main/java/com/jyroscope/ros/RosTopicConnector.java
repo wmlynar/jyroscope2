@@ -58,7 +58,7 @@ public class RosTopicConnector {
                 }
 			}
 //        });
-		}, "RosTopicConnector").start();
+		}, "Subscriber-" + topic.getName()).start();
     }
     
     private void open() throws SystemException {
