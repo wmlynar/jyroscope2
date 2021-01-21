@@ -11,6 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,8 +78,8 @@ public class JyroscopeDi implements PubSubClient {
 
 	private String name;
 
-	public ArrayList<String> publishedTopics = new ArrayList<>();
-	public ArrayList<String> subscribedTopics = new ArrayList<>();
+	public HashSet<String> publishedTopics = new HashSet<>();
+	public HashSet<String> subscribedTopics = new HashSet<>();
 
 	private Object parameterListenerId;
 
