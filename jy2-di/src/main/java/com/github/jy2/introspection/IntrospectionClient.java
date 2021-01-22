@@ -103,7 +103,8 @@ public class IntrospectionClient {
 			public void accept(Object arg0) {
 			}
 		});
-		subscriber.removeAllMessageListeners();
+		// subscriber.removeAllMessageListeners();
+		jy2.deleteSubscriber(subscriber);
 		TopicInfo ti = new TopicInfo();
 		ti.reportedIsLatched = subscriber.isLatched();
 		ti.reportedJavaType = subscriber.getRemoteJavaType();

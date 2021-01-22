@@ -1,5 +1,6 @@
 package com.github.jy2.commandline.picocli;
 
+import java.io.IOError;
 import java.util.Random;
 
 import org.jline.reader.EndOfFileException;
@@ -90,7 +91,8 @@ public class Main {
 					CommandLine.run(commands, arguments);
 				} catch (UserInterruptException e) {
 					if (TopicEchoCommand.subscriber != null) {
-						TopicEchoCommand.subscriber.removeAllMessageListeners();
+						//TopicEchoCommand.subscriber.removeAllMessageListeners();
+						Main.di.deleteSubscriber(TopicEchoCommand.subscriber);
 						TopicEchoCommand.subscriber = null;
 					}
 					if (TopicPubCommand.thread != null) {
@@ -103,6 +105,8 @@ public class Main {
 				} catch (EndOfFileException e) {
 					System.exit(0);
 				} catch (Exception t) {
+					t.printStackTrace();
+				} catch (IOError t) {
 					t.printStackTrace();
 				}
 			}

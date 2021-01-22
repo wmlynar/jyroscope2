@@ -43,14 +43,16 @@ public class TfChildPositionalCompletionCandidates implements Iterable<String> {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			subscriber.removeAllMessageListeners();
+			//subscriber.removeAllMessageListeners();
+			Main.di.deleteSubscriber(subscriber);
 			ArrayList<TransformStamped> tfList = tfManager.getTransformList();
 			for (TransformStamped t : tfList) {
 				list.add(t.childFrameId);
 			}
 		} finally {
 			if (subscriber != null) {
-				subscriber.removeAllMessageListeners();
+				//subscriber.removeAllMessageListeners();
+				Main.di.deleteSubscriber(subscriber);
 			}
 		}
 		list.sort(String::compareToIgnoreCase);
