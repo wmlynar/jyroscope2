@@ -446,7 +446,7 @@ public class JyroscopeDi implements PubSubClient {
 		}
 	}
 
-	public <T> Publisher<T> createPublisher(String topicName, Class<T> topicType, boolean isLatched) {
+	public <T> Publisher<T> createPublisher(String topicName, Class<T> topicType, boolean isLatched, int queueSize) {
 		String newTopicName = graphNameOfTopic("", topicName);
 		String remappedTopicName = remappings.get(newTopicName);
 		if (remappedTopicName != null) {
@@ -477,7 +477,7 @@ public class JyroscopeDi implements PubSubClient {
 //		singleton.nodePublishersMap.put(this.name, topicName);
 //		return new Publisher<>(singleton.hzInstance, singleton.latchedMap, newTopicName, false, isReliable);
 		publishedTopics.add(topicName);
-		return JyroscopeDiSingleton.jy2.createPublisher(newTopicName, topicType, isLatched);
+		return JyroscopeDiSingleton.jy2.createPublisher(newTopicName, topicType, isLatched, queueSize);
 	}
 
 	/**
@@ -880,7 +880,7 @@ public class JyroscopeDi implements PubSubClient {
 //		singleton.nodePublishersMap.put(this.name, topicName);
 
 		publishedTopics.add(topicName);
-		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched);
+		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched, publish.queueLength());
 	}
 
 	private Class<?> getGenericParameterType(Type param) {

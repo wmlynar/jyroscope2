@@ -5,7 +5,7 @@ public interface PubSubClient {
 	/**
 	 * Type = null subscribes to any type.
 	 */
-	<D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched);
+	<D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize);
 
 	/**
 	 * Type = null subscribes to any type.
@@ -22,7 +22,11 @@ public interface PubSubClient {
 	void shutdown();
 
 	default <D> Publisher<D> createPublisher(String topicName, Class<D> topicType) {
-		return createPublisher(topicName, topicType, false);
+		return createPublisher(topicName, topicType, false, 5);
+	}
+
+	default <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched) {
+		return createPublisher(topicName, topicType, latched, 5);
 	}
 
 	default <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType) {

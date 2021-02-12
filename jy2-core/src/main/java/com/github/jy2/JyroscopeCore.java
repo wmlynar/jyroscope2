@@ -101,7 +101,7 @@ public class JyroscopeCore implements PubSubClient {
 	}
 
 	@Override
-	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched) {
+	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize) {
 		try {
 			RosTypeConvertersSerializationWrapper.precompile(topicType);
 		} catch (ConversionException e) {
@@ -122,7 +122,9 @@ public class JyroscopeCore implements PubSubClient {
 			throw new RuntimeException("Cannot find ros type for topic " + topicName + ", type " + topicType.getName(),
 					e);
 		}
-		return new Jy2Subscriber<D>(getTopic(topicName), topicType);
+		Topic<?> topic = getTopic(topicName);
+		topic.setQueueSize(queueSize);
+		return new Jy2Subscriber<D>(topic, topicType);
 	}
 
 	@Override
