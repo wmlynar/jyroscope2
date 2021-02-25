@@ -13,6 +13,6 @@ public @interface ParameterFromFile {
 
 	String defaultValue() default "";
 	
-	boolean watch() default false;
+	boolean watch() default true;
 
 }

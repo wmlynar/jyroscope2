@@ -49,6 +49,12 @@ public class TopicPubCommand implements Runnable {
 		}
 		Publisher publisher = Main.di.createPublisher(topicName, type, latched);
 
+		// give time for the listeners to connect
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+		
 		if (rate == null) {
 			// if type is primitive - convert to primitive
 			// if type is string - publish string

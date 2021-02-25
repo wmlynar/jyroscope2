@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayDeque;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.github.jy2.di.LogSeldom;
-import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.Link;
 import com.jyroscope.SystemException;
@@ -31,12 +29,12 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     private RosTopic topic;
     
     private boolean closed;
-    private ArrayDeque<RosMessage> messages;
+    private ArrayBlockingQueue<RosMessage> messages;
     
     public TCPROSLocalToRemoteConnection(TCPROSServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
-        this.messages = new ArrayDeque<>();
+		this.messages = new ArrayBlockingQueue<>(10);
     }
     
     public void open() {

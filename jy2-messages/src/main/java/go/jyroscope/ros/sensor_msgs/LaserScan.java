@@ -37,6 +37,19 @@ public class LaserScan {
     	ranges = ranges2;
 	}
 
+	public LaserScan(LaserScan scan) {
+		header = new Header();
+		header.setSeconds(scan.header.toSeconds());
+		header.frameId = scan.header.frameId;
+		rangeMin = scan.rangeMin;
+		rangeMax = scan.rangeMax;
+		angleMin = scan.angleMin;
+		angleMax = scan.angleMax;
+		angleIncrement = scan.angleIncrement;
+		ranges = scan.ranges;
+		intensities = scan.intensities;
+	}
+
 	@Override
     public String toString() {
         return "LaserScan{" + "header=" + header + ", angleMin=" + angleMin + ", angleMax=" + angleMax + ", angleIncrement=" + angleIncrement + ", timeIncrement=" + timeIncrement + ", scanTime=" + scanTime + ", rangeMin=" + rangeMin + ", rangeMax=" + rangeMax + ", ranges=" + ranges + ", intensities=" + intensities + '}';
