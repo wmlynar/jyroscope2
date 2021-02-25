@@ -109,7 +109,7 @@ public class JyroscopeCore implements PubSubClient {
 					e);
 		}
 		Topic<?> topic = getTopic(topicName);
-		topic.setQueueSize(queueSize);
+		topic.setSendQueueSize(queueSize);
 		return new Jy2Publisher<D>(topic, topicType, latched);
 	}
 

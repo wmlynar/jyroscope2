@@ -511,12 +511,12 @@ public class RosTopic<T> implements Topic<T> {
 	}
 
 	@Override
-	public void setQueueSize(int queueSize) {
+	public void setSendQueueSize(int queueSize) {
 		this.queueSize = queueSize;
 	}
 
 	@Override
-	public int getQueueSize() {
+	public int getSendQueueSize() {
 		return queueSize;
 	}
 	

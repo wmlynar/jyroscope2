@@ -21,6 +21,6 @@ public interface Topic<T> {
 
 	Name getName();
 
-	void setQueueSize(int queueSize);
-	int getQueueSize();
+	void setSendQueueSize(int queueSize);
+	int getSendQueueSize();
 }

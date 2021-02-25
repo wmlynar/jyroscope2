@@ -76,7 +76,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                         topic = server.findTopic(caller, topicName);
                         
                         // change queue size according to what was set in publisher
-						int queueSize = topic.getQueueSize();
+						int queueSize = topic.getSendQueueSize();
 						if (queueSize != DEFAULT_SEND_QUEUE_SIZE) {
 							this.messages = new ArrayBlockingQueue<>(queueSize);
 						}
