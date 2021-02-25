@@ -176,4 +176,14 @@ public class LocalTopic<T> implements Topic<T> {
 		return name;
 	}
 
+	@Override
+	public void setSendQueueSize(int queueSize) {
+		// do nothing
+	}
+
+	@Override
+	public int getSendQueueSize() {
+		return 1;
+	}
+
 }

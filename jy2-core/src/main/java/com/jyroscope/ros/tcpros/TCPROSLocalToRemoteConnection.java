@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayDeque;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.github.jy2.di.LogSeldom;
-import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.Link;
 import com.jyroscope.SystemException;
@@ -20,7 +18,7 @@ import com.jyroscope.ros.RosTopicConnector;
 import com.jyroscope.types.ConversionException;
 
 public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
-
+	
 	private static final Logger LOG = Logger.getLogger(TCPROSLocalToRemoteConnection.class.getCanonicalName());
 	
     private TCPROSServer server;
@@ -31,12 +29,12 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     private RosTopic topic;
     
     private boolean closed;
-    private ArrayDeque<RosMessage> messages;
+    private ArrayBlockingQueue<RosMessage> messages;
     
     public TCPROSLocalToRemoteConnection(TCPROSServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
-        this.messages = new ArrayDeque<>();
+		//this.messages = new ArrayBlockingQueue<>(5);
     }
     
     public void open() {
@@ -74,6 +72,10 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 					if(error == null || "*".equals(typeName))
                     {
                         topic = server.findTopic(caller, topicName);
+                        
+                        // set queue size according to what was set in publisher
+						int queueSize = topic.getSendQueueSize();
+						this.messages = new ArrayBlockingQueue<>(queueSize);
 
                         // woj: handle case when requested topic type is "*"
 						if ("*".equals(typeName) && topic != null) {
