@@ -10,19 +10,19 @@ public interface Subscriber<T> {
 		return addMessageListener(consumer, 1, 0, 50, null);
 	}
 
-	default Object addMessageListener(Consumer<T> consumer, int queueLength) {
-		return addMessageListener(consumer, queueLength, 0, 50, null);
+	default Object addMessageListener(Consumer<T> consumer, int queueSize) {
+		return addMessageListener(consumer, queueSize, 0, 50, null);
 	}
 
-	default Object addMessageListener(Consumer<T> consumer, int queueLength, int timeout) {
-		return addMessageListener(consumer, queueLength, timeout, 50, null);
+	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout) {
+		return addMessageListener(consumer, queueSize, timeout, 50, null);
 	}
 
-	default Object addMessageListener(Consumer<T> consumer, int queueLength, int timeout, int maxExecutionTime) {
-		return addMessageListener(consumer, queueLength, timeout, maxExecutionTime, null);
+	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime) {
+		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, null);
 	}
 
-	Object addMessageListener(Consumer<T> consumer, int queueLength, int timeout, int maxExecutionTime, Method method);
+	Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime, Method method);
 
 	void removeMessageListener(Object handle);
 

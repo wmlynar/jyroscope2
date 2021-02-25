@@ -49,6 +49,8 @@ public class RosTopic<T> implements Topic<T> {
 	private boolean latched = false;
 
     private Link<RosMessage> remoteMessageHandler;
+    
+    private int queueSize = 5;
    
 //    private HashMap<URI, RosNode> rosPublishers;
 //    private HashSet<String> publisherCount;
@@ -506,6 +508,16 @@ public class RosTopic<T> implements Topic<T> {
 		return "RosTopic [name=" + name + ", messageType=" + messageType + ", latched=" + latched
 				+ ", isRegisteredPublisher=" + isRegisteredPublisher + ", isRegisteredSubscriber="
 				+ isRegisteredSubscriber + ", slave=" + slave + "]";
+	}
+
+	@Override
+	public void setQueueSize(int queueSize) {
+		this.queueSize = queueSize;
+	}
+
+	@Override
+	public int getQueueSize() {
+		return queueSize;
 	}
 	
 }

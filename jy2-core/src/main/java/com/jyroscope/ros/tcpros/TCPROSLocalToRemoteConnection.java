@@ -18,7 +18,9 @@ import com.jyroscope.ros.RosTopicConnector;
 import com.jyroscope.types.ConversionException;
 
 public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
-
+	
+	private static final int DEFAULT_SEND_QUEUE_SIZE = 5;
+	
 	private static final Logger LOG = Logger.getLogger(TCPROSLocalToRemoteConnection.class.getCanonicalName());
 	
     private TCPROSServer server;
@@ -34,7 +36,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     public TCPROSLocalToRemoteConnection(TCPROSServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
-		this.messages = new ArrayBlockingQueue<>(10);
+		this.messages = new ArrayBlockingQueue<>(DEFAULT_SEND_QUEUE_SIZE);
     }
     
     public void open() {
@@ -72,6 +74,12 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 					if(error == null || "*".equals(typeName))
                     {
                         topic = server.findTopic(caller, topicName);
+                        
+                        // change queue size according to what was set in publisher
+						int queueSize = topic.getQueueSize();
+						if (queueSize != DEFAULT_SEND_QUEUE_SIZE) {
+							this.messages = new ArrayBlockingQueue<>(queueSize);
+						}
 
                         // woj: handle case when requested topic type is "*"
 						if ("*".equals(typeName) && topic != null) {
