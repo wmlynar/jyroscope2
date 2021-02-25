@@ -50,7 +50,7 @@ public class RosTopic<T> implements Topic<T> {
 
     private Link<RosMessage> remoteMessageHandler;
     
-    private int queueSize = 5;
+    private int queueSize = -1;
    
 //    private HashMap<URI, RosNode> rosPublishers;
 //    private HashSet<String> publisherCount;
@@ -511,13 +511,25 @@ public class RosTopic<T> implements Topic<T> {
 	}
 
 	@Override
-	public void setSendQueueSize(int queueSize) {
-		this.queueSize = queueSize;
+	public synchronized void setSendQueueSize(int queueSize) {
+		if (queueSize <= 0) {
+			throw new IllegalArgumentException(
+					"Queue size cannot be less or equal to zero in publisher of topic: " + this.toString());
+		}
+		if (this.queueSize == -1) {
+			this.queueSize = queueSize;
+		} else if (this.queueSize != queueSize) {
+			throw new RuntimeException("Inconsistent queue size in publisher of topic: " + this.toString());
+		}
 	}
 
 	@Override
-	public int getSendQueueSize() {
-		return queueSize;
+	public synchronized int getSendQueueSize() {
+		if (queueSize == -1) {
+			return 5;
+		} else {
+			return queueSize;
+		}
 	}
 	
 }
