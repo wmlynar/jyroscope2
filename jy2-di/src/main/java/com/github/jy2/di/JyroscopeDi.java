@@ -772,7 +772,7 @@ public class JyroscopeDi implements PubSubClient {
 		java.lang.reflect.Parameter parameter = parameters[0];
 		final Class<?> type = parameter.getType();
 
-		int queueLenght = subscribe.queueLength();
+		int queueLenght = subscribe.queueSize();
 		int timeout = subscribe.timeout();
 		int maxExecutionTime = subscribe.maxExecutionTime();
 
@@ -880,7 +880,7 @@ public class JyroscopeDi implements PubSubClient {
 //		singleton.nodePublishersMap.put(this.name, topicName);
 
 		publishedTopics.add(topicName);
-		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched, publish.queueLength());
+		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched, publish.queueSize());
 	}
 
 	private Class<?> getGenericParameterType(Type param) {

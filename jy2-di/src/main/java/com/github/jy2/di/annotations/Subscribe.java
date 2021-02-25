@@ -11,7 +11,7 @@ public @interface Subscribe {
 
 	String value();
 
-	int queueLength() default 5;
+	int queueSize() default 5;
 
 	int timeout() default 0;
 

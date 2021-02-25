@@ -12,6 +12,6 @@ public @interface Publish {
     String value();
 	boolean latched() default false;
 	boolean reliable() default false;
-	int queueLength() default 5;
+	int queueSize() default 5;
     
 }
