@@ -31,7 +31,7 @@
 					<assembleDirectory>${jy2.assembler.directory}</assembleDirectory>
 					<repositoryLayout>${jy2.assembler.repository.layout}</repositoryLayout>
 					<useTimestampInSnapshotFileName>${jy2.assembler.use.timestamp}</useTimestampInSnapshotFileName>
-					<extraJvmArguments>-Xmx256m</extraJvmArguments>
+					<!-- <extraJvmArguments>-Xmx256m</extraJvmArguments> -->
 				</configuration>
 				<executions>
 					<execution>
