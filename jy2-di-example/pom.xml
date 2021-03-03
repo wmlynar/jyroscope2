@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.19</version>
+		<version>0.0.20</version>
 	</parent>
 	<artifactId>jy2-di-example</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.19</version>
+			<version>0.0.20</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -31,7 +31,7 @@
 					<assembleDirectory>${jy2.assembler.directory}</assembleDirectory>
 					<repositoryLayout>${jy2.assembler.repository.layout}</repositoryLayout>
 					<useTimestampInSnapshotFileName>${jy2.assembler.use.timestamp}</useTimestampInSnapshotFileName>
-					<extraJvmArguments>-Xmx256m</extraJvmArguments>
+					<!-- <extraJvmArguments>-Xmx256m</extraJvmArguments> -->
 				</configuration>
 				<executions>
 					<execution>
