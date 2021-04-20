@@ -1,6 +1,7 @@
 package com.github.jy2.messages;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.vecmath.Matrix4d;
 import javax.vecmath.Point3d;
@@ -144,4 +145,22 @@ public class Pose2d implements Serializable {
 		return "Pose2d{" + "x=" + x + ", y=" + y + ", a=" + a + '}';
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Pose2d pose2d = (Pose2d) o;
+		return Double.compare(pose2d.x, x) == 0 &&
+				Double.compare(pose2d.y, y) == 0 &&
+				Double.compare(pose2d.a, a) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, a);
+	}
 }
