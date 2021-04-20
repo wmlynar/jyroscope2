@@ -22,43 +22,39 @@ public class DirectoryMonitor {
 
 	public void monitor(Path path) throws IOException {
 		watcher = FileSystems.getDefault().newWatchService();
-		thread = new Thread(new Runnable() {
+		thread = new Thread(() -> {
+			while (keepRunning) {
+				WatchKey key;
+				try {
+					key = watcher.take();
+				} catch (InterruptedException x) {
+					continue;
+				}
 
-			@Override
-			public void run() {
-				while (keepRunning) {
-					WatchKey key;
-					try {
-						key = watcher.take();
-					} catch (InterruptedException x) {
+				for (WatchEvent<?> event : key.pollEvents()) {
+					WatchEvent.Kind<?> kind = event.kind();
+
+					if (kind == OVERFLOW) {
 						continue;
 					}
 
-					for (WatchEvent<?> event : key.pollEvents()) {
-						WatchEvent.Kind<?> kind = event.kind();
-
-						if (kind == OVERFLOW) {
-							continue;
-						}
-
-						WatchEvent<Path> ev = (WatchEvent<Path>) event;
-						Path filename = ev.context();
-						updateConsumers(filename.toString());
-					}
-
-					boolean valid = key.reset();
-					if (!valid) {
-						break;
-					}
-
+					WatchEvent<Path> ev = (WatchEvent<Path>) event;
+					Path filename = ev.context();
+					updateConsumers(filename.toString());
 				}
+
+				boolean valid = key.reset();
+				if (!valid) {
+					break;
+				}
+
 			}
 		}, "DirectoryMonitor");
 		thread.start();
 		key = path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 	}
 
-	public synchronized void addListener(Consumer<String> consumer) throws IOException {
+	public synchronized void addListener(Consumer<String> consumer) {
 		consumers.add(consumer);
 	}
 

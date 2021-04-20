@@ -21,13 +21,9 @@ public class FileChangeMonitor {
 			dm.monitor(path);
 			dms.put(path, dm);
 		}
-		dm.addListener(new Consumer<String>() {
-
-			@Override
-			public void accept(String str) {
-				if (str.equals(name)) {
-					runnable.run();
-				}
+		dm.addListener(str -> {
+			if (str.equals(name)) {
+				runnable.run();
 			}
 		});
 	}
