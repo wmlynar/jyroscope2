@@ -28,6 +28,11 @@ public class RosTopicConnector {
 	private String remoteJavaType;
 	private String remoteRosType;
 	private Semaphore semaphore = new Semaphore(1);
+	
+	// WOJ: bugfix for disconnecting. we need to be able to close the connection (blocked on read)
+	// otherwise "connected" might be set to true on when starting another subscriber
+	// which will fail to close it and we might be getting duplicated messages
+	private TCPROSRemoteToLocalConnection lastConnection = null;
     
     public RosTopicConnector(RosTopic topic, URI slaveURI, RosSlave localSlave) {
         this.topic = topic;
@@ -80,6 +85,9 @@ public class RosTopicConnector {
 
 				if (!subscriber.connect())
 					throw new SystemException("Unexpected end of stream while connecting to publisher");
+
+				// WOJ: store reference to the subscriber to be able to close it
+				storeLastConnection(subscriber);
 
 				this.remoteIsLatched = subscriber.getRemoteIsLatched();
 				this.remoteJavaType = subscriber.getRemoteJavaType();
@@ -141,6 +149,7 @@ public class RosTopicConnector {
         // TODO handle this better -- try to unblock the subscriber.read() so that it isn't sitting around on an unsubscribed connection
         // Note that this method should not block
         connected = false;
+        closeLastConnection();
     }
 
 	public boolean isRemoteLatched() {
@@ -177,5 +186,20 @@ public class RosTopicConnector {
 			semaphore.release();
 		}
         return null;
+	}
+	
+	private void storeLastConnection(TCPROSRemoteToLocalConnection connection) {
+		lastConnection = connection;
+	}
+
+	private void closeLastConnection() {
+		if (lastConnection != null) {
+			try {
+				lastConnection.close();
+			} catch (IOException e) {
+				LOG.warning("Could not close connection to remote subscriber");
+			}
+			lastConnection = null;
+		}
 	}
 }

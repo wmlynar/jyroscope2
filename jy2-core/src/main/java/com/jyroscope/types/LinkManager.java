@@ -506,4 +506,15 @@ public class LinkManager {
 		this.sendLocalMessages = !skip;
 	}
 
+	public void clearLatchedValues() {
+		lock.writeLock().lock();
+		try {
+			for (Receive<?> publisher : publishers.values()) {
+				publisher.latchedValue = null;
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
 }
