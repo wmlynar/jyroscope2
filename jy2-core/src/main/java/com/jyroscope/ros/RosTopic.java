@@ -413,6 +413,8 @@ public class RosTopic<T> implements Topic<T> {
         links.unsubscribe(subscriber);
 //        localSubscribers.remove(subscriber);
         if (!links.hasLocalSubscribers()) {
+        	// BUGFIX: do not receive old latched value when re-creating subscriber and latched topic
+        	links.clearLatchedValues();
             disconnectToRemote();
             unregisterAsSubscriber();
         }
