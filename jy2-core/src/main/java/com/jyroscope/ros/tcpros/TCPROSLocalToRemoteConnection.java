@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.ros.concurrent.CircularBlockingDeque;
 
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.Link;
@@ -28,8 +29,8 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     
     private RosTopic topic;
     
-    private boolean closed;
-    private ArrayBlockingQueue<RosMessage> messages;
+	private volatile boolean closed;
+    private CircularBlockingDeque<RosMessage> messages;
     
     public TCPROSLocalToRemoteConnection(TCPROSServer server, Socket socket) {
         this.server = server;
@@ -75,7 +76,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                         
                         // set queue size according to what was set in publisher
 						int queueSize = topic == null ? 5 : topic.getSendQueueSize();
-						this.messages = new ArrayBlockingQueue<>(queueSize);
+						this.messages = new CircularBlockingDeque<>(queueSize);
 
                         // woj: handle case when requested topic type is "*"
 						if ("*".equals(typeName) && topic != null) {
@@ -150,19 +151,13 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     private void messageLoop() {
         try {
             while (true) {
-                RosMessage message;
+                RosMessage message = null;
                 boolean hasNext;
-                synchronized (this) {
-                    message = messages.poll();
-                    hasNext = messages.isEmpty();
-                    if (message == null && !closed) {
-                        try {
-                            this.wait();
-                        } catch (InterruptedException ex) {
-                            // do nothing
-                        }
-                    }
-                }
+                try {
+					message = messages.takeFirst();
+				} catch (InterruptedException e) {
+				}
+                hasNext = messages.isEmpty();
                 if (message != null) {
                     message.writeOut(os);
                     if (hasNext)
@@ -190,15 +185,14 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
     }
 
     @Override
-    public synchronized void handle(RosMessage message) {
-        messages.offer(message);
-        this.notify();
+    public void handle(RosMessage message) {
+        messages.addLast(message);
     }
 
-    public synchronized void close() {
+    public void close() {
         // The queue is drained before the close takes effect
         closed = true;
-        this.notify();
+        messages.addLast(null);
     }
 
 	@Override

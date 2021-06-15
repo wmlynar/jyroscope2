@@ -3,9 +3,10 @@ package com.jyroscope.types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.ros.concurrent.CircularBlockingDeque;
 
 import com.github.jy2.di.LogSeldom;
 import com.github.jy2.log.Jy2DiLog;
@@ -269,11 +270,11 @@ public class LinkManager {
 		private class Consumer<D> {
 
 			private boolean keepRunnning = true;
-			private ArrayBlockingQueue<D> queue;
+			private CircularBlockingDeque<D> queue;
 			private Thread thread;
 
 			public Consumer(Link<D> subscriber, int queueSize) {
-				this.queue = new ArrayBlockingQueue<>(queueSize);
+				this.queue = new CircularBlockingDeque<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
 				String name = subscriber.getThreadName();
@@ -282,7 +283,7 @@ public class LinkManager {
 					public void run() {
 						while (keepRunnning) {
 							try {
-								D message = queue.take();
+								D message = queue.takeFirst();
 								subscriber.handle(message);
 							} catch (InterruptedException e) {
 							}
@@ -292,7 +293,7 @@ public class LinkManager {
 			}
 
 			public void offer(D message) {
-				queue.offer(message);
+				queue.addLast(message);
 			}
 
 			public void start() {
