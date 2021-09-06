@@ -56,6 +56,12 @@ public class OrchestratorClient {
 
 	public static void stopItem(String address, String itemName) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
-		commandPublisher.publish(new KeyValue("start", itemName));
+		commandPublisher.publish(new KeyValue("stop", itemName));
 	}
+	
+	public static void scan(String address) {
+		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
+		commandPublisher.publish(new KeyValue("scan", ""));
+	}
+	
 }
