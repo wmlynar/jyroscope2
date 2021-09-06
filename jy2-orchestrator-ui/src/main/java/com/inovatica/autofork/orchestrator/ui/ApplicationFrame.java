@@ -89,7 +89,7 @@ public class ApplicationFrame extends JFrame {
 				btnConnectDisconnectPressed();
 			}
 		});
-        textAddress.setText("/orchestrator_navbox");
+        textAddress.setText("/orchestrator");
         toolBar.add(textAddress);
         textAddress.setColumns(10);
 
