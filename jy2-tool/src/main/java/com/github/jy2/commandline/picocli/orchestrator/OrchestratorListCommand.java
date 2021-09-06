@@ -26,6 +26,12 @@ public class OrchestratorListCommand implements Runnable {
 	public void run() {
 //		String address = orchestratorName != null ? orchestratorName : Main.orchestratorName;
 
+		if (!Main.introspector.nodeExists(Main.orchestratorName)) {
+			System.out.println("Orchestrator node " + Main.orchestratorName
+					+ " does not exist. Use orchestrator name command to change the name");
+			return;
+		}
+		
 		ArrayList<OrchestratorStatusItem> list = OrchestratorClient.getItemStatuses(Main.orchestratorName);
 		list.sort(new Comparator<OrchestratorStatusItem>() {
 			@Override

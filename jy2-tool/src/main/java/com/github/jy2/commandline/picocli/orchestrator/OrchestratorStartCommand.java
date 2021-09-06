@@ -18,6 +18,12 @@ public class OrchestratorStartCommand implements Runnable {
 	String itemName;
 
 	public void run() {
+		if (!Main.introspector.nodeExists(Main.orchestratorName)) {
+			System.out.println("Orchestrator node " + Main.orchestratorName
+					+ " does not exist. Use orchestrator name command to change the name");
+			return;
+		}
+		
 		OrchestratorClient.startItem(Main.orchestratorName, itemName);
 	}
 }

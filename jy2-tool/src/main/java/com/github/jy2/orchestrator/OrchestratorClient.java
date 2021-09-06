@@ -2,6 +2,7 @@ package com.github.jy2.orchestrator;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import com.github.jy2.Publisher;
 import com.github.jy2.commandline.picocli.Main;
@@ -27,11 +28,13 @@ public class OrchestratorClient {
 			latch.countDown();
 		}, 1);
 		try {
-			latch.await();
+			latch.await(10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			return new ArrayList<OrchestratorStatusItem>();
+		} finally {
+			statusSubscriber.removeMessageListener(listenerId);
 		}
-		statusSubscriber.removeMessageListener(listenerId);
 		status = holder.value;
 
 		return status.items;
