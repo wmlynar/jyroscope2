@@ -41,6 +41,8 @@
 		<module>jy2-di</module>
 		<module>jy2-di-example</module>
 		<module>jy2-tf-lib</module>
+                <module>jy2-orchestrator</module>
+                <module>jy2-orchestrator-ui</module>
 		<module>jy2-tool</module>
 		<module>jy2-launch</module>
 		<module>jy2-sm-lib-messages</module>
