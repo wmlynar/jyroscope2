@@ -30,5 +30,6 @@ public class OrchestratorRestartCommand implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		OrchestratorClient.startItem(Main.orchestratorName, itemName);
 	}
 }
