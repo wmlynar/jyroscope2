@@ -1,16 +1,21 @@
 package com.github.jy2.commandline.picocli.orchestrator;
 
 import com.github.jy2.commandline.picocli.Main;
+import com.github.jy2.commandline.picocli.orchestrator.completion.OrchestratorNameCompletionCandidates;
 import com.github.jy2.orchestrator.OrchestratorClient;
 
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
 
-@Command(name = "scan", description = "Scan for new items item")
-public class OrchestratorScanCommand implements Runnable {
+@Command(name = "kill", description = "Kill item")
+public class OrchestratorKillCommand implements Runnable {
 
 	@ParentCommand
 	OrchestratorCommand parent;
+
+	@Parameters(index = "0", description = "Name of the item", completionCandidates = OrchestratorNameCompletionCandidates.class)
+	String itemName;
 
 	public void run() {
 		if (!Main.introspector.nodeExists(Main.orchestratorName)) {
@@ -18,7 +23,7 @@ public class OrchestratorScanCommand implements Runnable {
 					+ " does not exist. Use orchestrator name command to change the name");
 			return;
 		}
-
-		OrchestratorClient.scan(Main.orchestratorName);
+		
+		OrchestratorClient.killItem(Main.orchestratorName, itemName);
 	}
 }

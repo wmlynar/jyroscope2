@@ -8,7 +8,8 @@ import picocli.CommandLine.ParentCommand;
 
 @Command(name = "orchestrator", description = "Orchestrator operations", subcommands = { OrchestratorListCommand.class,
 		OrchestratorStartCommand.class, OrchestratorStopCommand.class, OrchestratorRestartCommand.class,
-		OrchestratorNameCommand.class, OrchestratorScanCommand.class }, sortOptions = true)
+		OrchestratorNameCommand.class, OrchestratorScanCommand.class,
+		OrchestratorKillCommand.class }, sortOptions = true)
 public class OrchestratorCommand implements Runnable {
 
 	@ParentCommand
