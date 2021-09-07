@@ -51,22 +51,37 @@ public class OrchestratorClient {
 
 	public static void startItem(String address, String itemName) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
+		// give time for the listeners to connect
+		sleep(500);
 		commandPublisher.publish(new KeyValue("start", itemName));
 	}
 
 	public static void stopItem(String address, String itemName) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
+		// give time for the listeners to connect
+		sleep(500);
 		commandPublisher.publish(new KeyValue("stop", itemName));
 	}
 	
 	public static void killItem(String address, String itemName) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
+		// give time for the listeners to connect
+		sleep(500);
 		commandPublisher.publish(new KeyValue("kill", itemName));
 	}
-	
+
 	public static void scan(String address) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
+		// give time for the listeners to connect
+		sleep(500);
 		commandPublisher.publish(new KeyValue("scan", ""));
+	}
+	
+	private static void sleep(int ms) {
+		try {
+			Thread.sleep(ms);
+		} catch (InterruptedException e) {
+		}
 	}
 	
 }
