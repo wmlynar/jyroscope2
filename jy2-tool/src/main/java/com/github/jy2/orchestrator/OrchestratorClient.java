@@ -33,7 +33,7 @@ public class OrchestratorClient {
 			e.printStackTrace();
 			return new ArrayList<OrchestratorStatusItem>();
 		} finally {
-			statusSubscriber.removeMessageListener(listenerId);
+			Main.di.deleteSubscriber(statusSubscriber);
 		}
 		status = holder.value;
 
@@ -62,7 +62,7 @@ public class OrchestratorClient {
 		sleep(500);
 		commandPublisher.publish(new KeyValue("stop", itemName));
 	}
-	
+
 	public static void killItem(String address, String itemName) {
 		Publisher<KeyValue> commandPublisher = Main.di.createPublisher(address + "/command", KeyValue.class);
 		// give time for the listeners to connect
@@ -76,12 +76,12 @@ public class OrchestratorClient {
 		sleep(500);
 		commandPublisher.publish(new KeyValue("scan", ""));
 	}
-	
+
 	private static void sleep(int ms) {
 		try {
 			Thread.sleep(ms);
 		} catch (InterruptedException e) {
 		}
 	}
-	
+
 }
