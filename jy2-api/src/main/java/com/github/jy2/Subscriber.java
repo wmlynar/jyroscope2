@@ -43,4 +43,6 @@ public interface Subscriber<T> {
 	 */
 	String getRemoteRosType();
 
+	void shutdown();
+
 }

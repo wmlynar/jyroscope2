@@ -104,7 +104,7 @@ public class IntrospectionClient {
 			}
 		});
 		// subscriber.removeAllMessageListeners();
-		jy2.deleteSubscriber(subscriber);
+		subscriber.shutdown();
 		TopicInfo ti = new TopicInfo();
 		ti.reportedIsLatched = subscriber.isLatched();
 		ti.reportedJavaType = subscriber.getRemoteJavaType();

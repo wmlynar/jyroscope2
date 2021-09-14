@@ -61,7 +61,7 @@ public class TfListCommand implements Runnable {
 				e.printStackTrace();
 			}
 			//subscriber.removeAllMessageListeners();
-			Main.di.deleteSubscriber(subscriber);
+			subscriber.shutdown();
 			System.out.println("List of transforms:");
 			ArrayList<TransformStamped> list = tfManager.getTransformList();
 			for (TransformStamped t : list) {
@@ -86,7 +86,7 @@ public class TfListCommand implements Runnable {
 		} finally {
 			if (subscriber != null) {
 				//subscriber.removeAllMessageListeners();
-				Main.di.deleteSubscriber(subscriber);
+				subscriber.shutdown();
 			}
 		}
 	}

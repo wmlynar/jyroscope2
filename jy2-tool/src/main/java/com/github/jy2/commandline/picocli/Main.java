@@ -100,7 +100,7 @@ public class Main {
 				} catch (UserInterruptException e) {
 					if (TopicEchoCommand.subscriber != null) {
 						//TopicEchoCommand.subscriber.removeAllMessageListeners();
-						Main.di.deleteSubscriber(TopicEchoCommand.subscriber);
+						TopicEchoCommand.subscriber.shutdown();
 						TopicEchoCommand.subscriber = null;
 					}
 					if (TopicPubCommand.thread != null) {

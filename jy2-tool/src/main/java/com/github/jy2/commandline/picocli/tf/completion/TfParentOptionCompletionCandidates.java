@@ -44,7 +44,7 @@ public class TfParentOptionCompletionCandidates implements Iterable<String> {
 				e.printStackTrace();
 			}
 			//subscriber.removeAllMessageListeners();
-			Main.di.deleteSubscriber(subscriber);
+			subscriber.shutdown();
 			ArrayList<TransformStamped> tfList = tfManager.getTransformList();
 			for (TransformStamped t : tfList) {
 				list.add(t.header.frameId);
@@ -52,7 +52,7 @@ public class TfParentOptionCompletionCandidates implements Iterable<String> {
 		} finally {
 			if (subscriber != null) {
 				//subscriber.removeAllMessageListeners();
-				Main.di.deleteSubscriber(subscriber);
+				subscriber.shutdown();
 			}
 		}
 		list.sort(String::compareToIgnoreCase);

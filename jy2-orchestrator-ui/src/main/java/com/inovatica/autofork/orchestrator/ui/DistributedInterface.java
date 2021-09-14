@@ -75,9 +75,9 @@ public class DistributedInterface {
     public void onDisconnect() {
         LOG.info("Disconnect button pressed");
         //statusSubscriber.removeAllMessageListeners();
-        di.deleteSubscriber(statusSubscriber);
+        statusSubscriber.shutdown();
         //logSubscriber.removeAllMessageListeners();
-        di.deleteSubscriber(logSubscriber);
+        logSubscriber.shutdown();
 
         // somehow adding this causes weird behavior on reconnect (inability to send
         // messages, or receiving multiple messages)

@@ -46,11 +46,12 @@ import com.github.jy2.di.monitor.FileChangeMonitor;
 import com.github.jy2.di.ros.TimeProvider;
 import com.github.jy2.di.utils.JsonMapper;
 import com.github.jy2.di.utils.YamlMapper;
+import com.github.jy2.internal.DeleteSubscriber;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.util.ExceptionUtil;
 
-public class JyroscopeDi implements PubSubClient {
+public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 	private static final LogSeldom LOG = new Jy2DiLog(JyroscopeDi.class);
 
@@ -521,7 +522,7 @@ public class JyroscopeDi implements PubSubClient {
 //				isReliable, LOG);
 		subscribedTopics.add(topicName);
 		Subscriber<T> subscriber = JyroscopeDiSingleton.jy2.createSubscriber(newTopicName, topicType, queueLength,
-				maxExecutionTime, isReliable);
+				maxExecutionTime, isReliable, this);
 		subscribers.add(subscriber);
 		return subscriber;
 	}

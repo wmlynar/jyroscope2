@@ -33,7 +33,7 @@ public class OrchestratorClient {
 			e.printStackTrace();
 			return new ArrayList<OrchestratorStatusItem>();
 		} finally {
-			Main.di.deleteSubscriber(statusSubscriber);
+			statusSubscriber.shutdown();
 		}
 		status = holder.value;
 
