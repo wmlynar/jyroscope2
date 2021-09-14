@@ -34,6 +34,7 @@ public class Main {
 	public static JyroscopeDi di;
 	public static LogCollector logCollector;
 	public static IntrospectionClient introspector;
+	public static String orchestratorName;
 
 	public static void main(String[] args) {
 		try {
@@ -43,6 +44,13 @@ public class Main {
 			logCollector = di.create(LogCollector.class);
 			introspector = di.inject(new IntrospectionClient(di));
 			di.start();
+
+			// get orchestrator name
+			orchestratorName = "/orchestrator";
+			String tmp = System.getenv("ROS_ORCHESTRATOR_NAME");
+			if (tmp != null) {
+				orchestratorName = tmp;
+			}
 
 			// set up the completion
 			HzCommand commands = new HzCommand();
@@ -92,7 +100,7 @@ public class Main {
 				} catch (UserInterruptException e) {
 					if (TopicEchoCommand.subscriber != null) {
 						//TopicEchoCommand.subscriber.removeAllMessageListeners();
-						Main.di.deleteSubscriber(TopicEchoCommand.subscriber);
+						TopicEchoCommand.subscriber.shutdown();
 						TopicEchoCommand.subscriber = null;
 					}
 					if (TopicPubCommand.thread != null) {

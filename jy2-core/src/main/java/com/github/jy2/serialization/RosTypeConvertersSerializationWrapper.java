@@ -23,6 +23,11 @@ public class RosTypeConvertersSerializationWrapper {
 	private static final TypeConverter JAVA_TO_ROS_CONVERTER = new FstJavaToRosConverter<>();
 
 	private static final HashSet<Class<?>> javaTypes = new HashSet<>();
+	
+	static {
+		// hack to be able to deserialize java objects published by rosbag play (rosbags do not record headers)
+		javaTypes.add(go.jyroscope.ros.jy2_msgs.JavaObject.class);
+	}
 
 	public static boolean isJavaType(Class<?> type) {
 		boolean hasAnnotation = type.getAnnotation(Message.class) != null;

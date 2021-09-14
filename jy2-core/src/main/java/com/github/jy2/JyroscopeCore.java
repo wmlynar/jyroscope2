@@ -15,6 +15,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import com.github.jy2.di.LogSeldom;
+import com.github.jy2.internal.DeleteSubscriber;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.log.RosoutHandler;
@@ -116,6 +117,11 @@ public class JyroscopeCore implements PubSubClient {
 	@Override
 	public <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType, int queueSize, int maxExecutionTime,
 			boolean isReliable) {
+		return createSubscriber(topicName, topicType, queueSize, maxExecutionTime, isReliable, null);
+	}
+	
+	public <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType, int queueSize, int maxExecutionTime,
+			boolean isReliable, DeleteSubscriber ds) {
 		try {
 			if (topicType != null) {
 				RosTypeConvertersSerializationWrapper.precompile(topicType);
@@ -124,7 +130,7 @@ public class JyroscopeCore implements PubSubClient {
 			throw new RuntimeException("Cannot find ros type for topic " + topicName + ", type " + topicType.getName(),
 					e);
 		}
-		return new Jy2Subscriber<D>(getTopic(topicName), topicType);
+		return new Jy2Subscriber<D>(getTopic(topicName), topicType, ds);
 	}
 
 	@Override
@@ -222,10 +228,12 @@ public class JyroscopeCore implements PubSubClient {
 		private Topic<?> topic;
 		private final Class<D> topicType;
 		private ArrayList<LinkImplementation> links = new ArrayList<>();
+		private DeleteSubscriber deleteSubscriber;
 
-		private Jy2Subscriber(Topic<?> topic, Class<D> topicType) {
+		private Jy2Subscriber(Topic<?> topic, Class<D> topicType, DeleteSubscriber ds) {
 			this.topic = topic;
 			this.topicType = topicType;
+			this.deleteSubscriber = ds;
 		}
 
 		@Override
@@ -408,6 +416,14 @@ public class JyroscopeCore implements PubSubClient {
 				} else {
 					return "Listener-" + topic.getName() + "-" + consumer.getClass().getName();
 				}
+			}
+		}
+
+		@Override
+		public void shutdown() {
+			removeAllMessageListeners();
+			if (deleteSubscriber != null) {
+				deleteSubscriber.deleteSubscriber(this);
 			}
 		}
 	}

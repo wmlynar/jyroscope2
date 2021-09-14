@@ -51,9 +51,9 @@ public class RosHandler {
 		applicationFrame.setLifeText("");
 		applicationFrame.setDurationText("");
 		// structureSubscriber.removeAllMessageListeners();
-		connectedNode.deleteSubscriber(structureSubscriber);
+		structureSubscriber.shutdown();
 		// stateSubscriber.removeAllMessageListeners();
-		connectedNode.deleteSubscriber(stateSubscriber);
+		stateSubscriber.shutdown();
 	}
 
 	protected void onStateMessage(SmState smState) {
