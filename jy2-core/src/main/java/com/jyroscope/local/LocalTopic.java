@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
+
+import org.ros.concurrent.CircularBlockingDeque;
 
 import com.jyroscope.Link;
 import com.jyroscope.Name;
@@ -125,17 +126,18 @@ public class LocalTopic<T> implements Topic<T> {
 	private static class Consumer<D> {
 
 		private boolean keepRunnning = true;
-		private ArrayBlockingQueue<D> queue;
+		private CircularBlockingDeque<D> queue;
 		private Thread thread;
 
 		public Consumer(Link<D> subscriber, int queueSize) {
-			this.queue = new ArrayBlockingQueue<>(queueSize);
+//			this.queue = new ArrayBlockingQueue<>(queueSize);
+			this.queue = new CircularBlockingDeque<>(queueSize);
 			this.thread = new Thread("LocalTopic.Consumer-" + subscriber.getType().getName()) {
 				@Override
 				public void run() {
 					while (keepRunnning) {
 						try {
-							D message = queue.take();
+							D message = queue.takeFirst();
 							subscriber.handle(message);
 						} catch (InterruptedException e) {
 						}
@@ -145,7 +147,7 @@ public class LocalTopic<T> implements Topic<T> {
 		}
 
 		public void offer(D message) {
-			queue.offer(message);
+			queue.addLast(message);
 		}
 
 		public void start() {
