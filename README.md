@@ -18,4 +18,6 @@ please add following line to your .bashrc
 export JDK_JAVA_OPTIONS='--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-opens java.base/java.math=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED'
 ```
 
+Licence: [Creative Commons Zero / Public Domain license](https://creativecommons.org/publicdomain/zero/1.0/)
+
 Project to be profiled with JProfiler https://www.ej-technologies.com/products/jprofiler/overview.html
