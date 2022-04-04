@@ -19,8 +19,8 @@ export JDK_JAVA_OPTIONS='--add-opens java.base/java.lang=ALL-UNNAMED --add-opens
 ```
 
 Licences:
-jyroscope  [Creative Commons Zero / Public Domain license] (https://creativecommons.org/publicdomain/zero/1.0/)
-jy2-launch [BSD-3-Clause License] [https://github.com/bponsler/rosjava_roslaunch/blob/master/LICENSE]
-jy2-tf [Apache License 2.0] [https://www.apache.org/licenses/LICENSE-2.0
+* jy2-launch [BSD-3-Clause License] [https://github.com/bponsler/rosjava_roslaunch/blob/master/LICENSE]
+* jy2-tf [Apache License 2.0] [https://www.apache.org/licenses/LICENSE-2.0
+* jyroscope (everything else)  [Creative Commons Zero / Public Domain license] (https://creativecommons.org/publicdomain/zero/1.0/)
 
 Project to be profiled with JProfiler https://www.ej-technologies.com/products/jprofiler/overview.html
