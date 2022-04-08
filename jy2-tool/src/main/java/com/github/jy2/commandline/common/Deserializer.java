@@ -4,10 +4,17 @@ import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public class Deserializer {
 
 	private static ObjectMapper mapper = new ObjectMapper();
+	
+	static {
+		mapper.registerModule(new Jdk8Module());
+		mapper.registerModule(new JavaTimeModule());
+	}
 
 	public Deserializer() {
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
