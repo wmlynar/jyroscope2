@@ -670,6 +670,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		com.github.jy2.di.annotations.Parameter parameter = field
 				.getAnnotation(com.github.jy2.di.annotations.Parameter.class);
 		if (parameter != null) {
+			verifyType(field);
 			verifyNonStatic(field);
 			makeAccessible(field);
 
@@ -912,6 +913,19 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 	private void verifyNonStatic(Field field) throws CreationException {
 		if (Modifier.isStatic(field.getModifiers())) {
 			throw new CreationException("Field " + field.toGenericString() + " must be non-static");
+		}
+	}
+
+	private void verifyType(Field field) throws CreationException {
+		Class<?> type = field.getType();
+		boolean correctType = Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type)
+				|| Integer.class.isAssignableFrom(type) || int.class.isAssignableFrom(type)
+				|| Double.class.isAssignableFrom(type) || double.class.isAssignableFrom(type)
+				|| String.class.isAssignableFrom(type) || List.class.isAssignableFrom(type)
+				|| Map.class.isAssignableFrom(type);
+		if (!correctType) {
+			throw new CreationException(
+					"Field " + field.toGenericString() + " type must be one of: boolean, int, double, String, List, Map");
 		}
 	}
 
