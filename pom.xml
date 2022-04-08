@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wmlynar</groupId>
 	<artifactId>jy2-parent</artifactId>
-	<version>0.0.22</version>
+	<version>0.0.23</version>
 	<packaging>pom</packaging>
 	<name>Jyroscope2</name>
 	<description>Next version of Jyroscope ROS Java client.</description>
@@ -41,8 +41,8 @@
 		<module>jy2-di</module>
 		<module>jy2-di-example</module>
 		<module>jy2-tf-lib</module>
-                <module>jy2-orchestrator</module>
-                <module>jy2-orchestrator-ui</module>
+		<module>jy2-orchestrator</module>
+		<module>jy2-orchestrator-ui</module>
 		<module>jy2-tool</module>
 		<module>jy2-launch</module>
 		<module>jy2-sm-lib-messages</module>
@@ -56,8 +56,10 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		
-		<jackson.version>2.10.3</jackson.version>
+
+		<jackson.version>2.13.2</jackson.version>
+		<jackson.databind.version>2.13.2.1</jackson.databind.version>
+		<snakeyaml.version>1.30</snakeyaml.version>
 
 		<jy2.assembler.directory>/opt/jy2</jy2.assembler.directory>
 		<jy2.assembler.repository.layout>flat</jy2.assembler.repository.layout>

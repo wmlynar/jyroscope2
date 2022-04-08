@@ -6,6 +6,7 @@ import static guru.nidi.graphviz.model.Factory.mutNode;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.attribute.Style;
@@ -27,7 +28,7 @@ public class Graph {
 		MutableNode n = getNode(name);
 	}
 
-	public void addNode(String name, ArrayList<String> connections) {
+	public void addNode(String name, List<String> connections) {
 		MutableNode n1 = getNode(name);
 		for (String connection : connections) {
 			MutableNode n2 = getNode(connection);
