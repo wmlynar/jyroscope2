@@ -20,16 +20,18 @@ public class SubscriberRef {
 	private int queueSize;
 	private int timeout;
 	private int maxExecutionTime;
+	private boolean logStoppedReceivingMessage;
 	private Subscriber<?> subscriber;
 
 	public SubscriberRef(JyroscopeCore jy2, Object object, Method method, String topicName, Class<?> topicType,
-			int queueSize, int timeout, int maxExecutionTime, LogSeldom log) {
+			int queueSize, int timeout, int maxExecutionTime, boolean logStoppedReceivingMessage, LogSeldom log) {
 		this.object = object;
 		this.method = method;
 		this.log = log;
 		this.queueSize = queueSize;
 		this.timeout = timeout;
 		this.maxExecutionTime = maxExecutionTime;
+		this.logStoppedReceivingMessage = logStoppedReceivingMessage;
 		this.subscriber = jy2.createSubscriber(topicName, topicType, queueSize);
 	}
 
@@ -45,7 +47,7 @@ public class SubscriberRef {
 							+ message, e);
 				}
 			}
-		}, queueSize, timeout, maxExecutionTime, method);
+		}, queueSize, timeout, maxExecutionTime, logStoppedReceivingMessage, method);
 	}
 
 	public void shutdown() {

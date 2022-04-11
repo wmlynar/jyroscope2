@@ -238,7 +238,7 @@ public class JyroscopeCore implements PubSubClient {
 
 		@Override
 		public synchronized Object addMessageListener(Consumer<D> consumer, int queueLength, int timeout,
-				int maxExecutionTime, Method method) {
+				int maxExecutionTime, boolean logStoppedReceivingMessage, Method method) {
 			LinkImplementation link = new LinkImplementation(consumer);
 			link.maxExecutionTime = maxExecutionTime;
 			link.method = method;
@@ -275,7 +275,7 @@ public class JyroscopeCore implements PubSubClient {
 							dt = 0;
 						}
 						if (dt >= timeout) {
-							if (link.firstTimeWarning) {
+							if (link.firstTimeWarning && logStoppedReceivingMessage) {
 								if (method != null) {
 									log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
 											+ method.toGenericString());

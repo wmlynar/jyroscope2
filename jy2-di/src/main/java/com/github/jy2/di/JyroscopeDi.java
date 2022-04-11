@@ -817,7 +817,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 		subscribedTopics.add(topicName);
 		return new SubscriberRef(JyroscopeDiSingleton.jy2, object, method, topicName, type, queueLenght, timeout,
-				maxExecutionTime, LOG);
+				maxExecutionTime, subscribe.logStoppedReceivingMessage(), LOG);
 	}
 
 	private <T> void collectRepeaters(Method method, T object) throws CreationException {
