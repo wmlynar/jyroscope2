@@ -22,8 +22,8 @@ public interface Subscriber<T> {
 	}
 
 	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime,
-			Method method) {
-		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, true, null);
+			boolean logStoppedReceivingMessage) {
+		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, logStoppedReceivingMessage, null);
 	}
 
 	Object addMessageListener(Consumer<T> consumer, int queueLength, int timeout, int maxExecutionTime,
