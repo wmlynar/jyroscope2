@@ -65,7 +65,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void trace(Object message) {
-		log(Level.FINEST, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.FINEST, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.FINEST, message, null, false);
+		}
 	}
 
 	@Override
@@ -75,7 +79,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void debug(Object message) {
-		log(Level.FINE, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.FINE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.FINE, message, null, false);
+		}
 	}
 
 	@Override
@@ -85,7 +93,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void info(Object message) {
-		log(Level.INFO, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.INFO, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.INFO, message, null, false);
+		}
 	}
 
 	@Override
@@ -95,7 +107,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void warn(Object message) {
-		log(Level.WARNING, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.WARNING, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.WARNING, message, null, false);
+		}
 	}
 
 	@Override
@@ -105,7 +121,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void error(Object message) {
-		log(Level.SEVERE, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.SEVERE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.SEVERE, message, null, false);
+		}
 	}
 
 	@Override
@@ -115,7 +135,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void fatal(Object message) {
-		log(Level.SEVERE, message, null, false);
+		if (message instanceof Throwable) {
+			log(Level.SEVERE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, false);
+		} else {
+			log(Level.SEVERE, message, null, false);
+		}
 	}
 
 	@Override
@@ -125,7 +149,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void debugSeldom(Object message) {
-		log(Level.FINE, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.FINE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.FINE, message, null, true);
+		}
 	}
 
 	@Override
@@ -135,7 +163,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void errorSeldom(Object message) {
-		log(Level.SEVERE, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.SEVERE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.SEVERE, message, null, true);
+		}
 	}
 
 	@Override
@@ -145,7 +177,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void fatalSeldom(Object message) {
-		log(Level.SEVERE, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.SEVERE, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.SEVERE, message, null, true);
+		}
 	}
 
 	@Override
@@ -155,7 +191,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void infoSeldom(Object message) {
-		log(Level.INFO, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.INFO, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.INFO, message, null, true);
+		}
 	}
 
 	@Override
@@ -165,7 +205,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void traceSeldom(Object message) {
-		log(Level.FINEST, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.FINEST, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.FINEST, message, null, true);
+		}
 	}
 
 	@Override
@@ -175,7 +219,11 @@ public class Jy2DiLog implements Log, LogSeldom {
 
 	@Override
 	public void warnSeldom(Object message) {
-		log(Level.WARNING, message, null, true);
+		if (message instanceof Throwable) {
+			log(Level.WARNING, "Exception caught (incorrect use of logging, missing message)", (Throwable) message, true);
+		} else {
+			log(Level.WARNING, message, null, true);
+		}
 	}
 
 	@Override
