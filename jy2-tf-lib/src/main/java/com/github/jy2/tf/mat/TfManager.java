@@ -22,6 +22,7 @@ import com.github.jy2.tf.mat.dataobjects.StringPair;
 import com.github.jy2.tf.mat.internal.TransformBuffer;
 
 import go.jyroscope.ros.geometry_msgs.Quaternion;
+import go.jyroscope.ros.geometry_msgs.Transform;
 import go.jyroscope.ros.geometry_msgs.TransformStamped;
 import go.jyroscope.ros.std_msgs.Header;
 import go.jyroscope.ros.tf2_msgs.TFMessage;
@@ -190,6 +191,37 @@ public class TfManager {
 				return false;
 			}
 			return multiplyMatricesInPath(path.indexes, path.inverted, latestTime.time, mat);
+		}
+	}
+
+	public boolean getTransformLatest(String from, String to, TransformStamped transform) {
+		if (from.equalsIgnoreCase(to)) {
+			transform.setIdentity();
+			transform.childFrameId = from;
+			transform.header.frameId = from;
+			// todo: what value for time?
+			// transform.time=?
+			return true;
+		}
+		synchronized (mutex) {
+			Path path = getPath(from, to);
+			if (path == null || path.indexes.length == 0) {
+				return false;
+			}
+			if (!getLatestTime(path.indexes, latestTime)) {
+				return false;
+			}
+			if (multiplyMatricesInPath(path.indexes, path.inverted, latestTime.time, mat)) {
+				transform.header = new Header();
+				transform.header.setSeconds(latestTime.time);
+				transform.header.frameId = from;
+				transform.childFrameId = to;
+				transform.transform = new Transform();
+				transform.transform.set(mat);
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
