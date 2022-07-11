@@ -303,6 +303,22 @@ public class TfManager {
 		// System.out.println(String.format("waited %.3f\n", now-start));
 		return multiplyMatricesInPath(path.indexes, path.inverted, time, mat);
 	}
+	
+	public boolean waitForTransform(TimeProvider timeProvider, String from, String to, double time, TransformStamped transform) {
+		Matrix4d mat = new Matrix4d();
+		if (!waitForTransform(timeProvider, from, to, time, mat)) {
+			return false;
+		}
+
+		transform.header = new Header();
+		transform.header.setSeconds(time);
+		transform.header.frameId = from;
+		transform.childFrameId = to;
+		transform.transform = new Transform();
+		transform.transform.set(mat);
+
+		return true;
+	}	
 
 	/**
 	 * Waits for semi-static transform to be available by sleeping short amount of
