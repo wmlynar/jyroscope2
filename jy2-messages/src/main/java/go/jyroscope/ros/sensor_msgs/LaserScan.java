@@ -48,7 +48,7 @@ public class LaserScan {
     	angleMax = endAngle;
     	angleIncrement = angleIncrement2;
     	ranges = ranges2;
-    	ranges = intensities;
+    	this.intensities = intensities;
 	}
 
 	public LaserScan(LaserScan scan) {
