@@ -37,6 +37,20 @@ public class LaserScan {
     	ranges = ranges2;
 	}
 
+    public LaserScan(double time, String frameId, float min, float max, float startAngle, float endAngle,
+			float angleIncrement2, float[] ranges2, float[] intensities) {
+    	header = new Header();
+    	header.setSeconds(time);
+    	header.frameId = frameId;
+    	rangeMin = min;
+    	rangeMax = max;
+    	angleMin = startAngle;
+    	angleMax = endAngle;
+    	angleIncrement = angleIncrement2;
+    	ranges = ranges2;
+    	ranges = intensities;
+	}
+
 	public LaserScan(LaserScan scan) {
 		header = new Header();
 		header.setSeconds(scan.header.toSeconds());
