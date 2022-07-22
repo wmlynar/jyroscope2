@@ -1,5 +1,7 @@
 package go.jyroscope.ros.sensor_msgs;
 
+import java.util.Arrays;
+
 import com.jyroscope.annotations.Message;
 import com.jyroscope.annotations.Name;
 
@@ -38,7 +40,7 @@ public class LaserScan {
 	}
 
     public LaserScan(double time, String frameId, float min, float max, float startAngle, float endAngle,
-			float angleIncrement2, float[] ranges2, float[] intensities) {
+			float angleIncrement2, float[] ranges2, float[] intensities2) {
     	header = new Header();
     	header.setSeconds(time);
     	header.frameId = frameId;
@@ -48,7 +50,7 @@ public class LaserScan {
     	angleMax = endAngle;
     	angleIncrement = angleIncrement2;
     	ranges = ranges2;
-    	this.intensities = intensities;
+    	intensities = intensities2;
 	}
 
 	public LaserScan(LaserScan scan) {
@@ -60,8 +62,8 @@ public class LaserScan {
 		angleMin = scan.angleMin;
 		angleMax = scan.angleMax;
 		angleIncrement = scan.angleIncrement;
-		ranges = scan.ranges;
-		intensities = scan.intensities;
+    	ranges = Arrays.copyOf(scan.ranges, scan.ranges.length);
+    	intensities = Arrays.copyOf(scan.intensities, scan.intensities.length);
 	}
 
 	@Override
