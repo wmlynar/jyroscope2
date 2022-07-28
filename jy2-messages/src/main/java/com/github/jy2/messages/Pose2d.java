@@ -149,14 +149,6 @@ public class Pose2d implements Serializable {
 		set(m2);
 	}
 
-	public void transformBy(Matrix3d matrix) {
-		Matrix3d m = new Matrix3d();
-		Matrix3d m2 = new Matrix3d(matrix);
-		get(m);
-		m2.mul(m);
-		set(m2);
-	}
-
 	@Override
 	public String toString() {
 		return "Pose2d{" + "x=" + x + ", y=" + y + ", a=" + a + '}';
