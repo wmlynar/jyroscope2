@@ -37,9 +37,12 @@ public class Graph {
 		}
 	}
 
-	public void addNode(String name, List<String> connections, int lineWidth, Color color) {
+	public void addNode(String name, List<String> connections, int lineWidth, Color color, boolean filled) {
 		MutableNode n1 = getNode(name);
 		n1.add(Style.lineWidth(lineWidth));
+		if (filled) {
+			n1.add(Style.FILLED);
+		}
 		n1.add(color);
 		for (String connection : connections) {
 			MutableNode n2 = getNode(connection);
