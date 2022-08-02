@@ -37,6 +37,16 @@ public class Graph {
 		}
 	}
 
+	public void addNode(String name, List<String> connections, int lineWidth, Color color) {
+		MutableNode n1 = getNode(name);
+		n1.add(Style.lineWidth(lineWidth));
+		n1.add(color);
+		for (String connection : connections) {
+			MutableNode n2 = getNode(connection);
+			n1.addLink(n2);
+		}
+	}
+
 	public BufferedImage renderImage(String currentNode) {
 		MutableNode n = null;
 		if (currentNode != null) {
