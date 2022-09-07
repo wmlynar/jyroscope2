@@ -17,7 +17,8 @@ public class Main {
 //		hzDi.create(DemoIntrospection.class);
 //		hzDi.inject(new IntrospectionClient(hzDi));
 //		hzDi.create(DemoTimeProvider.class);
-		hzDi.create(DemoLogging.class);
+//		hzDi.create(DemoLogging.class);
+		hzDi.create(DemoLazy.class);
 		hzDi.start();
 	}
 

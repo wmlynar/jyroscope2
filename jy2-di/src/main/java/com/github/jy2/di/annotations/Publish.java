@@ -13,5 +13,6 @@ public @interface Publish {
 	boolean latched() default false;
 	boolean reliable() default false;
 	int queueSize() default 5;
+	boolean lazy() default false;
     
 }
