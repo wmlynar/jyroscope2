@@ -201,7 +201,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 		if (!parameterFromFileReferences.isEmpty()) {
 			Subscriber<Boolean> subscriber = createSubscriber("reload_parameters", Boolean.class);
-			Publisher<Boolean> publisher = createPublisher("parameters_reloaded", Boolean.class);
+			Publisher<Boolean> publisher = createPublisher("parameters_reloaded", Boolean.class, false, 5, true);
+
 			subscriber.addMessageListener(msg -> {
 				LOG.info("Reloading parameters from file");
 				loadParametersFromFile();
