@@ -308,13 +308,15 @@ public class RosUtil
 					"Invalid <" + tag + "> tag: bool value for " + attribute + " must be non-empty");
 			}
 			else if (boolStr.toLowerCase().compareTo("true") != 0 &&
-					 boolStr.toLowerCase().compareTo("false") != 0)
+					 boolStr.toLowerCase().compareTo("false") != 0 &&
+					 boolStr.compareTo("1") != 0 &&
+					 boolStr.compareTo("0") != 0)
 			{
 				throw new RuntimeException(
 					"Invalid <" + tag + "> tag: invalid bool value for " + attribute + ": " + boolStr);
 			}
 
-			value = (boolStr.compareTo("true") == 0);
+			value = (boolStr.compareTo("true") == 0 || boolStr.compareTo("1") == 0);
 		}
 
 		return value;
