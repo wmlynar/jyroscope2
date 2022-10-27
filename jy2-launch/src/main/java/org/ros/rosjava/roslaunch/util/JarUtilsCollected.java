@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -93,6 +94,9 @@ public class JarUtilsCollected {
 					}
 					method.invoke(null, (Object) params);
 				} catch (Throwable e) {
+					if (e instanceof InvocationTargetException && e.getCause() != null) {
+						e = e.getCause();
+					}
 					PrintLog.error(e.getMessage());
 					PrintLog.error(ExceptionUtils.getStackTrace(e));
 				}
