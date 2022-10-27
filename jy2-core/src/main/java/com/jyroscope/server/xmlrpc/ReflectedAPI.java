@@ -30,7 +30,8 @@ public class ReflectedAPI implements API {
 					return method.invoke(target, params.toArray());
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					ExceptionUtil.rethrowErrorIfCauseIsError(e);
-					throw new RuntimeException("Exception caught while executing xml rpc method " + method.toGenericString(), e);
+					Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+					throw new RuntimeException("Exception caught while executing xml rpc method " + method.toGenericString(), t);
 				}
             }
         };

@@ -3,6 +3,7 @@ package com.github.jy2.di;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -573,7 +574,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 			initializer.method.invoke(initializer.object);
 		} catch (Exception e) {
 			ExceptionUtil.rethrowErrorIfCauseIsError(e);
-			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
+			Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), t);
 		}
 		long delta = System.currentTimeMillis() - before;
 		if (delta > initializer.init.maxExecutionTime() && initializer.init.maxExecutionTime() > 0) {
@@ -613,7 +615,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 						}
 					} catch (Exception e) {
 						ExceptionUtil.rethrowErrorIfCauseIsError(e);
-						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
+						Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+						LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
 					}
 					try {
 						if (isDelay) {
