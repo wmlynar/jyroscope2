@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.github.jy2.di.JyroscopeDi;
 import com.github.jy2.di.exceptions.CreationException;
-import com.github.jy2.introspection.IntrospectionClient;
 
 public class Main {
 
@@ -18,6 +17,7 @@ public class Main {
 //		hzDi.inject(new IntrospectionClient(hzDi));
 //		hzDi.create(DemoTimeProvider.class);
 //		hzDi.create(DemoLogging.class);
+//		hzDi.create(DemoRuntimeException.class);
 		hzDi.create(DemoLazy.class);
 		hzDi.start();
 	}
