@@ -3,11 +3,7 @@ package com.github.jy2.messages;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.vecmath.Matrix4d;
-import javax.vecmath.Point3d;
-import javax.vecmath.Quat4d;
-import javax.vecmath.Tuple2d;
-import javax.vecmath.Tuple3d;
+import javax.vecmath.*;
 
 import com.github.jy2.utils.MessagesQuaternionUtils;
 
@@ -77,6 +73,13 @@ public class Pose2d implements Serializable {
 		return this;
 	}
 
+	public Pose2d set(Matrix3d t) {
+		this.x = t.m02;
+		this.y = t.m12;
+		this.a = -Math.atan2(t.m01, t.m00);
+		return this;
+	}
+
 	public Pose2d set(Point3d p) {
 		this.x = p.x;
 		this.y = p.y;
@@ -92,6 +95,12 @@ public class Pose2d implements Serializable {
 		matrix.rotZ(a);
 		matrix.m03 = x;
 		matrix.m13 = y;
+	}
+
+	public void get(Matrix3d matrix) {
+		matrix.rotZ(a);
+		matrix.m02 = x;
+		matrix.m12 = y;
 	}
 
 	public void get(Tuple3d translation) {

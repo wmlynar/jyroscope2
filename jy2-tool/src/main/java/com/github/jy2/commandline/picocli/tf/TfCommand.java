@@ -7,7 +7,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;
 
 @Command(name = "tf", description = "Transform operations", subcommands = { TfEchoCommand.class, TfListCommand.class,
-		TfWhoCommand.class, TfDelayCommand.class, TfHzCommand.class }, sortOptions = true)
+		TfWhoCommand.class, TfDelayCommand.class, TfHzCommand.class, TfGetCommand.class }, sortOptions = true)
 public class TfCommand implements Runnable {
 
 	@ParentCommand

@@ -102,7 +102,8 @@ public class JyroscopeCore implements PubSubClient {
 	}
 
 	@Override
-	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize) {
+	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize,
+			boolean lazy) {
 		try {
 			RosTypeConvertersSerializationWrapper.precompile(topicType);
 		} catch (ConversionException e) {
@@ -111,7 +112,11 @@ public class JyroscopeCore implements PubSubClient {
 		}
 		Topic<?> topic = getTopic(topicName);
 		topic.setSendQueueSize(queueSize);
-		return new Jy2Publisher<D>(topic, topicType, latched);
+		if (lazy) {
+			return new LazyJy2Publisher<D>(topic, topicType, latched);
+		} else {
+			return new Jy2Publisher<D>(topic, topicType, latched);
+		}
 	}
 
 	@Override
@@ -119,7 +124,7 @@ public class JyroscopeCore implements PubSubClient {
 			boolean isReliable) {
 		return createSubscriber(topicName, topicType, queueSize, maxExecutionTime, isReliable, null);
 	}
-	
+
 	public <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType, int queueSize, int maxExecutionTime,
 			boolean isReliable, DeleteSubscriber ds) {
 		try {
@@ -221,6 +226,41 @@ public class JyroscopeCore implements PubSubClient {
 		}
 	}
 
+	private final static class LazyJy2Publisher<D> implements Publisher<D> {
+		private final Topic<?> topic;
+		private final Class<D> topicType;
+		private final boolean latched;
+		private Link<D> link = null;
+
+		private LazyJy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched) {
+			this.topic = topic;
+			this.topicType = topicType;
+			this.latched = latched;
+		}
+
+		@Override
+		public void publish(D message) {
+			if (link == null) {
+				try {
+					link = topic.getPublisher(topicType, latched);
+				} catch (ConversionException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			link.handle(message);
+		}
+
+		@Override
+		public int getNumberOfMessageListeners() {
+			return topic.getNumberOfMessageListeners();
+		}
+
+		@Override
+		public void skipLocalMessages(boolean skip) {
+			topic.skipLocalMessages(skip);
+		}
+	}
+
 	private final static class Jy2Subscriber<D> implements Subscriber<D> {
 
 		private LogSeldom log = JyroscopeCore.getLog();
@@ -238,7 +278,7 @@ public class JyroscopeCore implements PubSubClient {
 
 		@Override
 		public synchronized Object addMessageListener(Consumer<D> consumer, int queueLength, int timeout,
-				int maxExecutionTime, Method method) {
+				int maxExecutionTime, boolean logStoppedReceivingMessage, Method method) {
 			LinkImplementation link = new LinkImplementation(consumer);
 			link.maxExecutionTime = maxExecutionTime;
 			link.method = method;
@@ -275,7 +315,7 @@ public class JyroscopeCore implements PubSubClient {
 							dt = 0;
 						}
 						if (dt >= timeout) {
-							if (link.firstTimeWarning) {
+							if (link.firstTimeWarning && logStoppedReceivingMessage) {
 								if (method != null) {
 									log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
 											+ method.toGenericString());

@@ -3,6 +3,7 @@ package com.github.jy2.di;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -201,7 +202,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 		if (!parameterFromFileReferences.isEmpty()) {
 			Subscriber<Boolean> subscriber = createSubscriber("reload_parameters", Boolean.class);
-			Publisher<Boolean> publisher = createPublisher("parameters_reloaded", Boolean.class);
+			Publisher<Boolean> publisher = createPublisher("parameters_reloaded", Boolean.class, false, 5, true);
+
 			subscriber.addMessageListener(msg -> {
 				LOG.info("Reloading parameters from file");
 				loadParametersFromFile();
@@ -447,7 +449,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		}
 	}
 
-	public <T> Publisher<T> createPublisher(String topicName, Class<T> topicType, boolean isLatched, int queueSize) {
+	public <T> Publisher<T> createPublisher(String topicName, Class<T> topicType, boolean isLatched, int queueSize, boolean lazy) {
 		String newTopicName = graphNameOfTopic("", topicName);
 		String remappedTopicName = remappings.get(newTopicName);
 		if (remappedTopicName != null) {
@@ -478,7 +480,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 //		singleton.nodePublishersMap.put(this.name, topicName);
 //		return new Publisher<>(singleton.hzInstance, singleton.latchedMap, newTopicName, false, isReliable);
 		publishedTopics.add(topicName);
-		return JyroscopeDiSingleton.jy2.createPublisher(newTopicName, topicType, isLatched, queueSize);
+		return JyroscopeDiSingleton.jy2.createPublisher(newTopicName, topicType, isLatched, queueSize, lazy);
 	}
 
 	/**
@@ -572,7 +574,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 			initializer.method.invoke(initializer.object);
 		} catch (Exception e) {
 			ExceptionUtil.rethrowErrorIfCauseIsError(e);
-			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), e);
+			Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+			LOG.error("Exception caught while calling node initializer " + initializer.method.toGenericString(), t);
 		}
 		long delta = System.currentTimeMillis() - before;
 		if (delta > initializer.init.maxExecutionTime() && initializer.init.maxExecutionTime() > 0) {
@@ -612,7 +615,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 						}
 					} catch (Exception e) {
 						ExceptionUtil.rethrowErrorIfCauseIsError(e);
-						LOG.error("Exception caught while calling repeater " + method.toGenericString(), e);
+						Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+						LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
 					}
 					try {
 						if (isDelay) {
@@ -817,7 +821,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 		subscribedTopics.add(topicName);
 		return new SubscriberRef(JyroscopeDiSingleton.jy2, object, method, topicName, type, queueLenght, timeout,
-				maxExecutionTime, LOG);
+				maxExecutionTime, subscribe.logStoppedReceivingMessage(), LOG);
 	}
 
 	private <T> void collectRepeaters(Method method, T object) throws CreationException {
@@ -882,7 +886,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 //		singleton.nodePublishersMap.put(this.name, topicName);
 
 		publishedTopics.add(topicName);
-		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched, publish.queueSize());
+		return JyroscopeDiSingleton.jy2.createPublisher(topicName, topicType, isLatched, publish.queueSize(), publish.lazy());
 	}
 
 	private Class<?> getGenericParameterType(Type param) {

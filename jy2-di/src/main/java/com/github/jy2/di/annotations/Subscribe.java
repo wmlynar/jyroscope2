@@ -18,4 +18,7 @@ public @interface Subscribe {
 	int maxExecutionTime() default 50;
 
 	boolean reliable() default false;
+	
+	boolean logStoppedReceivingMessage() default true;
+	
 }

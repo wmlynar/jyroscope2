@@ -5,24 +5,29 @@ import java.util.function.Consumer;
 
 public interface Subscriber<T> {
 
-
 	default Object addMessageListener(Consumer<T> consumer) {
-		return addMessageListener(consumer, 1, 0, 50, null);
+		return addMessageListener(consumer, 1, 0, 50, true, null);
 	}
 
 	default Object addMessageListener(Consumer<T> consumer, int queueSize) {
-		return addMessageListener(consumer, queueSize, 0, 50, null);
+		return addMessageListener(consumer, queueSize, 0, 50, true, null);
 	}
 
 	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout) {
-		return addMessageListener(consumer, queueSize, timeout, 50, null);
+		return addMessageListener(consumer, queueSize, timeout, 50, true, null);
 	}
 
 	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime) {
-		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, null);
+		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, true, null);
 	}
 
-	Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime, Method method);
+	default Object addMessageListener(Consumer<T> consumer, int queueSize, int timeout, int maxExecutionTime,
+			boolean logStoppedReceivingMessage) {
+		return addMessageListener(consumer, queueSize, timeout, maxExecutionTime, logStoppedReceivingMessage, null);
+	}
+
+	Object addMessageListener(Consumer<T> consumer, int queueLength, int timeout, int maxExecutionTime,
+			boolean logStoppedReceivingMessage, Method method);
 
 	void removeMessageListener(Object handle);
 

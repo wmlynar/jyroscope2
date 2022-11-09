@@ -65,9 +65,10 @@ public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler 
 		String content = "Uncaught exception caught in thread " + t + "\n" + stringWriter + "\nAll Stack Traces:\n"
 				+ getAllStackTraces() + "\n" + "Heap:\n" + getHeapInfo();
 
-		File f = new File(fileName);
-		if (f.getParentFile() != null) {
-			f.getParentFile().mkdirs();
+		try {
+			new File(logFolder).mkdirs();
+		} catch (Exception e2) {
+			e2.printStackTrace();
 		}
 
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
