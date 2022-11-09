@@ -24,3 +24,9 @@ Licences:
 * jyroscope (everything else)  [Creative Commons Zero / Public Domain license] (https://creativecommons.org/publicdomain/zero/1.0/)
 
 Project to be profiled with JProfiler https://www.ej-technologies.com/products/jprofiler/overview.html
+
+Releasing the project:
+```
+mvn gitflow:release
+```
+This command will trigger automatic build on github
