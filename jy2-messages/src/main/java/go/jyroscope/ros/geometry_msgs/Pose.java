@@ -14,6 +14,8 @@ public class Pose {
 	}
 
 	public Pose() {
+		position = new Point();
+		orientation = new Quaternion();
 	}
 
 	public Pose(double x, double y, double z, double a) {
