@@ -352,10 +352,15 @@ public class JyroscopeCore implements PubSubClient {
 								}
 							}
 						}
+						long sleep = timeout - dt;
 						try {
-							Thread.sleep(timeout - dt);
+							if (sleep > 0) {
+								Thread.sleep(sleep);
+							}
 						} catch (InterruptedException e) {
 							// do nothing
+						} catch (Exception e) {
+							log.error("Exception caught while calling sleep " + method.toGenericString(), e);
 						}
 					}
 				}

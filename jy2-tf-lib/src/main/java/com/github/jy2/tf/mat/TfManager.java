@@ -258,6 +258,8 @@ public class TfManager {
 			try {
 				notify.wait(ms);
 			} catch (InterruptedException e) {
+			} catch (Exception e) {
+				LOG.error("Exception caught while calling sleep", e);
 			}
 		}
 	}
