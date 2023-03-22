@@ -622,15 +622,15 @@ public class TfManager {
 					LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
+				tb2.getLatestTime(latestTime);
+				if (latestTime.time < time - semiTimeout) {
+					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
+					return false;
+				}
 			} else {
 				if (!tb2.getTransform(time, mat)) {
 					LOG.warnSeldom("Missing transform in transfrom buffer at specific time "
 							+ String.format("%.4f", time) + ": " + tb2.from + "->" + tb2.to);
-					return false;
-				}
-				tb2.getLatestTime(latestTime);
-				if (latestTime.time < time - semiTimeout) {
-					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
 			}
