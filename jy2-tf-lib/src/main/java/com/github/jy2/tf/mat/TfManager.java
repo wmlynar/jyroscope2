@@ -604,7 +604,7 @@ public class TfManager {
 				return false;
 			}
 			tb.getLatestTime(latestTime);
-			if (latestTime.time < time - semiTimeout || time != Double.POSITIVE_INFINITY) {
+			if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
 				LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb.from + "->" + tb.to);
 				return false;
 			}
@@ -623,7 +623,7 @@ public class TfManager {
 					return false;
 				}
 				tb2.getLatestTime(latestTime);
-				if (latestTime.time < time - semiTimeout || time != Double.POSITIVE_INFINITY) {
+				if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
 					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
