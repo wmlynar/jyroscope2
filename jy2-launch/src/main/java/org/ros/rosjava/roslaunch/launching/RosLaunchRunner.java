@@ -74,6 +74,10 @@ public class RosLaunchRunner
 			String uri = RosUtil.createMasterUri(m_parsedArgs, m_port);
 			m_config.setUri(uri);
 		}
+		else { // WOJ: fixed bug with m_uri not initialized
+			String uri = RosUtil.getMasterUri(m_parsedArgs);
+			m_config.setUri(uri);
+		}
 
 		// Handle the optional num workers command line argument
 		int numWorkers = parsedArgs.getNumWorkers();
