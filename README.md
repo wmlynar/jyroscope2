@@ -10,7 +10,7 @@ This project derives from and combines following work
 In order to remove the warning message caused by the FST serialization
 ```
 WARNING: An illegal reflective access operation has occurred
-WARNING: Illegal reflective access by org.nustaq.serialization.FSTClazzInfo (file:/opt/jy2/repo/fst-2.56.jar) to field java.lang.String.value
+WARNING: Illegal reflective access by org.nustaq.serialization.FSTClazzInfo (file:/opt/jy2/repo/fst-2.56.jar) to outgoingField java.lang.String.value
 WARNING: Please consider reporting this to the maintainers of org.nustaq.serialization.FSTClazzInfo
 ```
 please add following line to your .bashrc
