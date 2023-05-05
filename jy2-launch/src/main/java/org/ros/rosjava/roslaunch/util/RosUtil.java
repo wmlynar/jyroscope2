@@ -732,8 +732,10 @@ public class RosUtil
 		RosXmlRpcClient client = new RosXmlRpcClient(uri);
 		try
 		{
-			@SuppressWarnings("unused")
-			SystemStateResponse state = client.getSystemState();
+// WOJ: hasParam should have less overhead
+//			@SuppressWarnings("unused")
+//			SystemStateResponse state = client.getSystemState();
+			client.hasParam("foo");
 			return true;  // master running
 		}
 		catch (Exception e) {
