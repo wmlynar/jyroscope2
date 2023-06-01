@@ -1,17 +1,11 @@
 package com.github.jy2.mapper;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import com.github.jy2.util.ExceptionUtil;
-import com.jyroscope.annotations.Initializer;
-import com.jyroscope.local.types.IdentityTypeConverter;
+import com.jyroscope.base.local.types.IdentityTypeConverter;
 import com.jyroscope.ros.RosMessage;
 import com.jyroscope.types.ConversionException;
 import com.jyroscope.types.TypeConverter;

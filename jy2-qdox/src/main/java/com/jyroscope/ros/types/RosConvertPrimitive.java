@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import com.jyroscope.types.TypeConverterHelper;
+import com.jyroscope.core.types.TypeConverterHelper;
 import com.thoughtworks.qdox.model.JavaType;
 
 public class RosConvertPrimitive implements TypeConverterHelper<RosType, JavaType> {

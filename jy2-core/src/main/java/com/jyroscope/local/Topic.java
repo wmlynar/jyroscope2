@@ -2,7 +2,6 @@ package com.jyroscope.local;
 
 import com.jyroscope.Link;
 import com.jyroscope.Name;
-import com.jyroscope.ros.RosTopic;
 import com.jyroscope.types.ConversionException;
 
 public interface Topic<T> {

@@ -51,7 +51,6 @@
 		<module>jy2-sm-lib-ui</module>
 		<module>jy2-uberjar-libs</module>
 		<module>jy2-uberjar-example</module>
-		<module>jy2-aaa</module>
 	</modules>
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>

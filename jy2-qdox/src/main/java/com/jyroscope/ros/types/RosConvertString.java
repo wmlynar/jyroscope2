@@ -1,6 +1,6 @@
 package com.jyroscope.ros.types;
 
-import com.jyroscope.types.TypeConverterHelper;
+import com.jyroscope.core.types.TypeConverterHelper;
 import com.thoughtworks.qdox.model.JavaType;
 
 public class RosConvertString implements TypeConverterHelper<RosType, JavaType> {

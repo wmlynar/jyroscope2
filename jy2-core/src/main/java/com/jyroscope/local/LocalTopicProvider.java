@@ -5,8 +5,7 @@ import java.util.concurrent.ExecutorService;
 import com.github.jy2.MasterClient;
 import com.github.jy2.SlaveClient;
 import com.jyroscope.Name;
-import com.jyroscope.SystemException;
-import com.jyroscope.ros.parameters.RosParameterClient;
+import com.jyroscope.roscore.parameters.RosParameterClient;
 
 public class LocalTopicProvider<T> implements TopicProvider<T> {
 

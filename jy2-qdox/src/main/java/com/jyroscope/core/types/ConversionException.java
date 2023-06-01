@@ -1,4 +1,4 @@
-package com.jyroscope.types;
+package com.jyroscope.core.types;
 
 public class ConversionException extends Exception {
     

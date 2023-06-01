@@ -25,7 +25,7 @@ import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.Link;
 import com.jyroscope.local.Topic;
 import com.jyroscope.local.TopicProvider;
-import com.jyroscope.ros.RosTopicProvider;
+import com.jyroscope.roscore.RosTopicProvider;
 import com.jyroscope.types.ConversionException;
 
 import go.jyroscope.ros.jy2_msgs.JavaObject;

@@ -4,11 +4,11 @@ import java.util.Map;
 
 import com.github.jy2.mapper.QdoxAnnotations;
 import com.jyroscope.Log;
-import com.jyroscope.types.BeanType;
-import com.jyroscope.types.ConversionException;
-import com.jyroscope.types.MethodBuilder;
-import com.jyroscope.types.TypeConverterBuilder;
-import com.jyroscope.types.TypeConverterHelperCollection;
+import com.jyroscope.core.types.BeanType;
+import com.jyroscope.core.types.ConversionException;
+import com.jyroscope.core.types.MethodBuilder;
+import com.jyroscope.core.types.TypeConverterBuilder;
+import com.jyroscope.core.types.TypeConverterHelperCollection;
 import com.jyroscope.util.Template;
 import com.thoughtworks.qdox.model.JavaAnnotation;
 import com.thoughtworks.qdox.model.JavaClass;
