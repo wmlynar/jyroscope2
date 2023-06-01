@@ -1,4 +1,4 @@
-package com.github.jy2.di;
+package com.github.jy2.api;
 
 import org.apache.commons.logging.Log;
 

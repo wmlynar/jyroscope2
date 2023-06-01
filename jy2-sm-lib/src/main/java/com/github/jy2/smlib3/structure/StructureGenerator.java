@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.smlib.messages.SmStructure;
 import com.github.jy2.smlib.messages.StateTransition;
 import com.github.jy2.smlib3.State;

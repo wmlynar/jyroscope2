@@ -6,10 +6,9 @@ import java.util.function.Consumer;
 
 import org.apache.commons.logging.Log;
 
-import com.github.jy2.JyroscopeCore;
-import com.github.jy2.PubSubClient;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Subscriber;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.util.ExceptionUtil;
 
 public class SubscriberRef {

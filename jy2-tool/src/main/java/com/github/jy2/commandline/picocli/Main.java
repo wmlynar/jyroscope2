@@ -13,7 +13,7 @@ import org.jline.reader.impl.DefaultParser;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
-import com.github.jy2.classpath.ClasspathUtils;
+import com.github.core.classpath.ClasspathUtils;
 import com.github.jy2.commandline.common.Deserializer;
 import com.github.jy2.commandline.common.Serializer;
 import com.github.jy2.commandline.picocli.member.MemberPingCommand;

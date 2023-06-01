@@ -1,10 +1,10 @@
-package com.github.jy2.log;
+package com.github.core.log;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 
 import go.jyroscope.ros.rosgraph_msgs.Log;
 

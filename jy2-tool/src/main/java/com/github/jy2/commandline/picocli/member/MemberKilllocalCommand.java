@@ -10,7 +10,7 @@ import java.util.HashSet;
 import com.github.jy2.Publisher;
 import com.github.jy2.commandline.picocli.Main;
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ParentCommand;

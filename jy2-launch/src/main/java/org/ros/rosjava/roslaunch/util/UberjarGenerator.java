@@ -27,7 +27,7 @@ public class UberjarGenerator {
 		return "package " + packageName + ";\n" + "\n" + "import com.github.jy2.uberjar.Util;\n"
 				+ "import com.github.jy2.ParameterClient;\n" + "import com.github.jy2.di.JyroscopeDi;\n"
 				+ "import com.github.jy2.di.exceptions.CreationException;\n"
-				+ "import com.github.jy2.log.NodeNameManager;\n" + "\n" + "public class " + className + " {\n" + "	\n"
+				+ "import NodeNameManager;\n" + "\n" + "public class " + className + " {\n" + "	\n"
 				+ "	public static void main(String[] args) throws CreationException {\n" + "		\n"
 				+ "		JyroscopeDi jyDi = new JyroscopeDi(\"autofork_uberjar\", args);\n"
 				+ "		ParameterClient pc = jyDi.getParameterClient();\n\n";

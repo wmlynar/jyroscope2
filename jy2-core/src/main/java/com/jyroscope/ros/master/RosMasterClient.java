@@ -1,14 +1,12 @@
 package com.jyroscope.ros.master;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.logging.Level;
 
 import com.github.jy2.MasterClient;
-import com.github.jy2.di.LogSeldom;
-import com.github.jy2.log.Jy2DiLog;
+import com.github.jy2.api.LogSeldom;
+import com.github.core.log.Jy2DiLog;
 import com.jyroscope.ros.RosSlave;
 import com.jyroscope.server.xmlrpc.XMLRPCArray;
 import com.jyroscope.server.xmlrpc.XMLRPCClient;

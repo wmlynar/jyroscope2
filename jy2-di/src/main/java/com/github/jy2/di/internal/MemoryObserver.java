@@ -1,7 +1,7 @@
 package com.github.jy2.di.internal;
 
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 
 public class MemoryObserver extends Thread {
 

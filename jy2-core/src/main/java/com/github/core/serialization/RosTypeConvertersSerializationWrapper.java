@@ -1,11 +1,11 @@
-package com.github.jy2.serialization;
+package com.github.core.serialization;
 
 import java.io.Serializable;
 import java.util.HashSet;
 
+import com.github.core.serialization.fst.FstJavaToRosConverter;
+import com.github.core.serialization.fst.FstRosToJavaConverter;
 import com.github.jy2.mapper.RosTypeConverters;
-import com.github.jy2.serialization.fst.FstJavaToRosConverter;
-import com.github.jy2.serialization.fst.FstRosToJavaConverter;
 import com.jyroscope.annotations.Message;
 import com.jyroscope.ros.RosMessage;
 import com.jyroscope.types.ConversionException;

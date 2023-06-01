@@ -1,7 +1,7 @@
 package com.github.jy2.smlib3.utils;
 
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.smlib.messages.SmState;
 import com.github.jy2.smlib.messages.SmStructure;
 import com.github.jy2.smlib3.StateMachine;

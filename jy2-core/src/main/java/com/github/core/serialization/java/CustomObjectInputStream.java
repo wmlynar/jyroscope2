@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.jy2.serialization.java;
+package com.github.core.serialization.java;
 
 import java.io.IOException;
 import java.io.InputStream;

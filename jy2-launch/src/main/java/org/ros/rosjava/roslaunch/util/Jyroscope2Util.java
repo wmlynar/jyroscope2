@@ -7,7 +7,7 @@ import java.util.Map;
 import org.ros.rosjava.roslaunch.parsing.RosParamTag;
 import org.ros.rosjava.roslaunch.xmlrpc.ObjectToXml;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.ParameterClient;
 
 public class Jyroscope2Util {

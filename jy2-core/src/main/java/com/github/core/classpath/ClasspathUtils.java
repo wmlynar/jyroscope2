@@ -1,4 +1,4 @@
-package com.github.jy2.classpath;
+package com.github.core.classpath;
 
 import java.io.File;
 import java.io.FilenameFilter;

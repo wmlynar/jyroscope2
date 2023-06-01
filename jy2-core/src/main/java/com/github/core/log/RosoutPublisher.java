@@ -1,10 +1,10 @@
-package com.github.jy2.log;
+package com.github.core.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Publisher;
 
 import go.jyroscope.ros.rosgraph_msgs.Log;
