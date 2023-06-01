@@ -14,7 +14,7 @@ import java.util.jar.Manifest;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.ros.rosjava.roslaunch.logging.PrintLog;
 
-import com.github.jy2.log.NodeNameManager;
+import com.github.core.log.NodeNameManager;
 
 public class JarUtils {
 

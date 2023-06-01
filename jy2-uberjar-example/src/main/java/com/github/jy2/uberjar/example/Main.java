@@ -1,10 +1,9 @@
 package com.github.jy2.uberjar.example;
 
-import com.github.jy2.uberjar.Util;
 import com.github.jy2.ParameterClient;
 import com.github.jy2.di.JyroscopeDi;
 import com.github.jy2.di.exceptions.CreationException;
-import com.github.jy2.log.NodeNameManager;
+import com.github.core.log.NodeNameManager;
 
 public class Main {
 	

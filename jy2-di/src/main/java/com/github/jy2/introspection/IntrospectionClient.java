@@ -14,10 +14,10 @@ import java.util.function.Predicate;
 
 import com.github.jy2.Subscriber;
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.di.annotations.Repeat;
 import com.github.jy2.di.annotations.Subscribe;
-import com.github.jy2.log.Jy2DiLog;
+import com.github.core.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.jyroscope.types.ConversionException;
 

@@ -1,4 +1,4 @@
-package com.github.jy2.internal;
+package com.github.core.internal;
 
 import com.github.jy2.Subscriber;
 

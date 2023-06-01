@@ -2,9 +2,8 @@ package com.github.jy2.example;
 
 import java.util.Random;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Publisher;
-import com.github.jy2.mapper.RosTypeConverters;
 
 import go.jyroscope.ros.sensor_msgs.LaserScan;
 

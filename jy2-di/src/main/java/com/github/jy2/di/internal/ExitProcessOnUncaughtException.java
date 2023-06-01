@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 
 public class ExitProcessOnUncaughtException implements UncaughtExceptionHandler {
 

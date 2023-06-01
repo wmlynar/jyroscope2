@@ -1,4 +1,4 @@
-package com.github.jy2;
+package com.github.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -10,18 +10,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import com.github.jy2.di.LogSeldom;
-import com.github.jy2.internal.DeleteSubscriber;
-import com.github.jy2.log.Jy2DiLog;
-import com.github.jy2.log.NodeNameManager;
-import com.github.jy2.log.RosoutHandler;
-import com.github.jy2.log.RosoutPublisher;
+import com.github.core.log.Jy2DiLog;
+import com.github.core.log.NodeNameManager;
+import com.github.core.log.RosoutHandler;
+import com.github.core.log.RosoutPublisher;
+import com.github.core.serialization.RosTypeConvertersSerializationWrapper;
+import com.github.jy2.*;
+import com.github.jy2.api.LogSeldom;
+import com.github.core.internal.DeleteSubscriber;
 import com.github.jy2.mapper.RosTypeConverters;
-import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
 import com.jyroscope.Link;
 import com.jyroscope.local.Topic;
 import com.jyroscope.local.TopicProvider;
@@ -103,7 +103,7 @@ public class JyroscopeCore implements PubSubClient {
 
 	@Override
 	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize,
-			boolean lazy) {
+	                                        boolean lazy) {
 		try {
 			RosTypeConvertersSerializationWrapper.precompile(topicType);
 		} catch (ConversionException e) {
@@ -121,7 +121,7 @@ public class JyroscopeCore implements PubSubClient {
 
 	@Override
 	public <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType, int queueSize, int maxExecutionTime,
-			boolean isReliable) {
+	                                          boolean isReliable) {
 		return createSubscriber(topicName, topicType, queueSize, maxExecutionTime, isReliable, null);
 	}
 

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
+import com.github.core.serialization.RosTypeConvertersSerializationWrapper;
 import com.jyroscope.Link;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;

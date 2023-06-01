@@ -1,4 +1,4 @@
-package com.github.jy2.log;
+package com.github.core.log;
 
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.logging.Log;
 
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 
 /**
  * Wrapper around org.apache.commons.logging.Log that sends the log to /rosout

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Publisher;
 import com.github.jy2.Subscriber;
 

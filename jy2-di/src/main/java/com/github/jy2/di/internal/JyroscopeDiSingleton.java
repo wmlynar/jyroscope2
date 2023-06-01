@@ -10,11 +10,11 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Publisher;
 import com.github.jy2.Subscriber;
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.di.annotations.Init;
 import com.github.jy2.di.annotations.Parameter;
 import com.github.jy2.di.annotations.Publish;

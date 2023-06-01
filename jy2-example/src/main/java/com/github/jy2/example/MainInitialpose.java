@@ -3,14 +3,12 @@ package com.github.jy2.example;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.Publisher;
 import com.github.jy2.Subscriber;
-import com.github.jy2.mapper.RosTypeConverters;
 
 import go.jyroscope.ros.geometry_msgs.PoseWithCovarianceStamped;
 import go.jyroscope.ros.std_msgs.Header;
-import go.jyroscope.ros.std_msgs.StringMessage;
 
 public class MainInitialpose {
 

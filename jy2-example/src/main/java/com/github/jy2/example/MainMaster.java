@@ -2,9 +2,8 @@ package com.github.jy2.example;
 
 import java.util.Random;
 
-import com.github.jy2.JyroscopeCore;
+import com.github.core.JyroscopeCore;
 import com.github.jy2.MasterClient;
-import com.github.jy2.mapper.RosTypeConverters;
 
 public class MainMaster {
 

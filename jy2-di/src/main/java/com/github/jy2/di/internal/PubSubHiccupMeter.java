@@ -2,7 +2,7 @@ package com.github.jy2.di.internal;
 
 import com.github.jy2.Publisher;
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.di.annotations.Parameter;
 import com.github.jy2.di.annotations.Publish;
 import com.github.jy2.di.annotations.Repeat;

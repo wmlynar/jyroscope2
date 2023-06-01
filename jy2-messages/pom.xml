@@ -18,6 +18,7 @@
 			<groupId>javax.vecmath</groupId>
 			<artifactId>vecmath</artifactId>
 			<version>1.5.2</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<build>
@@ -38,7 +39,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<!-- Fix for "Plugin execution not covered by lifecycle configuration” 
+		<!-- Fix for "Plugin execution not covered by lifecycle configuration”
 			issue in Eclipse builds -->
 		<pluginManagement>
 			<plugins>

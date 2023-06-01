@@ -13,7 +13,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleDirectedGraph;
 
 import com.github.jy2.di.JyroscopeDi;
-import com.github.jy2.di.LogSeldom;
+import com.github.jy2.api.LogSeldom;
 import com.github.jy2.di.annotations.Parameter;
 import com.github.jy2.di.ros.TimeProvider;
 import com.github.jy2.tf.mat.dataobjects.LatestTime;

@@ -1,4 +1,4 @@
-package com.github.jy2.log;
+package com.github.core.log;
 
 public class LogTime {
 
