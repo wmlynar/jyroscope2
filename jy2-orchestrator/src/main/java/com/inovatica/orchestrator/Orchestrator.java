@@ -118,6 +118,12 @@ public class Orchestrator implements OutputCallback {
     @Parameter("use_legacy_debug")
     public boolean useLegacyDebug = false;
 
+    @Parameter("debug_port_start")
+    public int debug_port_start = 4001;
+
+    @Parameter("jmx_port_start")
+    public int jmx_port_start = 9012;
+
     private OrchestratorStartStop startStop;
     private OrchestratorModelBuilder builder;
 
@@ -140,6 +146,8 @@ public class Orchestrator implements OutputCallback {
         builder.setHostname(hostname);
         builder.setHeapDumpOnOutOfMemomry(heapDumpOnOutOfMemomry);
         builder.setHeapDumpPath(heapDumpPath);
+        builder.debugPortStart = debug_port_start;
+        builder.jmxPortStart = jmx_port_start;
         builder.shenandoahGc = shenandoahGc;
         builder.concurrentGc = concurrentGc;
         builder.killOnOutOfMemory = killOnOutOfMemory;
