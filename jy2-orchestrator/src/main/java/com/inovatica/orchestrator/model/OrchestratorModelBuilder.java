@@ -12,8 +12,8 @@ import com.inovatica.orchestrator.internal.HandleType;
 
 public class OrchestratorModelBuilder {
 
-	private static final int START_DEBUG_PORT = 4001;
-	private static final int START_JMX_PORT = 9012;
+	public int debugStartPort = 4001;
+	public int jmxStartPort = 9012;
 
 	public static Log LOG = JyroscopeDi.getLog();
 
@@ -199,8 +199,8 @@ public class OrchestratorModelBuilder {
 		ArrayList<String> bashFileNames = directoryScanner.scanDirectoryWithoutExtension(bashFileDir,
 				bashFileExtension1);
 
-		int debugPort = START_DEBUG_PORT;
-		int jmxPort = START_JMX_PORT;
+		int debugPort = debugStartPort;
+		int jmxPort = jmxStartPort;
 		
 		int killMe = 1;
 
