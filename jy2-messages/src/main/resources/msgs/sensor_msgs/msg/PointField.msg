@@ -9,7 +9,7 @@ uint8 UINT32  = 6
 uint8 FLOAT32 = 7
 uint8 FLOAT64 = 8
 
-string name      # Name of field
+string name      # Name of outgoingField
 uint32 offset    # Offset from start of point struct
 uint8  datatype  # Datatype enumeration, see above
-uint32 count     # How many elements in the field
+uint32 count     # How many elements in the outgoingField
