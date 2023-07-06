@@ -8,32 +8,34 @@ import com.github.jy2.di.annotations.Subscribe;
 import go.jyroscope.ros.rosgraph_msgs.Clock;
 
 public class TimeProvider {
-	
-    @Parameter("/use_sim_time")
-    boolean useSimTime = false;
+
+	@Parameter("/use_sim_time")
+	boolean useSimTime = false;
 	private Instant clock;
 
 	public double now() {
-		if(useSimTime && clock!=null) {
+		if (useSimTime && clock != null) {
 			return clock.getEpochSecond() + clock.getNano() * 1e-9;
 		}
-		return ((double) System.currentTimeMillis()) * 0.001;
+//		return ((double) System.currentTimeMillis()) * 0.001;
+		Instant now = Instant.now();
+		return now.getEpochSecond() + now.getNano() * 1e-9;
 	}
-	
+
 	public Instant instant() {
-		if(useSimTime && clock!=null) {
+		if (useSimTime && clock != null) {
 			return clock;
 		}
 		return Instant.now();
 	}
-	
+
 	@Deprecated
 	public Time getCurrentTime() {
 		return new Time(System.currentTimeMillis());
 	}
-	
-    @Subscribe("/clock")
-    public void onClock(Clock message) {
-        clock = message.clock;
-    }
+
+	@Subscribe("/clock")
+	public void onClock(Clock message) {
+		clock = message.clock;
+	}
 }
