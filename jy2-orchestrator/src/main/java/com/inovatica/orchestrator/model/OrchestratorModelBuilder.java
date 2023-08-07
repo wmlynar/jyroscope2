@@ -45,6 +45,7 @@ public class OrchestratorModelBuilder {
 	public boolean shenandoahGc;
 	public boolean concurrentGc;
 	public boolean optimizeGc;
+	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
 
 	public OrchestratorModelBuilder setLaunchFileExtension(String string) {
@@ -174,6 +175,7 @@ public class OrchestratorModelBuilder {
 		model.shenandoahGc = shenandoahGc;
 		model.concurrentGc = concurrentGc;
 		model.optimizeGc = optimizeGc;
+		model.preallocateGc = preallocateGc;
 		model.killOnOutOfMemory = killOnOutOfMemory;
 		model.workingDir = new File(workingDir);
 

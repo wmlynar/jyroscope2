@@ -33,6 +33,7 @@ public class OrchestratorModel {
 	public boolean shenandoahGc;
 	public boolean concurrentGc;
 	public boolean optimizeGc;
+	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
 
 	public synchronized OrchestratorModelItem getByName(String string) {
