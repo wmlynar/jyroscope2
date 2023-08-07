@@ -146,13 +146,12 @@ public class LaunchHandle {
 		if (zGc) {
 			env = env + " -XX:+UseZGC";
 		} else if (shenandoahGc) {
-			env = env
-					+ " -XX:+UseShenandoahGC";
+			env = env + " -XX:+UseShenandoahGC";
 		} else if (concurrentGc) {
 			env = env + " -XX:+UseConcMarkSweepGC";
 		}
 		if (optimizeGc) {
-			env = env + " -XX:+AlwaysPreTouch -XX:+UseNUMA"; /* -XX:+UseTransparentHugePages */
+			env = env + " -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages"; /* -XX:+UseNUMA */
 		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";
