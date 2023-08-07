@@ -54,6 +54,7 @@ public class LaunchHandle {
 	private boolean zGc;
 	private boolean shenandoahGc;
 	private boolean concurrentGc;
+	private boolean preallocateGc;
 
 	private boolean killOnOutOfMemory;
 
@@ -73,7 +74,7 @@ public class LaunchHandle {
 
 	public LaunchHandle(OrchestratorModelItem item, String jarParams, String javaOpts, boolean debug, boolean jmx,
 			String bashParams, String hostName, boolean heapDumpOnOutOfMemory, String heapDumpPath,
-			boolean shenandoahGc, boolean concurrentGc, boolean killOnOutOfMemory, int newRatio, String user,
+			boolean shenandoahGc, boolean concurrentGc, boolean preallocateGc, boolean killOnOutOfMemory, int newRatio, String user,
 			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, OutputCallback callback) {
 		this.jarParams = jarParams;
 		this.javaOpts = javaOpts;
@@ -86,6 +87,7 @@ public class LaunchHandle {
 		this.heapDumpPath = heapDumpPath;
 		this.shenandoahGc = shenandoahGc;
 		this.concurrentGc = concurrentGc;
+		this.preallocateGc = preallocateGc;
 		this.callback = callback;
 		this.killOnOutOfMemory = killOnOutOfMemory;
 		this.newRatio = newRatio;
@@ -142,12 +144,15 @@ public class LaunchHandle {
 			env = env + " -XX:HeapDumpPath=" + heapDumpPath;
 		}
 		if (zGc) {
-			env = env + " -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:+AlwaysPreTouch";
+			env = env + " -XX:+UseZGC";
 		} else if (shenandoahGc) {
 			env = env
-					+ " -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages -XX:+UseNUMA";
+					+ " -XX:+UseShenandoahGC";
 		} else if (concurrentGc) {
 			env = env + " -XX:+UseConcMarkSweepGC";
+		}
+		if (preallocateGc) {
+			env = env + " -XX:+AlwaysPreTouch -XX:+UseNUMA"; /* -XX:+UseTransparentHugePages */
 		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";

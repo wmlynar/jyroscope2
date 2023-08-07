@@ -84,6 +84,9 @@ public class Orchestrator implements OutputCallback {
 
     @Parameter("concurrent_gc")
     public boolean concurrentGc = false;
+    
+    @Parameter("preallocate_gc")
+    public boolean preallocateGc = false;
 
     @Parameter("kill_on_out_of_memory")
     public boolean killOnOutOfMemory = true;
@@ -150,6 +153,7 @@ public class Orchestrator implements OutputCallback {
         builder.jmxStartPort = jmxStartPort;
         builder.shenandoahGc = shenandoahGc;
         builder.concurrentGc = concurrentGc;
+        builder.preallocateGc = preallocateGc;
         builder.killOnOutOfMemory = killOnOutOfMemory;
         OrchestratorModel model = builder.build();
         startStop = new OrchestratorStartStop(model, this);
