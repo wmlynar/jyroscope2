@@ -51,9 +51,10 @@ public class LaunchHandle {
 	private boolean heapDumpOnOutOfMemory;
 	private String heapDumpPath;
 
-	private boolean zGc;
 	private boolean shenandoahGc;
 	private boolean concurrentGc;
+	private boolean optimizeGc;
+	private boolean preallocateGc;
 
 	private boolean killOnOutOfMemory;
 
@@ -73,7 +74,7 @@ public class LaunchHandle {
 
 	public LaunchHandle(OrchestratorModelItem item, String jarParams, String javaOpts, boolean debug, boolean jmx,
 			String bashParams, String hostName, boolean heapDumpOnOutOfMemory, String heapDumpPath,
-			boolean shenandoahGc, boolean concurrentGc, boolean killOnOutOfMemory, int newRatio, String user,
+			boolean shenandoahGc, boolean concurrentGc, boolean optimizeGc, boolean preallocateGc, boolean killOnOutOfMemory, int newRatio, String user,
 			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, OutputCallback callback) {
 		this.jarParams = jarParams;
 		this.javaOpts = javaOpts;
@@ -86,6 +87,8 @@ public class LaunchHandle {
 		this.heapDumpPath = heapDumpPath;
 		this.shenandoahGc = shenandoahGc;
 		this.concurrentGc = concurrentGc;
+		this.optimizeGc = optimizeGc;
+		this.preallocateGc = preallocateGc;
 		this.callback = callback;
 		this.killOnOutOfMemory = killOnOutOfMemory;
 		this.newRatio = newRatio;
@@ -96,8 +99,6 @@ public class LaunchHandle {
 
 	public synchronized boolean start(HandleType type, String name, String fileName, File workingDir,
 			boolean suspendDebug, boolean remoteProfiling, boolean useLegacyDebug, boolean zGc, int javaMemoryLimit) {
-
-		this.zGc = zGc;
 
 		String user = this.user;
 		if (runAsSudoWhenSuffix && name.endsWith("sudo")) {
@@ -142,12 +143,14 @@ public class LaunchHandle {
 			env = env + " -XX:HeapDumpPath=" + heapDumpPath;
 		}
 		if (zGc) {
-			env = env + " -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -XX:+AlwaysPreTouch";
+			env = env + " -XX:+UseZGC";
 		} else if (shenandoahGc) {
-			env = env
-					+ " -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages -XX:+UseNUMA";
+			env = env + " -XX:+UseShenandoahGC";
 		} else if (concurrentGc) {
 			env = env + " -XX:+UseConcMarkSweepGC";
+		}
+		if (optimizeGc) {
+			env = env + " -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages"; /* -XX:+UseNUMA */
 		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";
@@ -157,6 +160,9 @@ public class LaunchHandle {
 		}
 		if (javaMemoryLimit > 0) {
 			env = env + " -Xmx" + javaMemoryLimit + "m";
+			if (preallocateGc) {
+				env = env + " -Xms" + javaMemoryLimit + "m";
+			}
 		}
 
 		// reduce thread stack size

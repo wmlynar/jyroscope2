@@ -84,6 +84,12 @@ public class Orchestrator implements OutputCallback {
 
     @Parameter("concurrent_gc")
     public boolean concurrentGc = false;
+    
+    @Parameter("optimize_gc")
+    public boolean optimizeGc = false;
+
+    @Parameter("preallocate_gc")
+    public boolean preallocateGc = false;
 
     @Parameter("kill_on_out_of_memory")
     public boolean killOnOutOfMemory = true;
@@ -118,6 +124,12 @@ public class Orchestrator implements OutputCallback {
     @Parameter("use_legacy_debug")
     public boolean useLegacyDebug = false;
 
+    @Parameter("debug_start_port")
+    public int debugStartPort = 4001;
+
+    @Parameter("jmx_start_port")
+    public int jmxStartPort = 9012;
+
     private OrchestratorStartStop startStop;
     private OrchestratorModelBuilder builder;
 
@@ -140,8 +152,12 @@ public class Orchestrator implements OutputCallback {
         builder.setHostname(hostname);
         builder.setHeapDumpOnOutOfMemomry(heapDumpOnOutOfMemomry);
         builder.setHeapDumpPath(heapDumpPath);
+        builder.debugStartPort = debugStartPort;
+        builder.jmxStartPort = jmxStartPort;
         builder.shenandoahGc = shenandoahGc;
         builder.concurrentGc = concurrentGc;
+        builder.optimizeGc = optimizeGc;
+        builder.preallocateGc = preallocateGc;
         builder.killOnOutOfMemory = killOnOutOfMemory;
         OrchestratorModel model = builder.build();
         startStop = new OrchestratorStartStop(model, this);

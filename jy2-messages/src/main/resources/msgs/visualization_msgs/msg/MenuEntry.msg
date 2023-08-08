@@ -4,7 +4,7 @@
 # A collection of MenuEntries together describe a
 # menu/submenu/subsubmenu/etc tree, though they are stored in a flat
 # array.  The tree structure is represented by giving each menu entry
-# an ID number and a "parent_id" field.  Top-level entries are the
+# an ID number and a "parent_id" outgoingField.  Top-level entries are the
 # ones with parent_id = 0.  Menu entries are ordered within their
 # level the same way they are ordered in the containing array.  Parent
 # entries must appear before their children.
@@ -46,8 +46,8 @@ string command
 # Command_type stores the type of response desired when this menu
 # entry is clicked.
 # FEEDBACK: send an InteractiveMarkerFeedback message with menu_entry_id set to this entry's id.
-# ROSRUN: execute "rosrun" with arguments given in the command field (above).
-# ROSLAUNCH: execute "roslaunch" with arguments given in the command field (above).
+# ROSRUN: execute "rosrun" with arguments given in the command outgoingField (above).
+# ROSLAUNCH: execute "roslaunch" with arguments given in the command outgoingField (above).
 uint8 FEEDBACK=0
 uint8 ROSRUN=1
 uint8 ROSLAUNCH=2

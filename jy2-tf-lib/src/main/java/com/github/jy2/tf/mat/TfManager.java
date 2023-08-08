@@ -258,6 +258,8 @@ public class TfManager {
 			try {
 				notify.wait(ms);
 			} catch (InterruptedException e) {
+			} catch (Exception e) {
+				LOG.error("Exception caught while calling sleep", e);
 			}
 		}
 	}
@@ -602,7 +604,7 @@ public class TfManager {
 				return false;
 			}
 			tb.getLatestTime(latestTime);
-			if (latestTime.time < time - semiTimeout) {
+			if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
 				LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb.from + "->" + tb.to);
 				return false;
 			}
@@ -620,15 +622,15 @@ public class TfManager {
 					LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
+				tb2.getLatestTime(latestTime);
+				if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
+					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
+					return false;
+				}
 			} else {
 				if (!tb2.getTransform(time, mat)) {
 					LOG.warnSeldom("Missing transform in transfrom buffer at specific time "
 							+ String.format("%.4f", time) + ": " + tb2.from + "->" + tb2.to);
-					return false;
-				}
-				tb2.getLatestTime(latestTime);
-				if (latestTime.time < time - semiTimeout) {
-					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
 			}

@@ -2,6 +2,7 @@ package com.github.jy2.commandline.picocli.orchestrator.completion;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.TimeoutException;
 
 import com.github.jy2.commandline.picocli.Main;
 import com.github.jy2.orchestrator.OrchestratorClient;
@@ -18,10 +19,14 @@ public class OrchestratorNameCompletionCandidates implements Iterable<String> {
 		if (AutoComplete.argIndex != getItemNameIndex()) {
 			return new ArrayList<String>().iterator();
 		}
-		
-		ArrayList<String> list = OrchestratorClient.getItemList(Main.orchestratorName);
-		list.sort(String::compareToIgnoreCase);
-		return list.iterator();
+
+		try {
+			ArrayList<String> list = OrchestratorClient.getItemList(Main.orchestratorName);
+			list.sort(String::compareToIgnoreCase);
+			return list.iterator();
+		} catch (TimeoutException e) {
+			return new ArrayList<String>().iterator();
+		}
 	}
 
 	private int getItemNameIndex() {

@@ -2,6 +2,7 @@ package com.github.jy2.commandline.picocli.orchestrator;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.concurrent.TimeoutException;
 
 import com.github.jy2.commandline.picocli.Main;
 import com.github.jy2.orchestrator.OrchestratorClient;
@@ -32,19 +33,23 @@ public class OrchestratorListCommand implements Runnable {
 			return;
 		}
 		
-		ArrayList<OrchestratorStatusItem> list = OrchestratorClient.getItemStatuses(Main.orchestratorName);
-		list.sort(new Comparator<OrchestratorStatusItem>() {
-			@Override
-			public int compare(OrchestratorStatusItem o1, OrchestratorStatusItem o2) {
-				return o1.name.compareToIgnoreCase(o2.name);
+		try {
+			ArrayList<OrchestratorStatusItem> list = OrchestratorClient.getItemStatuses(Main.orchestratorName);
+			list.sort(new Comparator<OrchestratorStatusItem>() {
+				@Override
+				public int compare(OrchestratorStatusItem o1, OrchestratorStatusItem o2) {
+					return o1.name.compareToIgnoreCase(o2.name);
+				}
+			});
+			for (OrchestratorStatusItem s : list) {
+				if (grep != null && !s.name.contains(grep)) {
+					continue;
+				}
+				System.out.println("\t" + s.name + (s.isStarted ? "\tstarted" : "\tstopped") + "\tdbg" + s.debugPort
+						+ "\tjmx" + s.jmxPort);
 			}
-		});
-		for (OrchestratorStatusItem s : list) {
-			if (grep != null && !s.name.contains(grep)) {
-				continue;
-			}
-			System.out.println("\t" + s.name + (s.isStarted ? "\tstarted" : "\tstopped") + "\tdbg" + s.debugPort
-					+ "\tjmx" + s.jmxPort);
+		} catch (TimeoutException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 }

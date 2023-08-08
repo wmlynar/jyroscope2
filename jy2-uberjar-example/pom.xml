@@ -5,25 +5,25 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.24</version>
+		<version>0.0.25</version>
 	</parent>
 	<artifactId>jy2-uberjar-example</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.24</version>
+			<version>0.0.25</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-uberjar-libs</artifactId>
-			<version>0.0.24</version>
+			<version>0.0.25</version>
 		</dependency>
 		<!-- dependencies of the launchfile -->
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di-example</artifactId>
-			<version>0.0.24</version>
+			<version>0.0.25</version>
 		</dependency>
 	</dependencies>
 	<build>

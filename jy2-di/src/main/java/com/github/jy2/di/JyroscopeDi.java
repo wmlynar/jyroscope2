@@ -632,6 +632,8 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 					} catch (InterruptedException ie) {
 						// thread was woken up, restart the counter
 						start = System.currentTimeMillis();
+					} catch (Exception e) {
+						LOG.error("Exception caught while calling sleep " + method.toGenericString(), e);
 					}
 				}
 			}

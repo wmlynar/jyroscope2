@@ -32,6 +32,8 @@ public class OrchestratorModel {
 	public String heapDumpPath;
 	public boolean shenandoahGc;
 	public boolean concurrentGc;
+	public boolean optimizeGc;
+	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
 
 	public synchronized OrchestratorModelItem getByName(String string) {

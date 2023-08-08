@@ -3,6 +3,7 @@ package com.github.jy2.orchestrator;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.github.jy2.Publisher;
 import com.github.jy2.commandline.picocli.Main;
@@ -14,7 +15,10 @@ import go.jyroscope.ros.diagnostic_msgs.KeyValue;
 
 public class OrchestratorClient {
 
-	public static ArrayList<OrchestratorStatusItem> getItemStatuses(String address) {
+	/**
+	 * @return null when not received status on time
+	 */
+	public static ArrayList<OrchestratorStatusItem> getItemStatuses(String address) throws TimeoutException {
 
 		String topic = address + "/status";
 
@@ -36,11 +40,15 @@ public class OrchestratorClient {
 			statusSubscriber.shutdown();
 		}
 		status = holder.value;
+		
+		if (status == null) {
+			throw new TimeoutException("Did not receive item " + address + " status on time");
+		}
 
 		return status.items;
 	}
 
-	public static ArrayList<String> getItemList(String address) {
+	public static ArrayList<String> getItemList(String address) throws TimeoutException {
 		ArrayList<OrchestratorStatusItem> list = getItemStatuses(address);
 		ArrayList<String> list2 = new ArrayList<String>();
 		for (OrchestratorStatusItem i : list) {

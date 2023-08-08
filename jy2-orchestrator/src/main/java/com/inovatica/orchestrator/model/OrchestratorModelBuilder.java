@@ -12,8 +12,8 @@ import com.inovatica.orchestrator.internal.HandleType;
 
 public class OrchestratorModelBuilder {
 
-	private static final int START_DEBUG_PORT = 4001;
-	private static final int START_JMX_PORT = 9012;
+	public int debugStartPort = 4001;
+	public int jmxStartPort = 9012;
 
 	public static Log LOG = JyroscopeDi.getLog();
 
@@ -44,6 +44,8 @@ public class OrchestratorModelBuilder {
 	private String heapDumpPath;
 	public boolean shenandoahGc;
 	public boolean concurrentGc;
+	public boolean optimizeGc;
+	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
 
 	public OrchestratorModelBuilder setLaunchFileExtension(String string) {
@@ -172,6 +174,8 @@ public class OrchestratorModelBuilder {
 		model.heapDumpPath = heapDumpPath;
 		model.shenandoahGc = shenandoahGc;
 		model.concurrentGc = concurrentGc;
+		model.optimizeGc = optimizeGc;
+		model.preallocateGc = preallocateGc;
 		model.killOnOutOfMemory = killOnOutOfMemory;
 		model.workingDir = new File(workingDir);
 
@@ -199,8 +203,8 @@ public class OrchestratorModelBuilder {
 		ArrayList<String> bashFileNames = directoryScanner.scanDirectoryWithoutExtension(bashFileDir,
 				bashFileExtension1);
 
-		int debugPort = START_DEBUG_PORT;
-		int jmxPort = START_JMX_PORT;
+		int debugPort = debugStartPort;
+		int jmxPort = jmxStartPort;
 		
 		int killMe = 1;
 
