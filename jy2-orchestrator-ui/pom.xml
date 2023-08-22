@@ -30,7 +30,7 @@
                                 <configuration>
                                         <programs>
                                                 <program>
-                                                        <id>jy-orchestrator-ui</id>
+                                                        <id>orchestratorui</id>
                                                         <mainClass>com.inovatica.autofork.orchestrator.ui.OrchestratorUIMain</mainClass>
                                                 </program>
                                         </programs>
