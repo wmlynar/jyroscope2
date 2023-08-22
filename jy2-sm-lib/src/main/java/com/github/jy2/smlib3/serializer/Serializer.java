@@ -58,7 +58,7 @@ public class Serializer {
 						sb.append(value.toString());
 					} catch (Exception e) {
 						log.error("Exception caught when serializing field " + field.getName()
-								+ ", serialized up till now \"" + sb.toString() + "\"");
+								+ ", serialized up till now \"" + sb.toString() + "\"", e);
 						sb.append("-- Exception when serializing: " + e.getClass() + " --");
 					}
 					sb.append("\n");
