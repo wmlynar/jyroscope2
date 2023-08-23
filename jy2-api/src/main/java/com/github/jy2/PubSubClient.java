@@ -31,11 +31,11 @@ public interface PubSubClient {
 	}
 
 	default <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize) {
-		return createPublisher(topicName, topicType, latched, 5, false, 0);
+		return createPublisher(topicName, topicType, latched, queueSize, false, 0);
 	}
 
 	default <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize, boolean lazy) {
-		return createPublisher(topicName, topicType, latched, 5, lazy, 0);
+		return createPublisher(topicName, topicType, latched, queueSize, lazy, 0);
 	}
 
 	default <D> Subscriber<D> createSubscriber(String topicName, Class<D> topicType) {
