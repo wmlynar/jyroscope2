@@ -207,9 +207,6 @@ public class JyroscopeCore implements PubSubClient {
 		private long lastPublishMilliseconds = 0;
 
 		private Jy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched, int maxPublishingInterval) {
-			if (maxPublishingInterval > 0) {
-				log = JyroscopeCore.getLog();
-			}
 			this.topic = topic;
 			this.maxPublishingInterval = maxPublishingInterval;
 			try {
@@ -245,6 +242,9 @@ public class JyroscopeCore implements PubSubClient {
 				long dt = time - lastPublishMilliseconds;
 				lastPublishMilliseconds = time;
 				if (dt > maxPublishingInterval) {
+					if (log == null) {
+						log = JyroscopeCore.getLog();
+					}
 					log.warn("Maximum publishing interval exceeded " + dt + " on topic " + topic.getName());
 				}
 			}
@@ -263,9 +263,6 @@ public class JyroscopeCore implements PubSubClient {
 		private long lastPublishMilliseconds = 0;
 
 		private LazyJy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched, int maxPublishingInterval) {
-			if (maxPublishingInterval > 0) {
-				log = JyroscopeCore.getLog();
-			}
 			this.topic = topic;
 			this.topicType = topicType;
 			this.latched = latched;
@@ -305,6 +302,9 @@ public class JyroscopeCore implements PubSubClient {
 				long dt = time - lastPublishMilliseconds;
 				lastPublishMilliseconds = time;
 				if (dt > maxPublishingInterval) {
+					if (log == null) {
+						log = JyroscopeCore.getLog();
+					}
 					log.warn("Maximum publishing interval exceeded " + dt + " on topic " + topic.getName());
 				}
 			}
