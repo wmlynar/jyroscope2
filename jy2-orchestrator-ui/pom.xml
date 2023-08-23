@@ -5,7 +5,7 @@
         <parent>
                 <groupId>com.github.wmlynar</groupId>
                 <artifactId>jy2-parent</artifactId>
-                <version>0.0.25</version>
+                <version>0.0.26</version>
         </parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>jy2-orchestrator-ui</artifactId>
@@ -13,12 +13,12 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-orchestrator</artifactId>
-			<version>0.0.25</version>
+			<version>0.0.26</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.25</version>
+			<version>0.0.26</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -30,7 +30,7 @@
                                 <configuration>
                                         <programs>
                                                 <program>
-                                                        <id>jy-orchestrator-ui</id>
+                                                        <id>orchestratorui</id>
                                                         <mainClass>com.inovatica.autofork.orchestrator.ui.OrchestratorUIMain</mainClass>
                                                 </program>
                                         </programs>

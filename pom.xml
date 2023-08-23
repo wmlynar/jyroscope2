@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.wmlynar</groupId>
 	<artifactId>jy2-parent</artifactId>
-	<version>0.0.25</version>
+	<version>0.0.26</version>
 	<packaging>pom</packaging>
 	<name>Jyroscope2</name>
 	<description>Next version of Jyroscope ROS Java client.</description>
@@ -167,7 +167,7 @@
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
+						<version>1.6.13</version>
 						<extensions>true</extensions>
 						<configuration>
 							<serverId>ossrh</serverId>

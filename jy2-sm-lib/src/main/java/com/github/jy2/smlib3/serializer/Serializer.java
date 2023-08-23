@@ -7,10 +7,14 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 
+import com.github.jy2.di.JyroscopeDi;
+import com.github.jy2.di.LogSeldom;
 import com.github.jy2.smlib3.annotations.DontSerialize;
 
 public class Serializer {
 
+	private final LogSeldom log = JyroscopeDi.getLog();
+	
 	public String serialize(Object object) throws IllegalAccessException {
 		StringBuilder sb = new StringBuilder();
 		serialize(sb, "", object);
@@ -50,7 +54,13 @@ public class Serializer {
 			} else {
 				if (isPrintable(field)) {
 					sb.append("=");
-					sb.append(value.toString());
+					try {
+						sb.append(value.toString());
+					} catch (Exception e) {
+						log.error("Exception caught when serializing field: " + field.getName()
+								+ ", serialized up till now \"" + sb.toString() + "\"", e);
+						sb.append("-- Exception when serializing: " + e.getClass() + " --");
+					}
 					sb.append("\n");
 				} else {
 					sb.append(":\n");
