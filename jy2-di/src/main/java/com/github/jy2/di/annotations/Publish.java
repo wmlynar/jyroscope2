@@ -14,5 +14,6 @@ public @interface Publish {
 	boolean reliable() default false;
 	int queueSize() default 5;
 	boolean lazy() default false;
+	int maxPublishingInterval() default 0;
     
 }

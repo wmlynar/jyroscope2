@@ -103,7 +103,7 @@ public class JyroscopeCore implements PubSubClient {
 
 	@Override
 	public <D> Publisher<D> createPublisher(String topicName, Class<D> topicType, boolean latched, int queueSize,
-			boolean lazy) {
+			boolean lazy, int maxPublishingInterval) {
 		try {
 			RosTypeConvertersSerializationWrapper.precompile(topicType);
 		} catch (ConversionException e) {
@@ -113,9 +113,9 @@ public class JyroscopeCore implements PubSubClient {
 		Topic<?> topic = getTopic(topicName);
 		topic.setSendQueueSize(queueSize);
 		if (lazy) {
-			return new LazyJy2Publisher<D>(topic, topicType, latched);
+			return new LazyJy2Publisher<D>(topic, topicType, latched, maxPublishingInterval);
 		} else {
-			return new Jy2Publisher<D>(topic, topicType, latched);
+			return new Jy2Publisher<D>(topic, topicType, latched, maxPublishingInterval);
 		}
 	}
 
@@ -198,11 +198,20 @@ public class JyroscopeCore implements PubSubClient {
 	}
 
 	private final static class Jy2Publisher<D> implements Publisher<D> {
+
+		private LogSeldom log;
+
 		private final Topic<?> topic;
 		private final Link<D> link;
+		private final int maxPublishingInterval;
+		private long lastPublishMilliseconds = 0;
 
-		private Jy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched) {
+		private Jy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched, int maxPublishingInterval) {
+			if (maxPublishingInterval > 0) {
+				log = JyroscopeCore.getLog();
+			}
 			this.topic = topic;
+			this.maxPublishingInterval = maxPublishingInterval;
 			try {
 				link = topic.getPublisher(topicType, latched);
 			} catch (ConversionException e) {
@@ -212,6 +221,9 @@ public class JyroscopeCore implements PubSubClient {
 
 		@Override
 		public void publish(D message) {
+			if (maxPublishingInterval > 0) {
+				checkPublishingInterval();
+			}
 			link.handle(message);
 		}
 
@@ -224,22 +236,47 @@ public class JyroscopeCore implements PubSubClient {
 		public void skipLocalMessages(boolean skip) {
 			topic.skipLocalMessages(skip);
 		}
+
+		private void checkPublishingInterval() {
+			long time = System.currentTimeMillis();
+			if (lastPublishMilliseconds == 0) {
+				lastPublishMilliseconds = time;
+			} else {
+				long dt = time - lastPublishMilliseconds;
+				lastPublishMilliseconds = time;
+				if (dt > maxPublishingInterval) {
+					log.warn("Maximum publishing interval exceeded " + dt + " on topic " + topic.getName());
+				}
+			}
+		}
 	}
 
 	private final static class LazyJy2Publisher<D> implements Publisher<D> {
+
+		private LogSeldom log;
+
 		private final Topic<?> topic;
 		private final Class<D> topicType;
 		private final boolean latched;
 		private Link<D> link = null;
+		private final int maxPublishingInterval;
+		private long lastPublishMilliseconds = 0;
 
-		private LazyJy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched) {
+		private LazyJy2Publisher(Topic<?> topic, Class<D> topicType, boolean latched, int maxPublishingInterval) {
+			if (maxPublishingInterval > 0) {
+				log = JyroscopeCore.getLog();
+			}
 			this.topic = topic;
 			this.topicType = topicType;
 			this.latched = latched;
+			this.maxPublishingInterval = maxPublishingInterval;
 		}
 
 		@Override
 		public void publish(D message) {
+			if (maxPublishingInterval > 0) {
+				checkPublishingInterval();
+			}
 			if (link == null) {
 				try {
 					link = topic.getPublisher(topicType, latched);
@@ -258,6 +295,19 @@ public class JyroscopeCore implements PubSubClient {
 		@Override
 		public void skipLocalMessages(boolean skip) {
 			topic.skipLocalMessages(skip);
+		}
+
+		private void checkPublishingInterval() {
+			long time = System.currentTimeMillis();
+			if (lastPublishMilliseconds == 0) {
+				lastPublishMilliseconds = time;
+			} else {
+				long dt = time - lastPublishMilliseconds;
+				lastPublishMilliseconds = time;
+				if (dt > maxPublishingInterval) {
+					log.warn("Maximum publishing interval exceeded " + dt + " on topic " + topic.getName());
+				}
+			}
 		}
 	}
 
