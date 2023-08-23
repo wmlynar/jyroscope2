@@ -9,6 +9,7 @@ public interface Topic<T> {
     
     void subscribe(Link<T> subscriber) throws ConversionException;
 	void subscribe(Link<T> subscriber, int queueSize) throws ConversionException;
+	void subscribe(Link<T> subscriber, int queueSize, int timeout) throws ConversionException;
     void unsubscribe(Link<T> subscriber);
     <D> Link<D> getPublisher(Class<? extends D> type, boolean latched) throws ConversionException;
 	boolean isLatched();
