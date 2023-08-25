@@ -30,11 +30,16 @@ public class LocalTopic<T> implements Topic<T> {
 
 	@Override
 	public synchronized void subscribe(Link<T> subscriber) {
-		subscribe(subscriber, 1);
+		subscribe(subscriber, 1, 0);
+	}
+
+	@Override
+	public synchronized void subscribe(Link<T> subscriber, int queueSize) {
+		subscribe(subscriber, queueSize, 0);
 	}
 
     @Override
-	public synchronized void subscribe(Link<T> subscriber, int queueSize) {
+	public synchronized void subscribe(Link<T> subscriber, int queueSize, int timeout) {
         types.add(subscriber.getType());
         subscribers.add(subscriber);
 

@@ -395,12 +395,17 @@ public class RosTopic<T> implements Topic<T> {
     
 	@Override
 	public void subscribe(Link<T> subscriber) throws ConversionException {
-		subscribe(subscriber, 1);
+		subscribe(subscriber, 1, 0);
+	}
+
+	@Override
+	public void subscribe(Link<T> subscriber, int queueSize) throws ConversionException {
+		subscribe(subscriber, queueSize, 0);
 	}
 
     @Override
-	public synchronized void subscribe(Link<T> subscriber, int queueSize) throws ConversionException {
-		links.subscribe(subscriber, true, queueSize);
+	public synchronized void subscribe(Link<T> subscriber, int queueSize, int timeout) throws ConversionException {
+		links.subscribe(subscriber, true, queueSize, timeout);
 //        localSubscribers.add(subscriber);
         if (messageType == null)
             messageType = subscriber.getType();

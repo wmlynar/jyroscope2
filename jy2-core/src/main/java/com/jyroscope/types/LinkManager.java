@@ -172,11 +172,11 @@ public class LinkManager {
 //			this.remoteConsumers = new HashMap<>();
         }
         
-		private void add(Link<D> link, boolean isLocal, int queueSize) {
+		private void add(Link<D> link, boolean isLocal, int queueSize, int timeout) {
 			lock.writeLock().lock();
 			try {
             if (isLocal) {
-    			Consumer<D> consumer = new Consumer<>(link, queueSize);
+    			Consumer<D> consumer = new Consumer<>(link, queueSize, timeout);
 //                local.add(link);
 				localConsumers.put(link, consumer);
 				consumer.start();
@@ -273,7 +273,7 @@ public class LinkManager {
 			private CircularBlockingDeque<D> queue;
 			private Thread thread;
 
-			public Consumer(Link<D> subscriber, int queueSize) {
+			public Consumer(Link<D> subscriber, int queueSize, int timeout) {
 				this.queue = new CircularBlockingDeque<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
@@ -283,7 +283,7 @@ public class LinkManager {
 					public void run() {
 						while (keepRunnning) {
 							try {
-								D message = queue.takeFirst();
+								D message = queue.takeFirstNullOnTimeout(timeout);
 								subscriber.handle(message);
 							} catch (InterruptedException e) {
 							}
@@ -359,10 +359,10 @@ public class LinkManager {
     }
 
 	public <D> void subscribe(Link<D> link, boolean isLocal) {
-		subscribe(link, isLocal, 1);
+		subscribe(link, isLocal, 1, 0);
 	}
     
-	public <D> void subscribe(Link<D> link, boolean isLocal, int queueSize) {
+	public <D> void subscribe(Link<D> link, boolean isLocal, int queueSize, int timeout) {
         ArrayList<D> latched;
         lock.readLock().lock();
         try {
@@ -401,7 +401,7 @@ public class LinkManager {
                 }
 
             }
-			deliver.add(link, isLocal, queueSize);
+			deliver.add(link, isLocal, queueSize, timeout);
 
             // Pass latched messages to new subscribers
             // Note that we need to convert them again because we don't cache the conversions
