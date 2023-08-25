@@ -330,95 +330,16 @@ public class JyroscopeCore implements PubSubClient {
 		public synchronized Object addMessageListener(Consumer<D> consumer, int queueLength, int timeout,
 				int maxExecutionTime, boolean logStoppedReceivingMessage, Method method) {
 			LinkImplementation link = new LinkImplementation(consumer);
-			link.maxExecutionTime = maxExecutionTime;
-			link.method = method;
 			link.timeout = timeout;
+			link.maxExecutionTime = maxExecutionTime;
 			link.logStoppedReceivingMessage = logStoppedReceivingMessage;
+			link.method = method;
 			try {
 				topic.subscribe((Link) link, queueLength, timeout);
 			} catch (ConversionException e) {
 				throw new RuntimeException(e);
 			}
-
 			links.add(link);
-/*
-			if (timeout <= 0) {
-				return link;
-			}
-
-			String name;
-			if (method != null) {
-				name = "Method-" + method.toGenericString();
-			} else {
-				name = "Consumer-" + consumer.getClass().getName();
-			}
-
-			link.lastMessageTime = System.currentTimeMillis();
-			link.timeoutThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (link.enabled) {
-						long time = System.currentTimeMillis();
-						long dt = time - link.lastMessageTime;
-						if (dt < 0) {
-							log.warn(
-									"Subscriber timeout: something wrong with time in the system (usually because of time synchronization), dt="
-											+ dt);
-							dt = 0;
-						}
-						if (dt >= timeout) {
-							if (link.firstTimeWarning && logStoppedReceivingMessage) {
-								if (method != null) {
-									log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
-											+ method.toGenericString());
-
-								} else {
-									log.info("Stopped receiving message on topic " + topic.getName() + ", in consumer "
-											+ consumer.getClass().getName());
-								}
-							}
-							link.firstTimeWarning = false;
-							dt = 0;
-							try {
-								consumer.accept(null);
-							} catch (Exception e) {
-								if (method != null) {
-									log.error("Exception caught while handling message in method "
-											+ method.toGenericString() + ", message: null", e);
-
-								} else {
-									log.error("Exception caught while handling handling message in consumer "
-											+ consumer.getClass().getName() + ", message: null", e);
-								}
-							}
-							long delta = System.currentTimeMillis() - time;
-							if (delta > maxExecutionTime && maxExecutionTime > 0) {
-								if (method != null) {
-									log.warn("Subscriber execution time " + delta + " exceeded threshold "
-											+ maxExecutionTime + " in method " + method.toGenericString()
-											+ ", message: null");
-								} else {
-									log.warn("Subscriber execution time " + delta + " exceeded threshold "
-											+ maxExecutionTime + " in consumer " + consumer.getClass().getName()
-											+ ", message: null");
-								}
-							}
-						}
-						long sleep = timeout - dt;
-						try {
-							if (sleep > 0) {
-								Thread.sleep(sleep);
-							}
-						} catch (InterruptedException e) {
-							// do nothing
-						} catch (Exception e) {
-							log.error("Exception caught while calling sleep " + method.toGenericString(), e);
-						}
-					}
-				}
-			}, "TimeoutThread-" + name);
-			link.timeoutThread.start();
-*/
 			return link;
 		}
 
@@ -458,7 +379,6 @@ public class JyroscopeCore implements PubSubClient {
 			public boolean logStoppedReceivingMessage;
 			public int timeout;
 			private final Consumer<D> consumer;
-			private long lastMessageTime;
 			private Thread timeoutThread;
 			public int maxExecutionTime;
 			public Method method;
@@ -501,7 +421,6 @@ public class JyroscopeCore implements PubSubClient {
 						}
 						firstTimeWarning = false;
 					} else {
-						lastMessageTime = before;
 						firstTimeWarning = true;
 					}
 					consumer.accept((D) message);
