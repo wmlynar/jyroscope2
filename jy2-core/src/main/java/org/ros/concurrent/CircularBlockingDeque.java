@@ -128,7 +128,13 @@ public class CircularBlockingDeque<T> implements Iterable<T> {
     return entry;
   }
   
-  public T takeFirst(int timeoutMillis) throws InterruptedException {
+  public T takeFirstNullOnTimeout(int timeoutMillis) throws InterruptedException {
+	long lastMessageTime = 0;
+	long waitTime = 0;
+	if (timeoutMillis > 0) {
+		lastMessageTime = System.currentTimeMillis();
+		waitTime = timeoutMillis;
+	}
     T entry;
     synchronized (mutex) {
       while (true) {
@@ -138,7 +144,14 @@ public class CircularBlockingDeque<T> implements Iterable<T> {
           length--;
           break;
         }
-        mutex.wait(timeoutMillis);
+        mutex.wait(waitTime);
+		if (timeoutMillis > 0) {
+			long dt = System.currentTimeMillis() - lastMessageTime;
+			waitTime = timeoutMillis - dt;
+			if (waitTime <= 0) {
+				return null;
+			}
+		}
       }
     }
     return entry;
