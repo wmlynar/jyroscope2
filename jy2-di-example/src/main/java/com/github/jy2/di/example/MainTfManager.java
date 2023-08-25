@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.vecmath.Matrix4d;
 
 import com.github.jy2.di.JyroscopeDi;
+import com.github.jy2.di.LogSeldom;
 import com.github.jy2.di.exceptions.CreationException;
 import com.github.jy2.tf.mat.TfManager;
 
@@ -18,10 +19,18 @@ public class MainTfManager {
 		TfManager tfManager = hzDi.create(TfManager.class);
 		hzDi.start();
 		
+		LogSeldom log = hzDi.getLog();
+		
 		Matrix4d mat = new Matrix4d();
 		mat.setIdentity();
 		tfManager.add(new TransformStamped(10, "aaa", "bbb", mat));
 		tfManager.getTransform("aaa", "bbb", 0, mat);
+		
+		try {
+			throw new RuntimeException();
+		} catch (Exception e) {
+			log.error("Exception caught", e);
+		}
 	}
 
 }
