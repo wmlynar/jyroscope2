@@ -283,7 +283,7 @@ public class LinkManager {
 					public void run() {
 						while (keepRunnning) {
 							try {
-								D message = queue.takeFirst(timeout);
+								D message = queue.takeFirstNullOnTimeout(timeout);
 								subscriber.handle(message);
 							} catch (InterruptedException e) {
 							}
