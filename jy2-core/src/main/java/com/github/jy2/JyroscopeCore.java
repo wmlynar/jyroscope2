@@ -332,14 +332,16 @@ public class JyroscopeCore implements PubSubClient {
 			LinkImplementation link = new LinkImplementation(consumer);
 			link.maxExecutionTime = maxExecutionTime;
 			link.method = method;
+			link.timeout = timeout;
+			link.logStoppedReceivingMessage = logStoppedReceivingMessage;
 			try {
-				topic.subscribe((Link) link, queueLength);
+				topic.subscribe((Link) link, queueLength, timeout);
 			} catch (ConversionException e) {
 				throw new RuntimeException(e);
 			}
 
 			links.add(link);
-
+/*
 			if (timeout <= 0) {
 				return link;
 			}
@@ -416,7 +418,7 @@ public class JyroscopeCore implements PubSubClient {
 				}
 			}, "TimeoutThread-" + name);
 			link.timeoutThread.start();
-
+*/
 			return link;
 		}
 
@@ -453,6 +455,8 @@ public class JyroscopeCore implements PubSubClient {
 		}
 
 		private final class LinkImplementation implements Link<D> {
+			public boolean logStoppedReceivingMessage;
+			public int timeout;
 			private final Consumer<D> consumer;
 			private long lastMessageTime;
 			private Thread timeoutThread;
@@ -473,9 +477,33 @@ public class JyroscopeCore implements PubSubClient {
 			@Override
 			public void handle(Object message) {
 				long before = System.currentTimeMillis();
-				lastMessageTime = before;
-				firstTimeWarning = true;
 				try {
+					if (message == null) {
+						if (timeout <= 0) {
+							if (method != null) {
+								log.error("Should not happen! Received null when timeout is " + timeout + " on topic "
+										+ topic.getName() + ", in method " + method.toGenericString());
+
+							} else {
+								log.error("Should not happen! Received null when timeout is " + timeout + " on topic "
+										+ topic.getName() + ", in consumer " + consumer.getClass().getName());
+							}
+						}
+						if (firstTimeWarning && logStoppedReceivingMessage) {
+							if (method != null) {
+								log.info("Stopped receiving message on topic " + topic.getName() + ", in method "
+										+ method.toGenericString());
+
+							} else {
+								log.info("Stopped receiving message on topic " + topic.getName() + ", in consumer "
+										+ consumer.getClass().getName());
+							}
+						}
+						firstTimeWarning = false;
+					} else {
+						lastMessageTime = before;
+						firstTimeWarning = true;
+					}
 					consumer.accept((D) message);
 				} catch (Exception e) {
 					if (method != null) {
