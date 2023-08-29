@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-tf-lib</artifactId>
-			<version>0.0.27-SNAPSHOT</version>
+			<version>0.0.28-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<build>
