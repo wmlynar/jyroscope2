@@ -15,7 +15,7 @@ public class RosoutHandler extends Handler {
 
 	public static final boolean LINE_NUMBER_INSIDE_PARAMETERS = false;
 	public static final boolean PLACE_FROM_EXCEPTION = true;
-	public static final boolean STACKTRACE_IN_PARAMETERS = true;
+	public static final boolean STACKTRACE_IN_PARAMETERS = false;
 
 	@Override
 	public void close() throws SecurityException {
