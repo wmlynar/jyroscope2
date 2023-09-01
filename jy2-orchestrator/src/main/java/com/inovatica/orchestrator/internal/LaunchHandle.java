@@ -203,9 +203,8 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "roslaunch", "--wait", "--screen", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
-				Process niceprocess = Runtime.getRuntime().exec(command);
 				if (nice != 0) {
-					niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 							Integer.toString(nice), "-p", Long.toString(process.pid()) });
 					try {
 						niceprocess.waitFor();
@@ -234,9 +233,8 @@ public class LaunchHandle {
 				// and subprocesses are in java
 				// process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
 				process = Runtime.getRuntime().exec(command, envWithKill, workingDir);
-				Process niceprocess = Runtime.getRuntime().exec(command);
 				if (nice != 0) {
-					niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 							Integer.toString(nice), "-p", Long.toString(process.pid()) });
 					try {
 						niceprocess.waitFor();
@@ -261,9 +259,8 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "hzlaunch", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
-				Process niceprocess = Runtime.getRuntime().exec(command);
 				if (nice != 0) {
-					niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 							Integer.toString(nice), "-p", Long.toString(process.pid()) });
 					try {
 						niceprocess.waitFor();
@@ -288,9 +285,8 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "jylaunch", "--wait", "--screen", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
-				Process niceprocess = Runtime.getRuntime().exec(command);
 				if (nice != 0) {
-					niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 							Integer.toString(nice), "-p", Long.toString(process.pid()) });
 					try {
 						niceprocess.waitFor();
@@ -320,9 +316,8 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "bash", "-c", "java -jar " + fileName + " " + jarParams };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
-				Process niceprocess = Runtime.getRuntime().exec(command);
 				if (nice != 0) {
-					niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 							Integer.toString(nice), "-p", Long.toString(process.pid()) });
 					try {
 						niceprocess.waitFor();
@@ -354,9 +349,9 @@ public class LaunchHandle {
 						// bashParams };
 						command = new String[] { "gosu", user, "bash", "-c", fileName + " " + bashParams };
 					}
-					Process niceprocess = Runtime.getRuntime().exec(command);
+					process = Runtime.getRuntime().exec(command, envWithKill, workingDir);
 					if (nice != 0) {
-						niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+						Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
 								Integer.toString(nice), "-p", Long.toString(process.pid()) });
 						try {
 							niceprocess.waitFor();
