@@ -93,6 +93,9 @@ public class Orchestrator implements OutputCallback {
 
     @Parameter("kill_on_out_of_memory")
     public boolean killOnOutOfMemory = true;
+    
+    @Parameter("allow_changing_nice")
+    public boolean allowChangingNice = true;
 
     @Parameter("new_ratio")
     public int newRatio = 0;
@@ -159,6 +162,7 @@ public class Orchestrator implements OutputCallback {
         builder.optimizeGc = optimizeGc;
         builder.preallocateGc = preallocateGc;
         builder.killOnOutOfMemory = killOnOutOfMemory;
+        builder.allowChangingNice = allowChangingNice;
         OrchestratorModel model = builder.build();
         startStop = new OrchestratorStartStop(model, this);
         setStartStopAttributes();
