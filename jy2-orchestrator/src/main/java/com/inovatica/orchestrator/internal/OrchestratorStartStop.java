@@ -68,7 +68,7 @@ public class OrchestratorStartStop {
 			LaunchHandle handle = new LaunchHandle(item, model.jarParams, model.javaOpts, model.debug, model.jmx,
 					model.bashParams, model.hostName, model.heapDumpOnOutOfMemomry, model.heapDumpPath,
 					model.shenandoahGc, model.concurrentGc, model.optimizeGc, model.preallocateGc, model.killOnOutOfMemory, newRatio, user,
-					runAsSudoWhenSuffix, limitMemoryWhenXmx, model.allowChangingNice, callback);
+					runAsSudoWhenSuffix, limitMemoryWhenXmx, model.allowChangingNice, model.logGc, model.logGcPath, callback);
 			if (handle.start(item.type, item.name, item.absolutePath, model.workingDir, suspendDebug, remoteProfiling,
 					useLegacyDebug, zGc, javaMemoryLimit)) {
 				item.handle = handle;

@@ -55,6 +55,8 @@ public class LaunchHandle {
 	private boolean concurrentGc;
 	private boolean optimizeGc;
 	private boolean preallocateGc;
+	private boolean logGc;
+	private String logGcPath;
 
 	private boolean killOnOutOfMemory;
 
@@ -78,7 +80,8 @@ public class LaunchHandle {
 	public LaunchHandle(OrchestratorModelItem item, String jarParams, String javaOpts, boolean debug, boolean jmx,
 			String bashParams, String hostName, boolean heapDumpOnOutOfMemory, String heapDumpPath,
 			boolean shenandoahGc, boolean concurrentGc, boolean optimizeGc, boolean preallocateGc, boolean killOnOutOfMemory, int newRatio, String user,
-			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, boolean allowChangingNice, OutputCallback callback) {
+			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, boolean allowChangingNice, boolean logGc, String logGcPath,
+			OutputCallback callback) {
 		this.jarParams = jarParams;
 		this.javaOpts = javaOpts;
 		this.debug = debug;
@@ -99,6 +102,8 @@ public class LaunchHandle {
 		this.runAsSudoWhenSuffix = runAsSudoWhenSuffix;
 		this.limitMemoryWhenXmx = limitMemoryWhenXmx;
 		this.allowChangingNice = allowChangingNice;
+		this.logGc = logGc;
+		this.logGcPath = logGcPath;
 	}
 
 	public synchronized boolean start(HandleType type, String name, String fileName, File workingDir,
@@ -163,6 +168,9 @@ public class LaunchHandle {
 		}
 		if (optimizeGc) {
 			env = env + " -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages"; /* -XX:+UseNUMA */
+		}
+		if (logGc && logGcPath != null && !logGcPath.trim().isEmpty()) {
+			env = env + " -Xlog:gc*:file=" + logGcPath;
 		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";

@@ -36,6 +36,8 @@ public class OrchestratorModel {
 	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
 	public boolean allowChangingNice;
+	public boolean logGc;
+	public String logGcPath;
 
 	public synchronized OrchestratorModelItem getByName(String string) {
 		return map.get(string);
