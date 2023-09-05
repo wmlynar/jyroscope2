@@ -170,7 +170,7 @@ public class LaunchHandle {
 			env = env + " -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages"; /* -XX:+UseNUMA */
 		}
 		if (logGc && logGcPath != null && !logGcPath.trim().isEmpty()) {
-			env = env + " -Xlog:gc*:file=" + logGcPath;
+			env = env + " -Xlog:gc*:file=" + logGcPath + "\\" + name;
 		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";
