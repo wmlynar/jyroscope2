@@ -22,6 +22,8 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 	
 	private static final Logger LOG = Logger.getLogger(TCPROSLocalToRemoteConnection.class.getCanonicalName());
 	
+	public static final boolean FLUSH_AFTER_EVERY_MESSAGE = true;
+	
     private TCPROSServer server;
     private Socket socket;
     private InputStream is;
@@ -160,7 +162,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                 hasNext = messages.isEmpty();
                 if (message != null) {
                     message.writeOut(os);
-                    if (hasNext)
+                    if (hasNext || FLUSH_AFTER_EVERY_MESSAGE)
                         os.flush();
                 } else if (closed)
                     break;
