@@ -170,7 +170,7 @@ public class Orchestrator implements OutputCallback {
         builder.killOnOutOfMemory = killOnOutOfMemory;
         builder.allowChangingNice = allowChangingNice;
         builder.logGc = logGc;
-        builder.allowChangingNice = allowChangingNice;
+        builder.logGcPath = logGcPath;
         OrchestratorModel model = builder.build();
         startStop = new OrchestratorStartStop(model, this);
         setStartStopAttributes();

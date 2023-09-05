@@ -49,7 +49,7 @@ public class OrchestratorModelBuilder {
 	public boolean killOnOutOfMemory;
 	public boolean allowChangingNice;
 	public boolean logGc;
-	private String logGcPath;
+	public String logGcPath;
 
 	public OrchestratorModelBuilder setLaunchFileExtension(String string) {
 		launchFileExtension1 = string;
