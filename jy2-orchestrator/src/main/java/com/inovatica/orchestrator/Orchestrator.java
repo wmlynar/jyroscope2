@@ -146,21 +146,8 @@ public class Orchestrator implements OutputCallback {
     @Init
     public void init() {
     	
-		// create folders heapDumpPath and logGcPath
-		if (heapDumpPath != null && !heapDumpPath.trim().isEmpty()) {
-			try {
-				new File(heapDumpPath).mkdirs();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
-		}
-		if (logGcPath != null && !logGcPath.trim().isEmpty()) {
-			try {
-				new File(logGcPath).mkdirs();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
-		}
+    	createDirectoryQuietly(heapDumpPath);
+    	createDirectoryQuietly(logGcPath);
 
         builder = new OrchestratorModelBuilder();
         builder.setWorkingDir(workingDir);
@@ -194,6 +181,16 @@ public class Orchestrator implements OutputCallback {
         setStartStopAttributes();
         startStop.onStartup();
     }
+
+	private void createDirectoryQuietly(String dir) {
+		if (dir != null && !dir.trim().isEmpty()) {
+			try {
+				new File(dir).mkdirs();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
 
     @Repeat(interval = 1000)
     public void publishOrchestratorStatus() throws IOException {
