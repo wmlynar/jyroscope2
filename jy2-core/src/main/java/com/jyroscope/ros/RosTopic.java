@@ -16,6 +16,7 @@ import com.jyroscope.Link;
 import com.jyroscope.Name;
 import com.jyroscope.SystemException;
 import com.jyroscope.local.Topic;
+import com.jyroscope.ros.tcpros.TCPROSLocalToRemoteConnection;
 import com.jyroscope.server.xmlrpc.XMLRPCArray;
 import com.jyroscope.server.xmlrpc.XMLRPCClient;
 import com.jyroscope.server.xmlrpc.XMLRPCException;
@@ -536,6 +537,15 @@ public class RosTopic<T> implements Topic<T> {
 			return 5;
 		} else {
 			return queueSize;
+		}
+	}
+
+	public synchronized void closeDeadPublisherConnections(HashSet<String> aliveNodes) {
+		for (Link<RosMessage> l : remoteSubscribers) {
+			TCPROSLocalToRemoteConnection c = (TCPROSLocalToRemoteConnection) l;
+			if (!aliveNodes.contains(c.callerId)) {
+				c.close();
+			}
 		}
 	}
 	
