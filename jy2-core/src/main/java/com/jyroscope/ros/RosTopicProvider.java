@@ -77,7 +77,7 @@ public class RosTopicProvider implements TopicProvider {
 	private void startPeriodicDeadPublisherChecker() {
 		int period = -1;
 		try {
-			String param = parameterClient.getParameter("/dead_publisher_checker_period");
+			String param = parameterClient.getParameter("/dead_publisher_checker_period_min");
 			period = Integer.parseInt(param);
 		} catch (Exception e) {
 			e.printStackTrace();
