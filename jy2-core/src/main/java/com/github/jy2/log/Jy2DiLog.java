@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 
 import com.github.jy2.di.LogSeldom;
+import com.github.jy2.internal.StackTracePrinter;
 
 /**
  * Wrapper around org.apache.commons.logging.Log that sends the log to /rosout
@@ -255,6 +256,9 @@ public class Jy2DiLog implements Log, LogSeldom {
 		rec.setSourceClassName(cname);
 		rec.setSourceMethodName(method);
 		rec.setThrown(ex);
+		if (locations != null && locations.length > 2 && RosoutHandler.STACKTRACE_IN_PARAMETERS) {
+			rec.setParameters(new Object[] { StackTracePrinter.getStackTrace(locations, 2) });
+		}
 		if (RosoutHandler.LINE_NUMBER_INSIDE_PARAMETERS) {
 			rec.setParameters(new Object[] { line });
 		} else {

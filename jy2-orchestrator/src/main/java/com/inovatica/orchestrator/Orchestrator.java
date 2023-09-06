@@ -93,6 +93,15 @@ public class Orchestrator implements OutputCallback {
 
     @Parameter("kill_on_out_of_memory")
     public boolean killOnOutOfMemory = true;
+    
+    @Parameter("allow_changing_nice")
+    public boolean allowChangingNice = true;
+
+    @Parameter("log_gc")
+    public boolean logGc = false;
+
+    @Parameter("log_gc_path")
+    public String logGcPath = "";
 
     @Parameter("new_ratio")
     public int newRatio = 0;
@@ -159,6 +168,9 @@ public class Orchestrator implements OutputCallback {
         builder.optimizeGc = optimizeGc;
         builder.preallocateGc = preallocateGc;
         builder.killOnOutOfMemory = killOnOutOfMemory;
+        builder.allowChangingNice = allowChangingNice;
+        builder.logGc = logGc;
+        builder.logGcPath = logGcPath;
         OrchestratorModel model = builder.build();
         startStop = new OrchestratorStartStop(model, this);
         setStartStopAttributes();

@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import com.github.jy2.JyroscopeCore;
+import com.github.jy2.internal.StackTracePrinter;
 
 import go.jyroscope.ros.rosgraph_msgs.Log;
 
@@ -14,6 +15,7 @@ public class RosoutHandler extends Handler {
 
 	public static final boolean LINE_NUMBER_INSIDE_PARAMETERS = false;
 	public static final boolean PLACE_FROM_EXCEPTION = true;
+	public static final boolean STACKTRACE_IN_PARAMETERS = false;
 
 	@Override
 	public void close() throws SecurityException {
@@ -41,6 +43,12 @@ public class RosoutHandler extends Handler {
 		String nodeName = NodeNameManager.getNodeName();
 		Throwable ex = record.getThrown();
 		String cname = record.getSourceClassName();
+		if (STACKTRACE_IN_PARAMETERS) {
+			Object[] p = record.getParameters();
+			if (p != null && p.length > 0) {
+				cname = (String) p[0];
+			}
+		}
 		String method = record.getSourceMethodName();
 		int line;
 		if (LINE_NUMBER_INSIDE_PARAMETERS) {
@@ -71,6 +79,9 @@ public class RosoutHandler extends Handler {
 					cname = exLocations[0].getClassName();
 					method = exLocations[0].getMethodName();
 					line = exLocations[0].getLineNumber();
+					if (STACKTRACE_IN_PARAMETERS) {
+						cname = StackTracePrinter.getStackTrace(locations, 4);
+					}
 				}
 			}
 			publisher.publish(roslevel, nodeName, cname, method, line, msg, ex);

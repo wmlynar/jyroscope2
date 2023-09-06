@@ -47,6 +47,9 @@ public class OrchestratorModelBuilder {
 	public boolean optimizeGc;
 	public boolean preallocateGc;
 	public boolean killOnOutOfMemory;
+	public boolean allowChangingNice;
+	public boolean logGc;
+	public String logGcPath;
 
 	public OrchestratorModelBuilder setLaunchFileExtension(String string) {
 		launchFileExtension1 = string;
@@ -177,6 +180,9 @@ public class OrchestratorModelBuilder {
 		model.optimizeGc = optimizeGc;
 		model.preallocateGc = preallocateGc;
 		model.killOnOutOfMemory = killOnOutOfMemory;
+		model.allowChangingNice = allowChangingNice;
+		model.logGc = logGc;
+		model.logGcPath = logGcPath;
 		model.workingDir = new File(workingDir);
 
 		String launchFileDir = new File(launchFileDirLocal1).getAbsolutePath();

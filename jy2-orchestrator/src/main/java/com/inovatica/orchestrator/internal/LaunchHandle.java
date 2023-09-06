@@ -55,6 +55,8 @@ public class LaunchHandle {
 	private boolean concurrentGc;
 	private boolean optimizeGc;
 	private boolean preallocateGc;
+	private boolean logGc;
+	private String logGcPath;
 
 	private boolean killOnOutOfMemory;
 
@@ -71,11 +73,15 @@ public class LaunchHandle {
 
 	boolean limitMemoryWhenXmx;
 	Pattern memoryLimitPatern = Pattern.compile("xmx(\\d+)m");
+	
+	boolean allowChangingNice;
+	Pattern nicePatern = Pattern.compile("nice(-?\\d+)");
 
 	public LaunchHandle(OrchestratorModelItem item, String jarParams, String javaOpts, boolean debug, boolean jmx,
 			String bashParams, String hostName, boolean heapDumpOnOutOfMemory, String heapDumpPath,
 			boolean shenandoahGc, boolean concurrentGc, boolean optimizeGc, boolean preallocateGc, boolean killOnOutOfMemory, int newRatio, String user,
-			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, OutputCallback callback) {
+			boolean runAsSudoWhenSuffix, boolean limitMemoryWhenXmx, boolean allowChangingNice, boolean logGc, String logGcPath,
+			OutputCallback callback) {
 		this.jarParams = jarParams;
 		this.javaOpts = javaOpts;
 		this.debug = debug;
@@ -95,6 +101,9 @@ public class LaunchHandle {
 		this.user = user;
 		this.runAsSudoWhenSuffix = runAsSudoWhenSuffix;
 		this.limitMemoryWhenXmx = limitMemoryWhenXmx;
+		this.allowChangingNice = allowChangingNice;
+		this.logGc = logGc;
+		this.logGcPath = logGcPath;
 	}
 
 	public synchronized boolean start(HandleType type, String name, String fileName, File workingDir,
@@ -109,6 +118,14 @@ public class LaunchHandle {
 			Matcher memoryLimitMatcher = memoryLimitPatern.matcher(name);
 			if (memoryLimitMatcher.find()) {
 				javaMemoryLimit = Integer.parseInt(memoryLimitMatcher.group(1));
+			}
+		}
+		
+		int nice = 0;
+		if (allowChangingNice) {
+			Matcher niceMatcher = nicePatern.matcher(name);
+			if (niceMatcher.find()) {
+				nice = Integer.parseInt(niceMatcher.group(1));
 			}
 		}
 
@@ -152,6 +169,9 @@ public class LaunchHandle {
 		if (optimizeGc) {
 			env = env + " -XX:+AlwaysPreTouch -XX:+UseTransparentHugePages"; /* -XX:+UseNUMA */
 		}
+		if (logGc && logGcPath != null && !logGcPath.trim().isEmpty()) {
+			env = env + " -Xlog:gc*:file=" + logGcPath + "/" + name;
+		}
 		if (killOnOutOfMemory) {
 			env = env + " -XX:+CrashOnOutOfMemoryError -XX:OnOutOfMemoryError=\"kill -9 %p\"";
 		}
@@ -191,6 +211,15 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "roslaunch", "--wait", "--screen", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
+				if (nice != 0) {
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+							Integer.toString(nice), "-p", Long.toString(process.pid()) });
+					try {
+						niceprocess.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("Error when setting nice level " + fileName);
+					}
+				}
 			} catch (IOException e) {
 				LOG.error("Exception caught while starting launchfile " + fileName, e);
 				return false;
@@ -212,6 +241,15 @@ public class LaunchHandle {
 				// and subprocesses are in java
 				// process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
 				process = Runtime.getRuntime().exec(command, envWithKill, workingDir);
+				if (nice != 0) {
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+							Integer.toString(nice), "-p", Long.toString(process.pid()) });
+					try {
+						niceprocess.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("Error when setting nice level " + fileName);
+					}
+				}
 			} catch (IOException e) {
 				LOG.error("Exception caught while starting ros2 launchfile " + fileName, e);
 				return false;
@@ -229,6 +267,15 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "hzlaunch", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
+				if (nice != 0) {
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+							Integer.toString(nice), "-p", Long.toString(process.pid()) });
+					try {
+						niceprocess.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("Error when setting nice level " + fileName);
+					}
+				}
 			} catch (IOException e) {
 				LOG.error("Exception caught while starting launchfile " + fileName, e);
 				return false;
@@ -246,6 +293,15 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "jylaunch", "--wait", "--screen", fileName };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
+				if (nice != 0) {
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+							Integer.toString(nice), "-p", Long.toString(process.pid()) });
+					try {
+						niceprocess.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("Error when setting nice level " + fileName);
+					}
+				}
 			} catch (IOException e) {
 				LOG.error("Exception caught while starting launchfile " + fileName, e);
 				return false;
@@ -268,6 +324,15 @@ public class LaunchHandle {
 					command = new String[] { "gosu", user, "bash", "-c", "java -jar " + fileName + " " + jarParams };
 				}
 				process = Runtime.getRuntime().exec(command, envWithJavaOpts, workingDir);
+				if (nice != 0) {
+					Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+							Integer.toString(nice), "-p", Long.toString(process.pid()) });
+					try {
+						niceprocess.waitFor();
+					} catch (InterruptedException e) {
+						LOG.error("Error when setting nice level " + fileName);
+					}
+				}
 			} catch (IOException e) {
 				LOG.error("Exception caught while starting jar " + fileName, e);
 				return false;
@@ -293,6 +358,15 @@ public class LaunchHandle {
 						command = new String[] { "gosu", user, "bash", "-c", fileName + " " + bashParams };
 					}
 					process = Runtime.getRuntime().exec(command, envWithKill, workingDir);
+					if (nice != 0) {
+						Process niceprocess = Runtime.getRuntime().exec(new String[] { "sudo", "renice", "-n",
+								Integer.toString(nice), "-p", Long.toString(process.pid()) });
+						try {
+							niceprocess.waitFor();
+						} catch (InterruptedException e) {
+							LOG.error("Error when setting nice level " + fileName);
+						}
+					}
 				} else {
 					LOG.error("Cannot execute bash on non-unix system: " + OsValidator.OS + ", item " + fileName);
 					return false;
