@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.28</version>
+		<version>0.0.29-SNAPSHOT</version>
 	</parent>
 	<artifactId>jy2-sm-lib-example</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-sm-lib</artifactId>
-			<version>0.0.28</version>
+			<version>0.0.29-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
