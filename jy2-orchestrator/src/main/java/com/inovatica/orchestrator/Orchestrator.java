@@ -1,5 +1,6 @@
 package com.inovatica.orchestrator;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +145,23 @@ public class Orchestrator implements OutputCallback {
 
     @Init
     public void init() {
+    	
+		// create folders heapDumpPath and logGcPath
+		if (heapDumpPath != null && !heapDumpPath.trim().isEmpty()) {
+			try {
+				new File(heapDumpPath).mkdirs();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+		if (logGcPath != null && !logGcPath.trim().isEmpty()) {
+			try {
+				new File(heapDumpPath).mkdirs();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+
         builder = new OrchestratorModelBuilder();
         builder.setWorkingDir(workingDir);
         builder.setLaunchFileDir(launchfilePath);
