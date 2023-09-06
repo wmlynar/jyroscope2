@@ -156,7 +156,7 @@ public class Orchestrator implements OutputCallback {
 		}
 		if (logGcPath != null && !logGcPath.trim().isEmpty()) {
 			try {
-				new File(heapDumpPath).mkdirs();
+				new File(logGcPath).mkdirs();
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
