@@ -12,6 +12,8 @@ import com.github.jy2.di.LogSeldom;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
+import com.github.jy2.workqueue.MessageProcessor;
+import com.github.jy2.workqueue.MessageProcessorFactory;
 import com.jyroscope.Link;
 import com.jyroscope.ros.RosMessage;
 
@@ -159,7 +161,7 @@ public class LinkManager {
 //        private final Class<? extends D> to;
 //        private final ArrayList<Link<D>> local;
         private final ArrayList<Link<D>> remote;
-		private HashMap<Link<D>, Consumer<D>> localConsumers;
+		private HashMap<Link<D>, WorkConsumer<D>> localConsumers;
 //		private HashMap<Link<D>, Consumer<D>> remoteConsumers;
 
 	    private ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -176,7 +178,12 @@ public class LinkManager {
 			lock.writeLock().lock();
 			try {
             if (isLocal) {
-    			Consumer<D> consumer = new Consumer<>(link, queueSize, timeout);
+            	WorkConsumer<D> consumer;
+				if (USE_THREADED_CONSUMER) {
+					consumer = new ThreadedConsumer<>(link, queueSize, timeout);
+				} else {
+					consumer = new WorkQueueConsumer<>(link, queueSize, timeout);
+				}
 //                local.add(link);
 				localConsumers.put(link, consumer);
             }
@@ -193,7 +200,7 @@ public class LinkManager {
 			try {
 //            local.remove(link);
             remote.remove(link);
-			Consumer<D> consumer = localConsumers.remove(link);
+			WorkConsumer<D> consumer = localConsumers.remove(link);
 			if (consumer != null) {
 				consumer.stop();
 			}
@@ -242,7 +249,7 @@ public class LinkManager {
         	// * if remote accept all: !isLocal
         	// * if local accept only if sendLocalMessages is true: sendLocalMessages 
 			if (localConsumers.size() > 0 && (!isLocal | sendLocalMessages))
-				for (Consumer<D> consumer : localConsumers.values())
+				for (WorkConsumer<D> consumer : localConsumers.values())
 					consumer.offer(message);
 //			if (isLocal && remoteConsumers.size() > 0)
 //				for (Consumer<D> consumer : remoteConsumers.values())
@@ -265,14 +272,14 @@ public class LinkManager {
 				lock.readLock().unlock();
 			}
         }
-
-		private class Consumer<D> {
+        
+		private class ThreadedConsumer<D> implements WorkConsumer<D> {
 
 			private boolean keepRunnning = true;
 			private CircularBlockingDeque<D> queue;
 			private Thread thread;
 
-			public Consumer(Link<D> subscriber, int queueSize, int timeout) {
+			public ThreadedConsumer(Link<D> subscriber, int queueSize, int timeout) {
 				this.queue = new CircularBlockingDeque<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
@@ -292,17 +299,48 @@ public class LinkManager {
 				this.thread.start();
 			}
 
+			@Override
 			public void offer(D message) {
 				queue.addLast(message);
 			}
 
+			@Override
 			public void stop() {
 				this.keepRunnning = false;
 				this.thread.interrupt();
 			}
 		}
+
+		private class WorkQueueConsumer<D> implements WorkConsumer<D> {
+			
+			private MessageProcessor<D> processor;
+
+			public WorkQueueConsumer(Link<D> subscriber, int queueSize, int timeout) {
+				this.processor = factory.createProcessor(message -> subscriber.handle((D) message), queueSize, timeout);
+			}
+
+			@Override
+			public void offer(D message) {
+				this.processor.addMessage(message);
+			}
+
+			@Override
+			public void stop() {
+				this.processor.stop();
+			}
+		}
     }
-    
+	
+	private static final boolean USE_THREADED_CONSUMER = true;
+	private static final int WORK_QUEUE_SIZE = 500;
+	
+	private static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE);
+	
+	interface WorkConsumer<D> {
+		void offer(D message);
+		void stop();
+	}
+
     private final HashMap<Class<?>, Receive<?>> publishers;
     private final HashMap<Class<?>, Deliver<?>> listeners;
     
