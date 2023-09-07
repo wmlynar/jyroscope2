@@ -47,4 +47,13 @@ public class CircularBuffer<T> {
 		}
 	}
 
+	public void clear() {
+		start = 0;
+		end = 0;
+		full = false;
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = null;
+		}
+	}
+
 }
