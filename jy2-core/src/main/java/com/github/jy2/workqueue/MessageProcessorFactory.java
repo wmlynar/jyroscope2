@@ -24,12 +24,14 @@ public class MessageProcessorFactory<T> {
 	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
 		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, this.executor,
 				this.timeoutQueue, this.lock, this.schedulerCondition);
-		lock.lock();
-		try {
-			timeoutQueue.add(messageProcessor);
-			schedulerCondition.signalAll();
-		} finally {
-			lock.unlock();
+		if (timeout > 0) {
+			lock.lock();
+			try {
+				timeoutQueue.add(messageProcessor);
+				schedulerCondition.signalAll();
+			} finally {
+				lock.unlock();
+			}
 		}
 		return messageProcessor;
 	}

@@ -52,16 +52,18 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 				startProcessingMessages();
 			}
 		}
-		lock.lock();
-		try {
-			timeoutQueue.remove(this);
-			timeoutQueue.offer(this);
-			schedulerCondition.signalAll();
-		} finally {
-			lock.unlock();
+		if (timeout > 0) {
+			lock.lock();
+			try {
+				timeoutQueue.remove(this);
+				timeoutQueue.offer(this);
+				schedulerCondition.signalAll();
+			} finally {
+				lock.unlock();
+			}
 		}
 	}
-	
+
 	public void stop() {
 		synchronized (this) {
 			queue.clear();
