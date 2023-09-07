@@ -179,7 +179,6 @@ public class LinkManager {
     			Consumer<D> consumer = new Consumer<>(link, queueSize, timeout);
 //                local.add(link);
 				localConsumers.put(link, consumer);
-				consumer.start();
             }
             else
                 remote.add(link);
@@ -290,17 +289,11 @@ public class LinkManager {
 						}
 					}
 				};
+				this.thread.start();
 			}
 
 			public void offer(D message) {
 				queue.addLast(message);
-			}
-
-			public void start() {
-				if (!keepRunnning) {
-					throw new IllegalStateException("Consumer was already stopped");
-				}
-				this.thread.start();
 			}
 
 			public void stop() {
