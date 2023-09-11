@@ -1,7 +1,7 @@
 package com.github.jy2.workqueue;
 
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -17,7 +17,7 @@ public class MessageProcessorFactory<T> {
 	private final Condition schedulerCondition = lock.newCondition();
 
 	public MessageProcessorFactory(int maxThreads) {
-		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
 		startScheduler();
 	}
 
