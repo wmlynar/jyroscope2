@@ -82,7 +82,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 			executor.execute(() -> {
 				T message;
 				while (true) {
-					synchronized (this) {
+					synchronized (MessageProcessor.this) {
 						message = queue.pollFirst();
 						if (message == null) {
 							isProcessing = false;
