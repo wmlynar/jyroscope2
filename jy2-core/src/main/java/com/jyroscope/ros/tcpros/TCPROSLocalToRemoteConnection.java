@@ -34,6 +34,8 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
 	private volatile boolean closed;
     private CircularBlockingDeque<RosMessage> messages;
     
+    public String callerId;
+    
     public TCPROSLocalToRemoteConnection(TCPROSServer server, Socket socket) {
         this.server = server;
         this.socket = socket;
@@ -59,6 +61,7 @@ public class TCPROSLocalToRemoteConnection implements Link<RosMessage> {
                     String typeName = header.getHeader("type");
                     
                     Thread.currentThread().setName("Publisher-" + topicName + "-" + caller);
+                    this.callerId = caller;
 
 					// final RosMessageType type = RosTypes.getMessageType(typeName);
 					String md5 = RosTypeConverters.getMd5(typeName);

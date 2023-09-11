@@ -1,5 +1,6 @@
 package com.inovatica.orchestrator;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +145,10 @@ public class Orchestrator implements OutputCallback {
 
     @Init
     public void init() {
+    	
+    	createDirectoryQuietly(heapDumpPath);
+    	createDirectoryQuietly(logGcPath);
+
         builder = new OrchestratorModelBuilder();
         builder.setWorkingDir(workingDir);
         builder.setLaunchFileDir(launchfilePath);
@@ -176,6 +181,16 @@ public class Orchestrator implements OutputCallback {
         setStartStopAttributes();
         startStop.onStartup();
     }
+
+	private void createDirectoryQuietly(String dir) {
+		if (dir != null && !dir.trim().isEmpty()) {
+			try {
+				new File(dir).mkdirs();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+		}
+	}
 
     @Repeat(interval = 1000)
     public void publishOrchestratorStatus() throws IOException {

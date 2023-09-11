@@ -1,6 +1,7 @@
 package com.jyroscope.ros;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -121,4 +122,13 @@ public class RosSlave {
 			}
 		}
 	}
+	
+	public void closeDeadPublisherConnections(HashSet<String> aliveNodes) {
+		synchronized (topicsMutex) {
+			for (RosTopic t : topics.payloads()) {
+				t.closeDeadPublisherConnections(aliveNodes);
+			}
+		}
+	}
+
 }
