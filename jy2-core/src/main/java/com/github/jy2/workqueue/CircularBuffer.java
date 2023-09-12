@@ -6,6 +6,7 @@ public class CircularBuffer<T> {
 	private int start = 0;
 	private int end = 0;
 	private boolean full = false;
+	private T marker;
 
 	@SuppressWarnings("unchecked")
 	public CircularBuffer(int maxSize) {
@@ -27,7 +28,17 @@ public class CircularBuffer<T> {
 		}
 	}
 
+	public void setMarker(T value) {
+		marker = value;
+	}
+
 	public T pollFirst() {
+		if (marker != null) {
+			T value = marker;
+			marker = null;
+			return value;
+		}
+
 		if (size() == 0) {
 			return null;
 		}
@@ -48,6 +59,8 @@ public class CircularBuffer<T> {
 	}
 
 	public void clear() {
+		marker = null;
+
 		start = 0;
 		end = 0;
 		full = false;

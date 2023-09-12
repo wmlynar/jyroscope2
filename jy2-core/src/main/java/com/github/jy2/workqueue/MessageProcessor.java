@@ -39,15 +39,13 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 
 	public void addMessage(T message) {
 		synchronized (this) {
-			if (message == TIMEOUT_MARKER && queue.size() > 0) {
-				return;
-			}
-// not needed because circular buffer will handle it by definition
-//			if (queue.size() >= queueLength) {
-//				queue.pollFirst();
-//			}
-			queue.addLast(message);
 			nextTimeout.set(System.nanoTime() + timeout);
+			if (message == TIMEOUT_MARKER) {
+				queue.clear();
+				queue.setMarker(message);
+			} else {
+				queue.addLast(message);
+			}
 			if (!isProcessing) {
 				startProcessingMessages();
 			}
