@@ -16,8 +16,9 @@ public class MessageProcessorFactory<T> {
 	private final Lock lock = new ReentrantLock();
 	private final Condition schedulerCondition = lock.newCondition();
 
-	public MessageProcessorFactory(int maxThreads) {
-		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+	public MessageProcessorFactory(int maxThreads, int bufferSize) {
+		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+				new BufferedThreadFactory(bufferSize));
 		startScheduler();
 	}
 

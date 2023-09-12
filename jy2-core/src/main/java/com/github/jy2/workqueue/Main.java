@@ -6,7 +6,7 @@ public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
 
-		MessageProcessorFactory<String> factory = new MessageProcessorFactory<>(10);
+		MessageProcessorFactory<String> factory = new MessageProcessorFactory<>(10, 1);
 		MessageProcessor<String> processor = factory.createProcessor(t -> extracted(t), 5, 100);
 
 		for (int i = 0; i < 100; i++) {

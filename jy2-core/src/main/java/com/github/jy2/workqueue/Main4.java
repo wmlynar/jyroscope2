@@ -1,6 +1,6 @@
 package com.github.jy2.workqueue;
 
-public class Main2 {
+public class Main4 {
 
 	static long lastTime = System.currentTimeMillis();
 
@@ -9,10 +9,7 @@ public class Main2 {
 		MessageProcessorFactory<String> factory = new MessageProcessorFactory<>(10, 1);
 		MessageProcessor<String> processor = factory.createProcessor(t -> extracted(t), 5, 100);
 
-		for (int i = 0; i < 10; i++) {
-			processor.addMessage("message " + i);
-			Thread.sleep(90);
-		}
+		processor.addMessage("message");
 	}
 
 	private static void extracted(String t) {

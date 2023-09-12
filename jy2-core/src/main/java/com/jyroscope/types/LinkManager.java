@@ -333,8 +333,9 @@ public class LinkManager {
 	
 	private static final boolean USE_THREADED_CONSUMER = true;
 	private static final int WORK_QUEUE_SIZE = 500;
-	
-	private static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE);
+	private static final int WORK_QUEUE_BUFFER = 10;
+
+	private static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
 	
 	interface WorkConsumer<D> {
 		void offer(D message);
