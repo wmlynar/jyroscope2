@@ -55,10 +55,10 @@ public class MessageProcessorFactory<T> {
 
 					long delay = sq.getNextTimeout() - System.nanoTime();
 					if (delay <= 0) {
-						timeoutQueue.poll();
+//						timeoutQueue.poll();
 						sq.addMessage(MessageProcessor.TIMEOUT_MARKER);
-						timeoutQueue.offer(sq);
-						schedulerCondition.signalAll();
+//						timeoutQueue.offer(sq);
+//						schedulerCondition.signalAll();
 					} else {
 						schedulerCondition.awaitNanos(delay);
 					}
