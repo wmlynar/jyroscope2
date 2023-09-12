@@ -28,7 +28,7 @@ public class BufferedThreadFactory implements ThreadFactory {
 					e.printStackTrace();
 				}
 			}
-		});
+		}, "buffered-pool-thread-creator");
 
 		backgroundThreadCreator.setDaemon(true); // So it doesn't prevent JVM shutdown
 		backgroundThreadCreator.start();
