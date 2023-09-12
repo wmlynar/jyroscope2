@@ -21,7 +21,7 @@ public class BufferedThreadFactory implements ThreadFactory {
 
 		// Create a background thread to refill the buffer
 		backgroundThreadCreator = new Thread(() -> {
-			while (!Thread.currentThread().isInterrupted()) {
+			while (true) {
 				try {
 					threadBuffer.put(new MyThread());
 				} catch (InterruptedException e) {
