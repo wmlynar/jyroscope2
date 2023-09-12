@@ -168,7 +168,7 @@ public class CircularBlockingDeque<T> implements Iterable<T> {
           break;
         }
         mutex.wait(timeoutMillis);
-        if (length > 0) {
+        if (length <= 0) {
           return null;
         }
       }
