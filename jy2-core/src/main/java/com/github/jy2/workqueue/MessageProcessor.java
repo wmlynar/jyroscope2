@@ -23,6 +23,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	private final CircularBuffer<T> queue;
 	private final AtomicLong nextTimeout = new AtomicLong();
 	private boolean isProcessing = false;
+	private Runnable command;
 
 	public MessageProcessor(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
@@ -34,20 +35,36 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 		this.timeoutQueue = timeoutQueue;
 		this.lock = lock;
 		this.schedulerCondition = schedulerCondition;
-		this.nextTimeout.set(System.currentTimeMillis() + timeout);
+		this.nextTimeout.set(System.nanoTime() + this.timeout);
+		
+		this.command = () -> {
+			T message;
+			while (true) {
+				synchronized (MessageProcessor.this) {
+					message = queue.pollFirst();
+					if (message == null) {
+						isProcessing = false;
+						return;
+					}
+				}
+				if (message == TIMEOUT_MARKER) {
+					callback.accept(null);
+				} else {
+					callback.accept(message);
+				}
+			}
+		};
 	}
 
 	public void addMessage(T message) {
 		synchronized (this) {
-			if (message == TIMEOUT_MARKER && queue.size() > 0) {
-				return;
-			}
-// not needed because circular buffer will handle it by definition
-//			if (queue.size() >= queueLength) {
-//				queue.pollFirst();
-//			}
-			queue.addLast(message);
 			nextTimeout.set(System.nanoTime() + timeout);
+			if (message == TIMEOUT_MARKER) {
+				queue.clear();
+				queue.setMarker(message);
+			} else {
+				queue.addLast(message);
+			}
 			if (!isProcessing) {
 				startProcessingMessages();
 			}
@@ -79,23 +96,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	private void startProcessingMessages() {
 		isProcessing = true;
 		try {
-			executor.execute(() -> {
-				T message;
-				while (true) {
-					synchronized (MessageProcessor.this) {
-						message = queue.pollFirst();
-						if (message == null) {
-							isProcessing = false;
-							return;
-						}
-					}
-					if (message == TIMEOUT_MARKER) {
-						callback.accept(null);
-					} else {
-						callback.accept(message);
-					}
-				}
-			});
+			executor.execute(command);
 		} catch (RejectedExecutionException e) {
 			isProcessing = false;
 		}
@@ -109,5 +110,5 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	public int compareTo(MessageProcessor<T> o) {
 		return Long.compare(this.nextTimeout.get(), o.nextTimeout.get());
 	}
-
+	
 }

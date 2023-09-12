@@ -278,20 +278,36 @@ public class LinkManager {
 			private boolean keepRunnning = true;
 			private CircularBlockingDeque<D> queue;
 			private Thread thread;
+			private volatile long lastMessageTime;
 
 			public ThreadedConsumer(Link<D> subscriber, int queueSize, int timeout) {
 				this.queue = new CircularBlockingDeque<>(queueSize);
 				Class<? extends D> type = subscriber.getType();
 				String typeName = type == null ? "null" : type.getName();
 				String name = subscriber.getThreadName();
+				this.lastMessageTime = System.currentTimeMillis();
 				this.thread = new Thread(subscriber.getThreadName()) {
 					@Override
 					public void run() {
-						while (keepRunnning) {
-							try {
-								D message = queue.takeFirstNullOnTimeout(timeout);
-								subscriber.handle(message);
-							} catch (InterruptedException e) {
+						if (timeout > 0) {
+							while (keepRunnning) {
+								try {
+									D message = queue.takeFirstWitDeadline(lastMessageTime + timeout);
+									if (message == null) {
+										queue.clear();
+										lastMessageTime = System.currentTimeMillis();
+									}
+									subscriber.handle(message);
+								} catch (InterruptedException e) {
+								}
+							}
+						} else {
+							while (keepRunnning) {
+								try {
+									D message = queue.takeFirst();
+									subscriber.handle(message);
+								} catch (InterruptedException e) {
+								}
 							}
 						}
 					}
@@ -301,6 +317,7 @@ public class LinkManager {
 
 			@Override
 			public void offer(D message) {
+				this.lastMessageTime = System.currentTimeMillis();
 				queue.addLast(message);
 			}
 
@@ -333,8 +350,9 @@ public class LinkManager {
 	
 	private static final boolean USE_THREADED_CONSUMER = true;
 	private static final int WORK_QUEUE_SIZE = 500;
-	
-	private static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE);
+	private static final int WORK_QUEUE_BUFFER = 10;
+
+	private static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
 	
 	interface WorkConsumer<D> {
 		void offer(D message);

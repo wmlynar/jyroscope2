@@ -1,7 +1,7 @@
 package com.github.jy2.workqueue;
 
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -16,8 +16,9 @@ public class MessageProcessorFactory<T> {
 	private final Lock lock = new ReentrantLock();
 	private final Condition schedulerCondition = lock.newCondition();
 
-	public MessageProcessorFactory(int maxThreads) {
-		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+	public MessageProcessorFactory(int maxThreads, int bufferSize) {
+		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+				new BufferedThreadFactory(bufferSize));
 		startScheduler();
 	}
 
@@ -54,12 +55,12 @@ public class MessageProcessorFactory<T> {
 
 					long delay = sq.getNextTimeout() - System.nanoTime();
 					if (delay <= 0) {
-						timeoutQueue.poll();
+//						timeoutQueue.poll();
 						sq.addMessage(MessageProcessor.TIMEOUT_MARKER);
-						timeoutQueue.offer(sq);
-						schedulerCondition.signalAll();
+//						timeoutQueue.offer(sq);
+//						schedulerCondition.signalAll();
 					} else {
-						schedulerCondition.await(delay, TimeUnit.NANOSECONDS);
+						schedulerCondition.awaitNanos(delay);
 					}
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
