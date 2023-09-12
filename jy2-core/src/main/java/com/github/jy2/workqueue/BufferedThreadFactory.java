@@ -62,9 +62,7 @@ public class BufferedThreadFactory implements ThreadFactory {
 
 		@Override
 		public void run() {
-			if (runnable != null) {
-				runnable.run();
-			}
+			runnable.run();
 		}
 	}
 }
