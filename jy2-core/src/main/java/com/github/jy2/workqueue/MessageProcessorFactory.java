@@ -60,7 +60,7 @@ public class MessageProcessorFactory<T> {
 						timeoutQueue.offer(sq);
 						schedulerCondition.signalAll();
 					} else {
-						schedulerCondition.await(delay, TimeUnit.NANOSECONDS);
+						schedulerCondition.awaitNanos(delay);
 					}
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
