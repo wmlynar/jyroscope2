@@ -34,7 +34,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 		this.timeoutQueue = timeoutQueue;
 		this.lock = lock;
 		this.schedulerCondition = schedulerCondition;
-		this.nextTimeout.set(System.currentTimeMillis() + timeout);
+		this.nextTimeout.set(System.nanoTime() + this.timeout);
 	}
 
 	public void addMessage(T message) {
