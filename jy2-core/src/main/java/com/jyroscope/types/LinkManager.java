@@ -278,7 +278,7 @@ public class LinkManager {
 			private boolean keepRunnning = true;
 			private CircularBlockingDeque<D> queue;
 			private Thread thread;
-			private long lastMessageTime;
+			private volatile long lastMessageTime;
 
 			public ThreadedConsumer(Link<D> subscriber, int queueSize, int timeout) {
 				this.queue = new CircularBlockingDeque<>(queueSize);
@@ -292,14 +292,11 @@ public class LinkManager {
 						if (timeout > 0) {
 							while (keepRunnning) {
 								try {
-									long dt = System.currentTimeMillis() - lastMessageTime;
-									long waitTime = timeout - dt;
-									if (waitTime <= 0) {
-										subscriber.handle(null);
-									} else {
-										D message = queue.takeFirstNullOnTimeout(waitTime);
-										subscriber.handle(message);
+									D message = queue.takeFirstWitDeadline(lastMessageTime + timeout);
+									if (message == null) {
+										lastMessageTime = System.currentTimeMillis();
 									}
+									subscriber.handle(message);
 								} catch (InterruptedException e) {
 								}
 							}

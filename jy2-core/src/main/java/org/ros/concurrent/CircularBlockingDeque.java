@@ -128,36 +128,13 @@ public class CircularBlockingDeque<T> implements Iterable<T> {
     return entry;
   }
   
-//  public T takeFirstNullOnTimeout(int timeoutMillis) throws InterruptedException {
-//	long lastMessageTime = 0;
-//	long waitTime = 0;
-//	if (timeoutMillis > 0) {
-//		lastMessageTime = System.currentTimeMillis();
-//		waitTime = timeoutMillis;
-//	}
-//    T entry;
-//    synchronized (mutex) {
-//      while (true) {
-//        if (length > 0) {
-//          entry = deque[start];
-//          start = (start + 1) % limit;
-//          length--;
-//          break;
-//        }
-//        mutex.wait(waitTime);
-//		if (timeoutMillis > 0) {
-//			long dt = System.currentTimeMillis() - lastMessageTime;
-//			waitTime = timeoutMillis - dt;
-//			if (waitTime <= 0) {
-//				return null;
-//			}
-//		}
-//      }
-//    }
-//    return entry;
-//  }
-
   public T takeFirstNullOnTimeout(long timeoutMillis) throws InterruptedException {
+	long lastMessageTime = 0;
+	long waitTime = 0;
+	if (timeoutMillis > 0) {
+		lastMessageTime = System.currentTimeMillis();
+		waitTime = timeoutMillis;
+	}
     T entry;
     synchronized (mutex) {
       while (true) {
@@ -167,14 +144,61 @@ public class CircularBlockingDeque<T> implements Iterable<T> {
           length--;
           break;
         }
-        mutex.wait(timeoutMillis);
-        if (length <= 0) {
-          return null;
-        }
+        mutex.wait(waitTime);
+		if (timeoutMillis > 0) {
+			long dt = System.currentTimeMillis() - lastMessageTime;
+			waitTime = timeoutMillis - dt;
+			if (waitTime <= 0) {
+				return null;
+			}
+		}
       }
     }
     return entry;
   }
+
+  public T takeFirstWitDeadline(long deadlineMillis) throws InterruptedException {
+	long waitTime = deadlineMillis - System.currentTimeMillis();
+	if (waitTime <= 0) {
+		return null;
+	}
+    T entry;
+    synchronized (mutex) {
+      while (true) {
+        if (length > 0) {
+          entry = deque[start];
+          start = (start + 1) % limit;
+          length--;
+          break;
+        }
+        mutex.wait(waitTime);
+		waitTime = deadlineMillis - System.currentTimeMillis();
+		if (waitTime <= 0) {
+			return null;
+		}
+      }
+    }
+    return entry;
+  }
+
+//  public T takeFirstNullOnTimeout(long timeoutMillis) throws InterruptedException {
+//    T entry;
+//    synchronized (mutex) {
+//      while (true) {
+//        if (length > 0) {
+//          entry = deque[start];
+//          start = (start + 1) % limit;
+//          length--;
+//          break;
+//        }
+//        mutex.wait(timeoutMillis);
+//        if (length <= 0) {
+//          return null;
+//        }
+//      }
+//    }
+//    return entry;
+//  }
 
   /**
    * Retrieves, but does not remove, the head of this queue, returning
