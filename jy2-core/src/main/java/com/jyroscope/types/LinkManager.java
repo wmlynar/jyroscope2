@@ -294,6 +294,7 @@ public class LinkManager {
 								try {
 									D message = queue.takeFirstWitDeadline(lastMessageTime + timeout);
 									if (message == null) {
+										queue.clear();
 										lastMessageTime = System.currentTimeMillis();
 									}
 									subscriber.handle(message);
