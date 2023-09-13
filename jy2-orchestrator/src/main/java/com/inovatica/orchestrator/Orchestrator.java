@@ -150,8 +150,12 @@ public class Orchestrator implements OutputCallback {
     @Init
     public void init() {
     	
-    	createDirectoryQuietly(heapDumpPath);
-    	createDirectoryQuietly(logGcPath);
+    	if(heapDumpOnOutOfMemomry) {
+        	createDirectoryQuietly(heapDumpPath);
+    	}
+    	if(logGc) {
+        	createDirectoryQuietly(logGcPath);
+    	}
 
         builder = new OrchestratorModelBuilder();
         builder.setWorkingDir(workingDir);
