@@ -2,6 +2,10 @@ package com.inovatica.orchestrator;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFileAttributeView;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -186,11 +190,29 @@ public class Orchestrator implements OutputCallback {
 		if (dir != null && !dir.trim().isEmpty()) {
 			try {
 				new File(dir).mkdirs();
+				if (user != null && !user.isBlank()) {
+					changeOwnerAndGroup(dir, user, user);
+				}
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
 		}
 	}
+	
+    public static void changeOwnerAndGroup(String filename, String newOwner, String newGroup) throws IOException {
+        Path path = Path.of(filename);
+
+        // Get the PosixFileAttributeView for the file
+        PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(path, PosixFileAttributeView.class);
+
+        if (fileAttributeView == null) {
+            throw new UnsupportedOperationException("Changing owner and group is not supported on this system.");
+        }
+
+        // Set the new owner and group
+        fileAttributeView.setOwner(FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByName(newOwner));
+        fileAttributeView.setGroup(FileSystems.getDefault().getUserPrincipalLookupService().lookupPrincipalByGroupName(newGroup));
+    }
 
     @Repeat(interval = 1000)
     public void publishOrchestratorStatus() throws IOException {
