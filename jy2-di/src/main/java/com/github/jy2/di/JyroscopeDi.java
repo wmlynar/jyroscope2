@@ -3,7 +3,6 @@ package com.github.jy2.di;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -16,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -51,6 +51,8 @@ import com.github.jy2.internal.DeleteSubscriber;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.util.ExceptionUtil;
+import com.github.jy2.workqueue.MessageProcessor;
+import com.jyroscope.types.LinkManager;
 
 public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
@@ -64,7 +66,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 	private ArrayList<Initializer> initializers = new ArrayList<>();
 	private ArrayList<Repeater> repeaters = new ArrayList<>();
-	private HashMap<InstanceWithName, Thread> repeatersMap = new HashMap<>();
+	private HashMap<InstanceWithName, Repeater> repeatersMap = new HashMap<>();
 	private ArrayList<SubscriberRef> subscriberRefs = new ArrayList<>();
 	private ArrayList<ParameterReference> parameterReferences = new ArrayList<>();
 	private HashMap<String, ParameterReference> parameterReferenceMap = new HashMap<>();
@@ -441,11 +443,15 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 	}
 
 	public synchronized void wakeupRepeater(Object object, String name) {
-		Thread thread = repeatersMap.get(new InstanceWithName(object, name));
-		if (thread == null) {
+		Repeater repeater = repeatersMap.get(new InstanceWithName(object, name));
+		if (repeater == null) {
 			LOG.errorSeldom("Cannot wakeup repeater, cannot find " + object.getClass().getCanonicalName() + " " + name);
 		} else {
-			thread.interrupt();
+			if (repeater.thread != null) {
+				repeater.thread.interrupt();
+			} else {
+				repeater.processor.wakeup();
+			}
 		}
 	}
 
@@ -591,57 +597,87 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		Repeat repeat = repeater.repeat;
 		boolean isDelay = repeat.delay() != 0;
 		boolean isInterval = repeat.interval() != 0;
-		repeater.thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				int count = 0;
-				long start = System.currentTimeMillis();
-				while ((repeat.count() == 0 || count < repeat.count()) && !repeater.shutdown) {
-					count++;
-					try {
-						long before = System.currentTimeMillis();
-						Object result = method.invoke(object);
-						long delta = System.currentTimeMillis() - before;
-						if (delta > repeater.repeat.maxExecutionTime() && repeater.repeat.maxExecutionTime() > 0) {
-							LOG.warn("Repeater execution time " + delta + " exceeded threshold "
-									+ repeater.repeat.maxExecutionTime() + " in method " + method.toGenericString());
-						}
-
-						// Check if it returned false
-						if (result != null) {
-							if (!(Boolean) result) {
-								break;
+		
+		if(LinkManager.USE_THREADED_REPEATER) {
+			repeater.thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					int count = 0;
+					long start = System.currentTimeMillis();
+					while ((repeat.count() == 0 || count < repeat.count()) && !repeater.shutdown) {
+						count++;
+						try {
+							long before = System.currentTimeMillis();
+							Object result = method.invoke(object);
+							long delta = System.currentTimeMillis() - before;
+							if (delta > repeater.repeat.maxExecutionTime() && repeater.repeat.maxExecutionTime() > 0) {
+								LOG.warn("Repeater execution time " + delta + " exceeded threshold "
+										+ repeater.repeat.maxExecutionTime() + " in method " + method.toGenericString());
 							}
-						}
-					} catch (Exception e) {
-						ExceptionUtil.rethrowErrorIfCauseIsError(e);
-						Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
-						LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
-					}
-					try {
-						if (isDelay) {
-							Thread.sleep(repeat.delay());
-						} else if (isInterval) {
-							long now = System.currentTimeMillis();
-							long sleep = repeat.interval() - (now - start);
-							start += repeat.interval();
-							if (sleep > 0) {
-								Thread.sleep(sleep);
+	
+							// Check if it returned false
+							if (result != null) {
+								if (!(Boolean) result) {
+									break;
+								}
 							}
+						} catch (Exception e) {
+							ExceptionUtil.rethrowErrorIfCauseIsError(e);
+							Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+							LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
 						}
-					} catch (InterruptedException ie) {
-						// thread was woken up, restart the counter
-						start = System.currentTimeMillis();
-					} catch (Exception e) {
-						LOG.error("Exception caught while calling sleep " + method.toGenericString(), e);
+						try {
+							if (isDelay) {
+								Thread.sleep(repeat.delay());
+							} else if (isInterval) {
+								long now = System.currentTimeMillis();
+								long sleep = repeat.interval() - (now - start);
+								start += repeat.interval();
+								if (sleep > 0) {
+									Thread.sleep(sleep);
+								}
+							}
+						} catch (InterruptedException ie) {
+							// thread was woken up, restart the counter
+							start = System.currentTimeMillis();
+						} catch (Exception e) {
+							LOG.error("Exception caught while calling sleep " + method.toGenericString(), e);
+						}
 					}
 				}
-			}
-		}, "Repeater-" + method.toString());
-		repeater.thread.start();
+			}, "Repeater-" + method.toString());
+			repeater.thread.start();
+		} else {
+			Supplier<Boolean> supplier = () -> {
+				try {
+					long before = System.currentTimeMillis();
+					Object result = method.invoke(object);
+					long delta = System.currentTimeMillis() - before;
+					if (delta > repeater.repeat.maxExecutionTime() && repeater.repeat.maxExecutionTime() > 0) {
+						LOG.warn("Repeater execution time " + delta + " exceeded threshold "
+								+ repeater.repeat.maxExecutionTime() + " in method " + method.toGenericString());
+					}
+
+					// Check if it returned false
+					if (result != null) {
+						if (!(Boolean) result) {
+							return false;
+						}
+					}
+				} catch (Exception e) {
+					ExceptionUtil.rethrowErrorIfCauseIsError(e);
+					Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+					LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
+				}
+				return true;
+			};
+			repeater.processor = LinkManager.factory.createRepeater(supplier, repeat.delay(), repeat.interval(), repeat.count());
+		}
+		
+		
 		String name = repeat.name();
 		if (name != null && !name.isEmpty()) {
-			repeatersMap.put(new InstanceWithName(repeater.object, name), repeater.thread);
+			repeatersMap.put(new InstanceWithName(repeater.object, name), repeater);
 		}
 	}
 

@@ -7,13 +7,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 
 	public static final Object TIMEOUT_MARKER = new Object();
 
-	private final Consumer<T> callback;
-	private final int queueLength;
 	private final int timeout;
 	private final ThreadPoolExecutor executor;
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue;
@@ -28,15 +27,13 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	public MessageProcessor(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
 		this.queue = new CircularBuffer<>(queueLength);
-		this.callback = callback;
-		this.queueLength = queueLength;
 		this.timeout = timeout * 1_000_000;
 		this.executor = executor;
 		this.timeoutQueue = timeoutQueue;
 		this.lock = lock;
 		this.schedulerCondition = schedulerCondition;
 		this.nextTimeout.set(System.nanoTime() + this.timeout);
-		
+
 		this.command = () -> {
 			T message;
 			while (true) {
@@ -51,6 +48,34 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 					callback.accept(null);
 				} else {
 					callback.accept(message);
+				}
+			}
+		};
+	}
+
+	public MessageProcessor(Supplier<Boolean> callable, int delay, int interval, ThreadPoolExecutor executor,
+			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
+		this.queue = new CircularBuffer<>(1);
+		this.timeout = interval * 1_000_000;
+		this.executor = executor;
+		this.timeoutQueue = timeoutQueue;
+		this.lock = lock;
+		this.schedulerCondition = schedulerCondition;
+		this.nextTimeout.set(System.nanoTime() + delay * 1_000_000);
+
+		this.command = () -> {
+			T message;
+			while (true) {
+				synchronized (MessageProcessor.this) {
+					message = queue.pollFirst();
+					if (message == null) {
+						isProcessing = false;
+						return;
+					}
+				}
+				boolean result = callable.get();
+				if (!result) {
+					stopTimer();
 				}
 			}
 		};
@@ -110,5 +135,23 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	public int compareTo(MessageProcessor<T> o) {
 		return Long.compare(this.nextTimeout.get(), o.nextTimeout.get());
 	}
-	
+
+	public void stopTimer() {
+		synchronized (MessageProcessor.this) {
+			lock.lock();
+			try {
+				timeoutQueue.remove(this);
+			} finally {
+				lock.unlock();
+			}
+			queue.clear();
+			isProcessing = false;
+			return;
+		}
+	}
+
+	public void wakeup() {
+		((MessageProcessor) this).addMessage(MessageProcessor.TIMEOUT_MARKER);
+	}
+
 }

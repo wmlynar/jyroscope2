@@ -3,6 +3,7 @@ package com.github.jy2.di.internal;
 import java.lang.reflect.Method;
 
 import com.github.jy2.di.annotations.Repeat;
+import com.github.jy2.workqueue.MessageProcessor;
 
 public class Repeater {
 	
@@ -10,6 +11,7 @@ public class Repeater {
 	public Method method;
 	public Repeat repeat;
 	public Thread thread;
+	public MessageProcessor processor;
 	
 	/**
 	 * Shutdown = true indicates that repeater should be shut down.
@@ -29,6 +31,8 @@ public class Repeater {
 		shutdown = true;
 		if(thread!=null) {
 			thread.interrupt();
+		} else if(processor!=null) {
+			processor.stopTimer();
 		}
 		
 	}
