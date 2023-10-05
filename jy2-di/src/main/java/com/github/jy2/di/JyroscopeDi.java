@@ -595,13 +595,22 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		Method method = repeater.method;
 		makeAccessible(method);
 		Repeat repeat = repeater.repeat;
-		boolean isDelay = repeat.delay() != 0;
-		boolean isInterval = repeat.interval() != 0;
 		
 		if(LinkManager.USE_THREADED_REPEATER) {
 			repeater.thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
+					boolean isDelay = repeat.delay() != 0;
+					boolean isInterval = repeat.interval() != 0;
+
+					if (isDelay) {
+						try {
+							Thread.sleep(repeat.delay());
+						} catch (InterruptedException e) {
+							// thread was woken up, finish delay
+						}
+						isDelay = false;
+					}
 					int count = 0;
 					long start = System.currentTimeMillis();
 					while ((repeat.count() == 0 || count < repeat.count()) && !repeater.shutdown) {
@@ -627,9 +636,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 							LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
 						}
 						try {
-							if (isDelay) {
-								Thread.sleep(repeat.delay());
-							} else if (isInterval) {
+							if (isInterval) {
 								long now = System.currentTimeMillis();
 								long sleep = repeat.interval() - (now - start);
 								start += repeat.interval();
