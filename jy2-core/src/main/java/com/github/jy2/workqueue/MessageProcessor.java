@@ -94,25 +94,25 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	}
 
 	public void addMessage(T message) {
-		synchronized (this) {
-			if (timeoutNanos > 0) {
-				nextTimeout.set(System.nanoTime() + timeoutNanos);
-				lock.lock();
-				try {
-					timeoutQueue.remove(this);
-					timeoutQueue.offer(this);
-					schedulerCondition.signalAll();
-				} finally {
-					lock.unlock();
-				}
-			} else if (delayNanos > 0) {
-				lock.lock();
-				try {
-					timeoutQueue.remove(this);
-				} finally {
-					lock.unlock();
-				}
+		if (timeoutNanos > 0) {
+			nextTimeout.set(System.nanoTime() + timeoutNanos);
+			lock.lock();
+			try {
+				timeoutQueue.remove(this);
+				timeoutQueue.offer(this);
+				schedulerCondition.signalAll();
+			} finally {
+				lock.unlock();
 			}
+		} else if (delayNanos > 0) {
+			lock.lock();
+			try {
+				timeoutQueue.remove(this);
+			} finally {
+				lock.unlock();
+			}
+		}
+		synchronized (this) {
 			if (message == TIMEOUT_MARKER) {
 				queue.clear();
 				queue.setMarker(message);
