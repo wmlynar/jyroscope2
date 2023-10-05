@@ -62,8 +62,8 @@ public class LaserScan {
 		angleMin = scan.angleMin;
 		angleMax = scan.angleMax;
 		angleIncrement = scan.angleIncrement;
-		ranges = ranges == null ? null : Arrays.copyOf(scan.ranges, scan.ranges.length);
-		intensities = intensities == null ? null : Arrays.copyOf(scan.intensities, scan.intensities.length);
+		ranges = (scan.ranges == null) ? null : Arrays.copyOf(scan.ranges, scan.ranges.length);
+		intensities = (scan.intensities == null) ? null : Arrays.copyOf(scan.intensities, scan.intensities.length);
 	}
 
 	@Override
