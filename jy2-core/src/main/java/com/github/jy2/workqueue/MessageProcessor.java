@@ -14,6 +14,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	public static final Object TIMEOUT_MARKER = new Object();
 
 	private final int timeoutNanos;
+	private final int delayNanos;
 	private final int count;
 	private final ThreadPoolExecutor executor;
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue;
@@ -31,6 +32,7 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
 		this.queue = new CircularBuffer<>(queueLength);
 		this.timeoutNanos = timeout * 1_000_000;
+		this.delayNanos = 0;
 		this.count = 0;
 		this.executor = executor;
 		this.timeoutQueue = timeoutQueue;
@@ -61,12 +63,13 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
 		this.queue = new CircularBuffer<>(1);
 		this.timeoutNanos = interval * 1_000_000;
+		this.delayNanos = delay * 1_000_000;
 		this.count = count;
 		this.executor = executor;
 		this.timeoutQueue = timeoutQueue;
 		this.lock = lock;
 		this.schedulerCondition = schedulerCondition;
-		this.nextTimeout.set(System.nanoTime() + delay * 1_000_000);
+		this.nextTimeout.set(System.nanoTime() + delayNanos);
 		this.counter = 0;
 
 		this.command = () -> {
@@ -94,6 +97,21 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 		synchronized (this) {
 			if (timeoutNanos > 0) {
 				nextTimeout.set(System.nanoTime() + timeoutNanos);
+				lock.lock();
+				try {
+					timeoutQueue.remove(this);
+					timeoutQueue.offer(this);
+					schedulerCondition.signalAll();
+				} finally {
+					lock.unlock();
+				}
+			} else if (delayNanos > 0) {
+				lock.lock();
+				try {
+					timeoutQueue.remove(this);
+				} finally {
+					lock.unlock();
+				}
 			}
 			if (message == TIMEOUT_MARKER) {
 				queue.clear();
@@ -103,16 +121,6 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 			}
 			if (!isProcessing) {
 				startProcessingMessages();
-			}
-		}
-		if (timeoutNanos > 0) {
-			lock.lock();
-			try {
-				timeoutQueue.remove(this);
-				timeoutQueue.offer(this);
-				schedulerCondition.signalAll();
-			} finally {
-				lock.unlock();
 			}
 		}
 	}

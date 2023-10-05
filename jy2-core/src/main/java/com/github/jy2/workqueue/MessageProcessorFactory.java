@@ -41,12 +41,16 @@ public class MessageProcessorFactory<T> {
 	public MessageProcessor<T> createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
 		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, this.executor,
 				this.timeoutQueue, this.lock, this.schedulerCondition);
-		lock.lock();
-		try {
-			timeoutQueue.add(messageProcessor);
-			schedulerCondition.signalAll();
-		} finally {
-			lock.unlock();
+		if (delay > 0 || interval > 0) {
+			lock.lock();
+			try {
+				timeoutQueue.add(messageProcessor);
+				schedulerCondition.signalAll();
+			} finally {
+				lock.unlock();
+			}
+		} else {
+			messageProcessor.wakeup();
 		}
 		return messageProcessor;
 	}
