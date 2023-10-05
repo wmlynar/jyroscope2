@@ -62,8 +62,8 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	public MessageProcessor(Supplier<Boolean> callable, int delay, int interval, int count, ThreadPoolExecutor executor,
 			PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue, Lock lock, Condition schedulerCondition) {
 		this.queue = new CircularBuffer<>(1);
-		this.timeoutNanos = interval * 1_000_000;
-		this.delayNanos = delay * 1_000_000;
+		this.timeoutNanos = interval * 1_000_000l;
+		this.delayNanos = delay * 1_000_000l;
 		this.count = count;
 		this.executor = executor;
 		this.timeoutQueue = timeoutQueue;
