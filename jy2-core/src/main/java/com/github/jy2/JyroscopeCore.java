@@ -80,9 +80,8 @@ public class JyroscopeCore implements PubSubClient {
 		try {
 			param = topicProvider.getParameterClient().getParameter("/use_thread_pool_listeners");
 			if (param != null) {
-				Boolean.parseBoolean(param.toString());
+				useThreadPoolListeners = Boolean.parseBoolean(param.toString());
 			}
-			useThreadPoolListeners = Boolean.parseBoolean(null);
 		} catch (IOException e1) {
 		}
 		LinkManager.USE_THREADED_CONSUMER = !useThreadPoolListeners;
@@ -91,9 +90,8 @@ public class JyroscopeCore implements PubSubClient {
 		try {
 			param = topicProvider.getParameterClient().getParameter("/use_thread_pool_repeaters");
 			if (param != null) {
-				Boolean.parseBoolean(param.toString());
+				useThreadPoolRepeaters = Boolean.parseBoolean(param.toString());
 			}
-			useThreadPoolRepeaters = Boolean.parseBoolean(null);
 		} catch (IOException e1) {
 		}
 		LinkManager.USE_THREADED_REPEATER = !useThreadPoolRepeaters;
