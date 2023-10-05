@@ -13,8 +13,8 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 
 	public static final Object TIMEOUT_MARKER = new Object();
 
-	private final int timeoutNanos;
-	private final int delayNanos;
+	private final long timeoutNanos;
+	private final long delayNanos;
 	private final int count;
 	private final ThreadPoolExecutor executor;
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue;
