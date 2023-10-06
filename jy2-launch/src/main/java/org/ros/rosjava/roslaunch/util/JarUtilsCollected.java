@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.jar.Attributes;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
@@ -74,7 +75,7 @@ public class JarUtilsCollected {
 
 	// run main method (in new thread)
 	public static ThreadGroup runJarThroughClassloader(ClassLoader classloader, String jarFileName, String[] params) {
-		ThreadGroup tg = new ThreadGroup("tg-main");
+		ThreadGroup tg = new ThreadGroup("main" + new Random().nextInt());
 		Thread t = new Thread(tg, new Runnable() {
 			@Override
 			public void run() {
