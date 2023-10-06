@@ -5,26 +5,26 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.30</version>
+		<version>0.0.31</version>
 	</parent>
 	<artifactId>jy2-tool</artifactId>
 	<dependencies>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-di</artifactId>
-			<version>0.0.30</version>
+			<version>0.0.31</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-tf-lib</artifactId>
-			<version>0.0.30</version>
+			<version>0.0.31</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-orchestrator</artifactId>
-			<version>0.0.30</version>
+			<version>0.0.31</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jline</groupId>

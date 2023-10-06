@@ -80,7 +80,6 @@ public class RosTopicProvider implements TopicProvider {
 			String param = parameterClient.getParameter("/dead_publisher_checker_period_min");
 			period = Integer.parseInt(param);
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		if (period < 1) {
 			return;

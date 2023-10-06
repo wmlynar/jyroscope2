@@ -8,6 +8,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MessageProcessorFactory<T> {
 
@@ -33,6 +34,23 @@ public class MessageProcessorFactory<T> {
 			} finally {
 				lock.unlock();
 			}
+		}
+		return messageProcessor;
+	}
+
+	public MessageProcessor<T> createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
+		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, this.executor,
+				this.timeoutQueue, this.lock, this.schedulerCondition);
+		if (delay > 0 || interval > 0) {
+			lock.lock();
+			try {
+				timeoutQueue.add(messageProcessor);
+				schedulerCondition.signalAll();
+			} finally {
+				lock.unlock();
+			}
+		} else {
+			messageProcessor.wakeup();
 		}
 		return messageProcessor;
 	}
@@ -68,7 +86,7 @@ public class MessageProcessorFactory<T> {
 					lock.unlock();
 				}
 			}
-		}).start();
+		}, "work-pool-timer-thread").start();
 	}
 
 }

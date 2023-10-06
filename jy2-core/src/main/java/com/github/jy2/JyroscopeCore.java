@@ -27,6 +27,7 @@ import com.jyroscope.local.Topic;
 import com.jyroscope.local.TopicProvider;
 import com.jyroscope.ros.RosTopicProvider;
 import com.jyroscope.types.ConversionException;
+import com.jyroscope.types.LinkManager;
 
 import go.jyroscope.ros.jy2_msgs.JavaObject;
 
@@ -66,9 +67,34 @@ public class JyroscopeCore implements PubSubClient {
 
 		configureLogging(topicProvider);
 
+		configureUseThreadPools(topicProvider);
+		
 		// TODO: should create it only once...
 		ROSOUT_PUBLISHER = new RosoutPublisher(this);
 		NodeNameManager.setNodeName(callerId);
+	}
+	
+	private void configureUseThreadPools(RosTopicProvider topicProvider) {
+		boolean useThreadPoolListeners = false;
+		Object param = null;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/use_thread_pool_listeners");
+			if (param != null) {
+				useThreadPoolListeners = Boolean.parseBoolean(param.toString());
+			}
+		} catch (IOException e1) {
+		}
+		LinkManager.USE_THREADED_CONSUMER = !useThreadPoolListeners;
+
+		boolean useThreadPoolRepeaters = false;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/use_thread_pool_repeaters");
+			if (param != null) {
+				useThreadPoolRepeaters = Boolean.parseBoolean(param.toString());
+			}
+		} catch (IOException e1) {
+		}
+		LinkManager.USE_THREADED_REPEATER = !useThreadPoolRepeaters;
 	}
 
 	private void configureLogging(RosTopicProvider topicProvider) {

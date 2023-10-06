@@ -41,6 +41,9 @@ public class RosoutHandler extends Handler {
 			return;
 		}
 		String nodeName = NodeNameManager.getNodeName();
+		if (nodeName == null) {
+			nodeName = "null";
+		}
 		Throwable ex = record.getThrown();
 		String cname = record.getSourceClassName();
 		if (STACKTRACE_IN_PARAMETERS) {
