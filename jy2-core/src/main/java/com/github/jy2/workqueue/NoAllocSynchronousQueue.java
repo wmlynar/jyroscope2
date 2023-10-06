@@ -71,6 +71,24 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 		}
 	}
 
+	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+		long nanos = unit.toNanos(timeout);
+		lock.lock();
+		try {
+			while (item == null) {
+				if (nanos <= 0L)
+					return null;
+				nanos = notEmpty.awaitNanos(nanos);
+			}
+			E x = item;
+			item = null;
+			notFull.signal();
+			return x;
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	@Override
 	public E poll() {
 		lock.lock();
@@ -104,11 +122,6 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
 		throw new UnsupportedOperationException();
 	}
 
