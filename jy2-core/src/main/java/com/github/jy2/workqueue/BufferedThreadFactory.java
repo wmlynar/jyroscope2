@@ -64,7 +64,7 @@ public class BufferedThreadFactory implements ThreadFactory {
 		}
 
 		public MyThread(ThreadGroup tg, Runnable r) {
-			super(tg, r, "unbuffered-pool-thread-" + threadNumber.getAndIncrement());
+			super(tg, "unbuffered-pool-thread-" + threadNumber.getAndIncrement());
 			this.runnable = r;
 		}
 
