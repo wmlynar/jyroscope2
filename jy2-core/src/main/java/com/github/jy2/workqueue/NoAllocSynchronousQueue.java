@@ -115,6 +115,16 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 		}
 	}
 
+	@Override
+	public int size() {
+		lock.lock();
+		try {
+			return (item == null) ? 0 : 1;
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	// Other BlockingQueue methods need to be implemented to fully satisfy the
 	// interface.
 	// The methods below are not implemented and would throw
@@ -152,11 +162,6 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public void clear() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int size() {
 		throw new UnsupportedOperationException();
 	}
 
