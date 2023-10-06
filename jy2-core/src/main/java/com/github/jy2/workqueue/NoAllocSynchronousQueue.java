@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @param <E> The type of elements held in this queue
  */
 public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
-	
+
 	private E item = null;
 	private final Lock lock = new ReentrantLock();
 	private final Condition notEmpty = lock.newCondition();
@@ -58,19 +58,45 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public boolean offer(E e) {
-	    lock.lock();
-	    try {
-	        if (item == null && e != null) {  // check for an existing item and null
-	            item = e;
-	            notEmpty.signal();
-	            return true;
-	        }
-	        return false;
-	    } finally {
-	        lock.unlock();
-	    }
+		lock.lock();
+		try {
+			if (item == null && e != null) { // check for an existing item and null
+				item = e;
+				notEmpty.signal();
+				return true;
+			}
+			return false;
+		} finally {
+			lock.unlock();
+		}
 	}
-	
+
+	@Override
+	public E poll() {
+		lock.lock();
+		try {
+			if (item == null) {
+				return null;
+			}
+			E x = item;
+			item = null;
+			notFull.signal();
+			return x;
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public int remainingCapacity() {
+		lock.lock();
+		try {
+			return (item == null) ? 1 : 0;
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	// Other BlockingQueue methods need to be implemented to fully satisfy the
 	// interface.
 	// The methods below are not implemented and would throw
@@ -83,11 +109,6 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public int remainingCapacity() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -158,11 +179,6 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public E remove() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public E poll() {
 		throw new UnsupportedOperationException();
 	}
 
