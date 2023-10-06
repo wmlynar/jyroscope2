@@ -74,7 +74,7 @@ public class JarUtilsCollected {
 
 	// run main method (in new thread)
 	public static ThreadGroup runJarThroughClassloader(ClassLoader classloader, String jarFileName, String[] params) {
-		ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+		ThreadGroup tg = new ThreadGroup("tg-main");
 		Thread t = new Thread(tg, new Runnable() {
 			@Override
 			public void run() {
