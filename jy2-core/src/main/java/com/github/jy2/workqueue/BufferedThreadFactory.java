@@ -5,6 +5,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.github.jy2.log.NodeNameManager;
+
 public class BufferedThreadFactory implements ThreadFactory {
 
 	private final AtomicInteger threadNumber = new AtomicInteger(1);
@@ -16,14 +18,18 @@ public class BufferedThreadFactory implements ThreadFactory {
 
 		// Pre-fill the buffer
 		for (int i = 0; i < bufferSize; i++) {
-			threadBuffer.offer(new MyThread());
+			ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+			threadBuffer.offer(new MyThread(tg));
 		}
 
 		// Create a background thread to refill the buffer
-		backgroundThreadCreator = new Thread(() -> {
+		ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+		backgroundThreadCreator = new Thread(tgb, () -> {
+			NodeNameManager.setNodeName("/thread_creator_fake_node");
 			while (true) {
 				try {
-					threadBuffer.put(new MyThread());
+					ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+					threadBuffer.put(new MyThread(tg));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -43,7 +49,8 @@ public class BufferedThreadFactory implements ThreadFactory {
 			e.printStackTrace();
 		}
 		if (thread == null) {
-			return new Thread(r);
+			ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+			return new MyThread(tgb, r);
 		}
 		thread.setRunnable(r);
 		return thread;
@@ -52,8 +59,12 @@ public class BufferedThreadFactory implements ThreadFactory {
 	private class MyThread extends Thread {
 		private Runnable runnable;
 
-		public MyThread() {
-			super("buffered-pool-thread-" + threadNumber.getAndIncrement());
+		public MyThread(ThreadGroup tg) {
+			super(tg, "buffered-pool-thread-" + threadNumber.getAndIncrement());
+		}
+
+		public MyThread(ThreadGroup tg, Runnable r) {
+			super(tg, r, "unbuffered-pool-thread-" + threadNumber.getAndIncrement());
 		}
 
 		public void setRunnable(Runnable runnable) {
@@ -62,7 +73,12 @@ public class BufferedThreadFactory implements ThreadFactory {
 
 		@Override
 		public void run() {
-			runnable.run();
+			try {
+				NodeNameManager.setNodeName("/temporary_fake_node");
+				runnable.run();
+			} finally {
+				NodeNameManager.removeThreadGroup();
+			}
 		}
 	}
 }

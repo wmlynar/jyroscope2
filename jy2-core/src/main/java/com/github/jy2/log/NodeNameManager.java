@@ -20,4 +20,8 @@ public class NodeNameManager {
 	public static synchronized String getNextThreadGroupName() {
 		return "hz-" + counter++;
 	}
+
+	public static synchronized void removeThreadGroup() {
+		threadMap.remove(Thread.currentThread().getThreadGroup().getName());
+	}
 }

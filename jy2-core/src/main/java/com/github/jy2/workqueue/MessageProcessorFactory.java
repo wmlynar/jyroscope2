@@ -10,6 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.github.jy2.log.NodeNameManager;
+
 public class MessageProcessorFactory<T> {
 
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue = new PriorityBlockingQueue<>();
@@ -62,7 +64,9 @@ public class MessageProcessorFactory<T> {
 	}
 
 	private void startScheduler() {
-		new Thread(() -> {
+		ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+		Thread t = new Thread(tgb, () -> {
+			NodeNameManager.setNodeName("/scheduler_fake_node");
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					lock.lock();
@@ -85,7 +89,9 @@ public class MessageProcessorFactory<T> {
 					lock.unlock();
 				}
 			}
-		}, "work-pool-timer-thread").start();
+		}, "work-pool-timer-thread");
+		t.setDaemon(true);
+		t.start();
 	}
 
 	private synchronized ThreadPoolExecutor getExecutor() {

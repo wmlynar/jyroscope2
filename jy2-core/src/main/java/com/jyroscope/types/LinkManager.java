@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import org.ros.concurrent.CircularBlockingDeque;
 
 import com.github.jy2.di.LogSeldom;
 import com.github.jy2.log.Jy2DiLog;
+import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
 import com.github.jy2.workqueue.MessageProcessor;
@@ -333,7 +335,14 @@ public class LinkManager {
 			private MessageProcessor<D> processor;
 
 			public WorkQueueConsumer(Link<D> subscriber, int queueSize, int timeout) {
-				this.processor = factory.createProcessor(message -> subscriber.handle((D) message), queueSize, timeout);
+				final String nodeName = NodeNameManager.getNodeName();
+				this.processor = factory.createProcessor(new Consumer() {
+					@Override
+					public void accept(Object message) {
+						NodeNameManager.setNodeName(nodeName);
+						subscriber.handle((D) message);
+					}
+				}, queueSize, timeout);
 			}
 
 			@Override

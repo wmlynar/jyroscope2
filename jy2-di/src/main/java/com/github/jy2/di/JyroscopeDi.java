@@ -54,6 +54,8 @@ import com.github.jy2.util.ExceptionUtil;
 import com.github.jy2.workqueue.MessageProcessor;
 import com.jyroscope.types.LinkManager;
 
+import go.jyroscope.ros.introspection_msgs.Node;
+
 public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
 	private static final LogSeldom LOG = new Jy2DiLog(JyroscopeDi.class);
@@ -655,8 +657,10 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 			}, "Repeater-" + method.toString());
 			repeater.thread.start();
 		} else {
+			final String nodeName = NodeNameManager.getNodeName();
 			Supplier<Boolean> supplier = () -> {
 				try {
+					NodeNameManager.setNodeName(nodeName);
 					long before = System.currentTimeMillis();
 					Object result = method.invoke(object);
 					long delta = System.currentTimeMillis() - before;
