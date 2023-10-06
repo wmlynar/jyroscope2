@@ -14,7 +14,7 @@ public class Main {
 		ParameterClient pc = jyDi.getParameterClient();
 
 
-		new Thread(new ThreadGroup(NodeNameManager.getNextThreadGroupName()), new Runnable() {
+		new Thread(new ThreadGroup("main"), new Runnable() {
 			@Override
 			public void run() {
 				try {
