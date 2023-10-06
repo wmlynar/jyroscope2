@@ -66,7 +66,7 @@ public class MessageProcessorFactory<T> {
 	private void startScheduler() {
 		ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
 		Thread t = new Thread(tgb, () -> {
-			NodeNameManager.setNodeName("/scheduler_fake_node");
+			NodeNameManager.setNodeName("/fake_node_scheduler");
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					lock.lock();

@@ -25,7 +25,7 @@ public class BufferedThreadFactory implements ThreadFactory {
 		// Create a background thread to refill the buffer
 		ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
 		backgroundThreadCreator = new Thread(tgb, () -> {
-			NodeNameManager.setNodeName("/thread_creator_fake_node");
+			NodeNameManager.setNodeName("/fake_node_thread_creator");
 			while (true) {
 				try {
 					ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
