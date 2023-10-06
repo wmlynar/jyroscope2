@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class NodeNameManager {
 
 	private static HashMap<ThreadGroup, String> threadMap = new HashMap<>();
+	private static int counter = 0;
 
 	public static synchronized void setNodeName(String nodeName) {
 		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
