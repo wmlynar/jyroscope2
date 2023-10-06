@@ -350,10 +350,10 @@ public class LinkManager {
 	
 	public static boolean USE_THREADED_CONSUMER = false;
 	public static boolean USE_THREADED_REPEATER = false;
-	private static final int WORK_QUEUE_SIZE = 500;
-	private static final int WORK_QUEUE_BUFFER = 10;
+	public static int WORK_QUEUE_SIZE = 500;
+	public static int WORK_QUEUE_BUFFER = 20;
 
-	public static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
+	public static MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
 	
 	interface WorkConsumer<D> {
 		void offer(D message);

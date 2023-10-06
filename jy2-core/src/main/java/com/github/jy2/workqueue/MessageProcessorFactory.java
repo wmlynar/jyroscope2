@@ -12,19 +12,21 @@ import java.util.function.Supplier;
 
 public class MessageProcessorFactory<T> {
 
-	private final ThreadPoolExecutor executor;
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue = new PriorityBlockingQueue<>();
 	private final Lock lock = new ReentrantLock();
 	private final Condition schedulerCondition = lock.newCondition();
 
+	private ThreadPoolExecutor executor;
+	private int maxThreads;
+	private int bufferSize;
+
 	public MessageProcessorFactory(int maxThreads, int bufferSize) {
-		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-				new BufferedThreadFactory(bufferSize));
-		startScheduler();
+		this.maxThreads = maxThreads;
+		this.bufferSize = bufferSize;
 	}
 
 	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, this.executor,
+		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, getExecutor(),
 				this.timeoutQueue, this.lock, this.schedulerCondition);
 		if (timeout > 0) {
 			lock.lock();
@@ -39,7 +41,7 @@ public class MessageProcessorFactory<T> {
 	}
 
 	public MessageProcessor<T> createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, this.executor,
+		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, getExecutor(),
 				this.timeoutQueue, this.lock, this.schedulerCondition);
 		if (delay > 0 || interval > 0) {
 			lock.lock();
@@ -73,10 +75,7 @@ public class MessageProcessorFactory<T> {
 
 					long delay = sq.getNextTimeout() - System.nanoTime();
 					if (delay <= 0) {
-//						timeoutQueue.poll();
 						sq.addMessage(MessageProcessor.TIMEOUT_MARKER);
-//						timeoutQueue.offer(sq);
-//						schedulerCondition.signalAll();
 					} else {
 						schedulerCondition.awaitNanos(delay);
 					}
@@ -87,6 +86,15 @@ public class MessageProcessorFactory<T> {
 				}
 			}
 		}, "work-pool-timer-thread").start();
+	}
+
+	private synchronized ThreadPoolExecutor getExecutor() {
+		if (executor == null) {
+			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+					new BufferedThreadFactory(bufferSize));
+			startScheduler();
+		}
+		return executor;
 	}
 
 }
