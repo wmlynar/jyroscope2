@@ -97,8 +97,9 @@ public class MessageProcessorFactory<T> {
 	private synchronized ThreadPoolExecutor getExecutor() {
 		if (executor == null) {
 // replaced with a version that does not allocate so much new objects
-//			executor = new ThreadPoolExecutor(... , new SynchronousQueue<>(),
-			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new NoAllocSynchronousQueue<>(),
+//			executor = new ThreadPoolExecutor(... , new NoAllocSynchronousQueue<>(),
+// but it does not work
+			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
 					new BufferedThreadFactory(bufferSize));
 			startScheduler();
 		}
