@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @param <E> The type of elements held in this queue
  */
 public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
-
+	
 	private E item = null;
 	private final Lock lock = new ReentrantLock();
 	private final Condition notEmpty = lock.newCondition();
@@ -56,6 +56,21 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 		}
 	}
 
+	@Override
+	public boolean offer(E e) {
+	    lock.lock();
+	    try {
+	        if (item == null && e != null) {  // check for an existing item and null
+	            item = e;
+	            notEmpty.signal();
+	            return true;
+	        }
+	        return false;
+	    } finally {
+	        lock.unlock();
+	    }
+	}
+	
 	// Other BlockingQueue methods need to be implemented to fully satisfy the
 	// interface.
 	// The methods below are not implemented and would throw
@@ -138,11 +153,6 @@ public class NoAllocSynchronousQueue<E> implements BlockingQueue<E> {
 
 	@Override
 	public boolean add(E e) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public boolean offer(E e) {
 		throw new UnsupportedOperationException();
 	}
 
