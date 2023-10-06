@@ -16,4 +16,8 @@ public class NodeNameManager {
 		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
 		return threadMap.get(threadGroup);
 	}
+
+	public static synchronized String getNextThreadGroupName() {
+		return "jy-" + counter++;
+	}
 }

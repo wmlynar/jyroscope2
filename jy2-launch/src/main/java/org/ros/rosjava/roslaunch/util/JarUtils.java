@@ -38,7 +38,7 @@ public class JarUtils {
 		}
 
 		// run main method (in new thread)
-		ThreadGroup tg = new ThreadGroup("tg-main");
+		ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
 		Thread t = new Thread(tg, new Runnable() {
 			@Override
 			public void run() {
