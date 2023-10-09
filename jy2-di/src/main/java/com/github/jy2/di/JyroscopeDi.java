@@ -598,7 +598,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		makeAccessible(method);
 		Repeat repeat = repeater.repeat;
 		
-		if(LinkManager.USE_THREADED_REPEATER) {
+		if(LinkManager.USE_THREADED_REPEATER || repeater.repeat.interval() <= 0) {
 			repeater.thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
