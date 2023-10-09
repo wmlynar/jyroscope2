@@ -87,7 +87,17 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 				++counter;
 				boolean result = callable.get();
 				if (!result) {
-					stopTimer();
+					synchronized (MessageProcessor.this) {
+						lock.lock();
+						try {
+							timeoutQueue.remove(this);
+						} finally {
+							lock.unlock();
+						}
+						queue.clear();
+						isProcessing = false;
+						return;
+					}
 				}
 			}
 		};
@@ -153,20 +163,6 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 	@Override
 	public int compareTo(MessageProcessor<T> o) {
 		return Long.compare(this.nextTimeout.get(), o.nextTimeout.get());
-	}
-
-	public void stopTimer() {
-		synchronized (MessageProcessor.this) {
-			lock.lock();
-			try {
-				timeoutQueue.remove(this);
-			} finally {
-				lock.unlock();
-			}
-			queue.clear();
-			isProcessing = false;
-			return;
-		}
 	}
 
 	public void wakeup() {
