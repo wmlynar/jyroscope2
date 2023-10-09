@@ -95,7 +95,7 @@ public class MessageProcessorFactory<T> {
 		t.start();
 	}
 
-	private synchronized ThreadPoolExecutor getExecutor() {
+	public synchronized ThreadPoolExecutor getExecutor() {
 		if (executor == null) {
 // replaced with a version that does not allocate so much new objects
 //			executor = new ThreadPoolExecutor(... , new NoAllocSynchronousQueue<>(),

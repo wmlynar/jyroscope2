@@ -98,7 +98,7 @@ public class JyroscopeCore implements PubSubClient {
 
 		int size = 500;
 		try {
-			param = topicProvider.getParameterClient().getParameter("/thread_pool_size");
+			param = topicProvider.getParameterClient().getParameter("/thread_pool_max_size");
 			if (param != null) {
 				size = Integer.parseInt(param.toString());
 			}
@@ -116,15 +116,15 @@ public class JyroscopeCore implements PubSubClient {
 		}
 		LinkManager.WORK_QUEUE_BUFFER = buffer;
 
-		size = 20;
+		size = 2;
 		try {
-			param = topicProvider.getParameterClient().getParameter("/repeater_pool_size");
+			param = topicProvider.getParameterClient().getParameter("/scheduler_pool_size");
 			if (param != null) {
 				size = Integer.parseInt(param.toString());
 			}
 		} catch (Exception e) {
 		}
-		LinkManager.REPEATER_POOL_SIZE = size;
+		LinkManager.SCHEDULER_POOL_SIZE = size;
 	}
 
 	private void configureLogging(RosTopicProvider topicProvider) {

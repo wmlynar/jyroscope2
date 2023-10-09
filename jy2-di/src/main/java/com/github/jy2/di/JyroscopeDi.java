@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -598,7 +599,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		makeAccessible(method);
 		Repeat repeat = repeater.repeat;
 		
-		if(LinkManager.USE_THREADED_REPEATER || repeater.repeat.interval() <= 0) {
+		if(LinkManager.USE_THREADED_REPEATER) {
 			repeater.thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -656,7 +657,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 				}
 			}, "Repeater-" + method.toString());
 			repeater.thread.start();
-		} else if(false) {
+		} else if(true) {
 			final String nodeName = NodeNameManager.getNodeName();
 			Supplier<Boolean> supplier = () -> {
 				try {
@@ -684,16 +685,16 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 			};
 			repeater.processor = LinkManager.factory.createRepeater(supplier, repeat.delay(), repeat.interval(), repeat.count());
 		} else {
-			if(LinkManager.executor ==null) {
-				LinkManager.executor = Executors.newScheduledThreadPool(LinkManager.REPEATER_POOL_SIZE, LinkManager.factory.getBufferedThreadFactory());
+			if (LinkManager.scheduledExecutor == null) {
+				LinkManager.scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
 			}
-			ScheduledFuture<?> future = null;
 			final String nodeName = NodeNameManager.getNodeName();
-			RepeaterWrapperRunnable runnable = new RepeaterWrapperRunnable(repeater, method, object, nodeName, repeat.count());
-			runnable.future = LinkManager.executor.scheduleAtFixedRate(runnable, repeat.delay(), repeat.interval(), 
-					TimeUnit.MILLISECONDS);			
-		}
-		
+			final ThreadPoolExecutor excutor = LinkManager.factory.getExecutor();
+			RepeaterWrapperRunnable runnable = new RepeaterWrapperRunnable(repeater, method, object, nodeName,
+					repeat.count());
+			runnable.future = LinkManager.scheduledExecutor.scheduleAtFixedRate(() -> excutor.execute(runnable),
+					repeat.delay(), repeat.interval(), TimeUnit.MILLISECONDS);
+		}		
 		
 		String name = repeat.name();
 		if (name != null && !name.isEmpty()) {
