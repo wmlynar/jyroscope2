@@ -18,19 +18,17 @@ import com.jyroscope.types.LinkManager;
 public class MessageProcessorFactory2<T> {
 
 	private final PriorityBlockingQueue<MessageProcessor2<T>> timeoutQueue = new PriorityBlockingQueue<>();
-	private final Lock lock = new ReentrantLock();
-	private final Condition schedulerCondition = lock.newCondition();
 
 	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
+	public ScheduledExecutorService scheduledExecutor;
+
 	private int maxThreads;
 	private int bufferSize;
-	private ScheduledFuture<?> future;
 
 	public MessageProcessorFactory2(int maxThreads, int bufferSize) {
 		this.maxThreads = maxThreads;
 		this.bufferSize = bufferSize;
-
 	}
 
 	public MessageProcessor2<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
@@ -42,8 +40,8 @@ public class MessageProcessorFactory2<T> {
 	}
 
 	public void shutdownAll() {
-		this.executor.shutdownNow();
-		LinkManager.scheduledExecutor.shutdownNow();
+		executor.shutdown();
+		scheduledExecutor.shutdown();
 	}
 
 	public synchronized BufferedThreadFactory getBufferedThreadFactory() {
@@ -62,9 +60,9 @@ public class MessageProcessorFactory2<T> {
 	}
 
 	public synchronized ScheduledExecutorService getScheduledExecutor() {
-		if (LinkManager.scheduledExecutor == null) {
-			LinkManager.scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
+		if (scheduledExecutor == null) {
+			scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
 		}
-		return LinkManager.scheduledExecutor;
+		return scheduledExecutor;
 	}
 }

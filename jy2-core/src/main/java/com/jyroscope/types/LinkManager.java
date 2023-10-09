@@ -366,8 +366,6 @@ public class LinkManager {
 
 	public static MessageProcessorFactory2 factory = new MessageProcessorFactory2(WORK_QUEUE_MAX_SIZE, WORK_QUEUE_BUFFER_SIZE);
 
-	public static ScheduledExecutorService scheduledExecutor = null;
-	
 	interface WorkConsumer<D> {
 		void offer(D message);
 		void stop();
