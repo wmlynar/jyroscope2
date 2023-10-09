@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.yaml.snakeyaml.Yaml;
@@ -51,10 +54,7 @@ import com.github.jy2.internal.DeleteSubscriber;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.util.ExceptionUtil;
-import com.github.jy2.workqueue.MessageProcessor;
 import com.jyroscope.types.LinkManager;
-
-import go.jyroscope.ros.introspection_msgs.Node;
 
 public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 
@@ -656,7 +656,7 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 				}
 			}, "Repeater-" + method.toString());
 			repeater.thread.start();
-		} else {
+		} else if(false) {
 			final String nodeName = NodeNameManager.getNodeName();
 			Supplier<Boolean> supplier = () -> {
 				try {
@@ -683,6 +683,15 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 				return true;
 			};
 			repeater.processor = LinkManager.factory.createRepeater(supplier, repeat.delay(), repeat.interval(), repeat.count());
+		} else {
+			if(LinkManager.executor ==null) {
+				LinkManager.executor = Executors.newScheduledThreadPool(LinkManager.REPEATER_POOL_SIZE, LinkManager.factory.getBufferedThreadFactory());
+			}
+			ScheduledFuture<?> future = null;
+			final String nodeName = NodeNameManager.getNodeName();
+			RepeaterWrapperRunnable runnable = new RepeaterWrapperRunnable(repeater, method, object, nodeName, repeat.count());
+			runnable.future = LinkManager.executor.scheduleAtFixedRate(runnable, repeat.delay(), repeat.interval(), 
+					TimeUnit.MILLISECONDS);			
 		}
 		
 		
@@ -692,6 +701,66 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 		}
 	}
 
+	private final class RepeaterWrapperRunnable implements Runnable {
+		private final Repeater repeater;
+		private final Method method;
+		private final Object object;
+		private final String nodeName;
+		private int count;
+		private int counter;
+		volatile public ScheduledFuture<?> future;
+
+		private RepeaterWrapperRunnable(Repeater repeater, Method method, Object object, String nodeName, int count) {
+			this.repeater = repeater;
+			this.method = method;
+			this.object = object;
+			this.nodeName = nodeName;
+			this.count = count;
+			this.counter = 0;
+		}
+
+		@Override
+		public void run() {
+			try {
+				if (count > 0) {
+					counter++;
+					if (counter >= count) {
+						stop();
+					}
+				}
+				NodeNameManager.setNodeName(nodeName);
+				long before = System.currentTimeMillis();
+				Object result = method.invoke(object);
+				long delta = System.currentTimeMillis() - before;
+				if (delta > repeater.repeat.maxExecutionTime() && repeater.repeat.maxExecutionTime() > 0) {
+					LOG.warn("Repeater execution time " + delta + " exceeded threshold "
+							+ repeater.repeat.maxExecutionTime() + " in method " + method.toGenericString());
+				}
+
+				// Check if it returned false
+				if (result != null) {
+					if (!(Boolean) result) {
+						stop();
+					}
+				}
+			} catch (Exception e) {
+				ExceptionUtil.rethrowErrorIfCauseIsError(e);
+				Throwable t = ExceptionUtil.getCauseIfInvocationException(e);
+				LOG.error("Exception caught while calling repeater " + method.toGenericString(), t);
+			}
+		}
+
+		private void stop() {
+			while (future == null) {
+				try {
+					Thread.sleep(1);
+				} catch (Exception e) {
+				}
+			}
+			future.cancel(false);
+		}
+	}
+	
 	private <T> void injectPublishers(Field field, T object, String instanceName)
 			throws IllegalAccessException, IllegalArgumentException, CreationException {
 		Publish publish = field.getAnnotation(Publish.class);

@@ -3,6 +3,8 @@ package com.jyroscope.types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
@@ -361,8 +363,11 @@ public class LinkManager {
 	public static boolean USE_THREADED_REPEATER = false;
 	public static int WORK_QUEUE_SIZE = 500;
 	public static int WORK_QUEUE_BUFFER = 20;
+	public static int REPEATER_POOL_SIZE = 20;
 
 	public static MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
+
+	public static ScheduledExecutorService executor = null;
 	
 	interface WorkConsumer<D> {
 		void offer(D message);

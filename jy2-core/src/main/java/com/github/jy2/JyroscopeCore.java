@@ -114,8 +114,17 @@ public class JyroscopeCore implements PubSubClient {
 			}
 		} catch (Exception e) {
 		}
-		LinkManager.WORK_QUEUE_SIZE = buffer;
+		LinkManager.WORK_QUEUE_BUFFER = buffer;
 
+		size = 20;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/repeater_pool_size");
+			if (param != null) {
+				size = Integer.parseInt(param.toString());
+			}
+		} catch (Exception e) {
+		}
+		LinkManager.REPEATER_POOL_SIZE = size;
 	}
 
 	private void configureLogging(RosTopicProvider topicProvider) {

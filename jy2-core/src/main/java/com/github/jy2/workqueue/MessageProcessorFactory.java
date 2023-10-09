@@ -18,6 +18,7 @@ public class MessageProcessorFactory<T> {
 	private final Lock lock = new ReentrantLock();
 	private final Condition schedulerCondition = lock.newCondition();
 
+	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
 	private int maxThreads;
 	private int bufferSize;
@@ -100,10 +101,17 @@ public class MessageProcessorFactory<T> {
 //			executor = new ThreadPoolExecutor(... , new NoAllocSynchronousQueue<>(),
 // but it does not work
 			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-					new BufferedThreadFactory(bufferSize));
+					getBufferedThreadFactory());
 			startScheduler();
 		}
 		return executor;
+	}
+
+	public synchronized BufferedThreadFactory getBufferedThreadFactory() {
+		if (threadFactory == null) {
+			threadFactory = new BufferedThreadFactory(bufferSize);
+		}
+		return threadFactory;
 	}
 
 }
