@@ -111,7 +111,7 @@ public class MessageProcessor2<T> {
 				if (future != null) {
 					future.cancel(false);
 				}
-				future = LinkManager.scheduledExecutor.scheduleAtFixedRate(() -> wakeup(), timeout, timeout,
+				future = scheduledExecutor.scheduleAtFixedRate(() -> wakeup(), timeout, timeout,
 						TimeUnit.MILLISECONDS);
 			}
 		}
