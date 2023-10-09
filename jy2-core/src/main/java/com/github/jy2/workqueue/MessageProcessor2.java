@@ -20,10 +20,9 @@ public class MessageProcessor2<T> {
 	private final CircularBuffer<T> queue;
 	private boolean isProcessing = false;
 	private Runnable command;
+	private Runnable wakeup = () -> wakeup();
 
 	private int counter;
-
-	private Runnable wakeup;
 
 	public MessageProcessor2(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			ScheduledExecutorService scheduledExecutor) {
@@ -49,7 +48,6 @@ public class MessageProcessor2<T> {
 				}
 			}
 		};
-		this.wakeup = () -> wakeup();
 
 		if (timeout > 0) {
 			synchronized (this) {
@@ -91,7 +89,6 @@ public class MessageProcessor2<T> {
 				}
 			}
 		};
-		this.wakeup = () -> wakeup();
 
 		if (delay > 0) {
 			synchronized (this) {
