@@ -360,11 +360,11 @@ public class LinkManager {
 	
 	public static boolean USE_THREADED_CONSUMER = false;
 	public static boolean USE_THREADED_REPEATER = false;
-	public static int WORK_QUEUE_SIZE = 500;
-	public static int WORK_QUEUE_BUFFER = 20;
+	public static int WORK_QUEUE_MAX_SIZE = 500;
+	public static int WORK_QUEUE_BUFFER_SIZE = 20;
 	public static int SCHEDULER_POOL_SIZE = 2;
 
-	public static MessageProcessorFactory2 factory = new MessageProcessorFactory2(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
+	public static MessageProcessorFactory2 factory = new MessageProcessorFactory2(WORK_QUEUE_MAX_SIZE, WORK_QUEUE_BUFFER_SIZE);
 
 	public static ScheduledExecutorService scheduledExecutor = null;
 	

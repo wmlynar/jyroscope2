@@ -104,7 +104,7 @@ public class JyroscopeCore implements PubSubClient {
 			}
 		} catch (Exception e) {
 		}
-		LinkManager.WORK_QUEUE_SIZE = size;
+		LinkManager.WORK_QUEUE_MAX_SIZE = size;
 
 		int buffer = 20;
 		try {
@@ -114,7 +114,7 @@ public class JyroscopeCore implements PubSubClient {
 			}
 		} catch (Exception e) {
 		}
-		LinkManager.WORK_QUEUE_BUFFER = buffer;
+		LinkManager.WORK_QUEUE_BUFFER_SIZE = buffer;
 
 		size = 2;
 		try {
