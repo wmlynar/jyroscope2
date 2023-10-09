@@ -108,7 +108,7 @@ public class JyroscopeCore implements PubSubClient {
 
 		int buffer = 20;
 		try {
-			param = topicProvider.getParameterClient().getParameter("/thread_pool_buffer");
+			param = topicProvider.getParameterClient().getParameter("/thread_pool_max_size");
 			if (param != null) {
 				buffer = Integer.parseInt(param.toString());
 			}
