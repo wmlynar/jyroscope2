@@ -8,15 +8,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.jyroscope.types.LinkManager;
-
 public class MessageProcessor2<T> {
 
 	public static final Object TIMEOUT_MARKER = new Object();
 
 	private final long timeout;
-	private final long delayNanos;
-	private final int count;
 	private final ThreadPoolExecutor executor;
 	private final ScheduledExecutorService scheduledExecutor;
 	private volatile ScheduledFuture<?> future;
@@ -27,12 +23,12 @@ public class MessageProcessor2<T> {
 
 	private int counter;
 
+	private Runnable wakeup;
+
 	public MessageProcessor2(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			ScheduledExecutorService scheduledExecutor) {
 		this.queue = new CircularBuffer<>(queueLength);
 		this.timeout = timeout;
-		this.delayNanos = 0;
-		this.count = 0;
 		this.executor = executor;
 		this.scheduledExecutor = scheduledExecutor;
 
@@ -53,10 +49,11 @@ public class MessageProcessor2<T> {
 				}
 			}
 		};
+		this.wakeup = () -> wakeup();
 
 		if (timeout > 0) {
 			synchronized (this) {
-				this.future = scheduledExecutor.schedule(() -> wakeup(), timeout, TimeUnit.MILLISECONDS);
+				this.future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
 			}
 		}
 	}
@@ -65,8 +62,6 @@ public class MessageProcessor2<T> {
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
 		this.queue = new CircularBuffer<>(1);
 		this.timeout = interval;
-		this.delayNanos = delay * 1_000_000l;
-		this.count = count;
 		this.executor = executor;
 		this.scheduledExecutor = scheduledExecutor;
 		this.counter = 0;
@@ -96,9 +91,11 @@ public class MessageProcessor2<T> {
 				}
 			}
 		};
+		this.wakeup = () -> wakeup();
+
 		if (delay > 0) {
 			synchronized (this) {
-				this.future = scheduledExecutor.schedule(() -> wakeup(), delay, TimeUnit.MILLISECONDS);
+				this.future = scheduledExecutor.schedule(wakeup, delay, TimeUnit.MILLISECONDS);
 			}
 		} else {
 			wakeup();
@@ -106,16 +103,13 @@ public class MessageProcessor2<T> {
 	}
 
 	public void addMessage(T message) {
-		if (timeout > 0) {
-			synchronized (this) {
+		synchronized (this) {
+			if (timeout > 0) {
 				if (future != null) {
 					future.cancel(false);
 				}
-				future = scheduledExecutor.scheduleAtFixedRate(() -> wakeup(), timeout, timeout,
-						TimeUnit.MILLISECONDS);
+				future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
 			}
-		}
-		synchronized (this) {
 			if (message == TIMEOUT_MARKER) {
 				queue.clear();
 				queue.setMarker(message);
