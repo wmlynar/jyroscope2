@@ -169,4 +169,16 @@ public class MessageProcessor<T> implements Comparable<MessageProcessor<T>> {
 		((MessageProcessor) this).addMessage(MessageProcessor.TIMEOUT_MARKER);
 	}
 
+	public void stopTimer() {
+		synchronized (MessageProcessor.this) {
+			lock.lock();
+			try {
+				timeoutQueue.remove(this);
+			} finally {
+				lock.unlock();
+			}
+			queue.clear();
+		}
+	}
+
 }
