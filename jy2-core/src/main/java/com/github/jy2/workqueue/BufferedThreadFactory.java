@@ -40,11 +40,8 @@ public class BufferedThreadFactory implements ThreadFactory {
 	@Override
 	public Thread newThread(Runnable r) {
 		MyThread thread = null;
-		try {
-			thread = threadBuffer.take();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		// Try to retrieve an item from the queue without waiting
+		thread = threadBuffer.poll();
 		if (thread == null) {
 			return new Thread(r, "unbuffered-pool-thread-" + threadNumber.getAndIncrement());
 		}
