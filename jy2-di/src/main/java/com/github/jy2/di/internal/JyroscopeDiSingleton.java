@@ -39,8 +39,11 @@ public class JyroscopeDiSingleton {
 	private static String memberName;
 	private static ArrayList<JyroscopeDi> nodes = new ArrayList<JyroscopeDi>();
 
-	@Parameter("/use_memory_observer")
-	private boolean useMemoryObserver = false;
+//	@Parameter("/use_memory_observer")
+//	private boolean useMemoryObserver = false;
+
+	@Parameter("/periodically_run_gc")
+	private boolean periodicallyRunGc = true;
 
 	@Parameter("/install_uncaught_exception_handler")
 	private boolean installUncaughtExceptionHandler = true;
@@ -165,13 +168,20 @@ public class JyroscopeDiSingleton {
 		jy2.shutdown();
 		isShutdown = true;
 	}
+	
+	@Repeat(interval = 60 * 1000)
+	public void runGc() {
+		if (periodicallyRunGc) {
+			System.gc();
+		}
+	}
 
 	@Init
 	public void init() {
 		// start memory observer
-		if (useMemoryObserver) {
-			new MemoryObserver().start();
-		}
+//		if (useMemoryObserver) {
+//			new MemoryObserver().start();
+//		}
 
 		if (installUncaughtExceptionHandler) {
 			ExitProcessOnUncaughtException.register();
