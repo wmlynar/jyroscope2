@@ -169,7 +169,7 @@ public class JyroscopeDiSingleton {
 		isShutdown = true;
 	}
 	
-	@Repeat(interval = 60 * 1000)
+	@Repeat(interval = 30 * 1000)
 	public void runGc() {
 		if (periodicallyRunGc) {
 			System.gc();
