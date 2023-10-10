@@ -73,9 +73,8 @@ public class JarUtilsCollected {
 	}
 
 	// run main method (in new thread)
-	public static ThreadGroup runJarThroughClassloader(ClassLoader classloader, String jarFileName, String[] params) {
-		ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
-		Thread t = new Thread(tg, new Runnable() {
+	public static void runJarThroughClassloader(ClassLoader classloader, String jarFileName, String[] params) {
+		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -103,7 +102,6 @@ public class JarUtilsCollected {
 			}
 		});
 		t.start();
-		return tg;
 	}
 
 	public static String getMainClassName(File jar) throws FileNotFoundException, IOException {

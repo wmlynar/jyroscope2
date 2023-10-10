@@ -7,18 +7,17 @@ import com.github.jy2.di.exceptions.CreationException;
 import com.github.jy2.log.NodeNameManager;
 
 public class Main {
-	
+
 	public static void main(String[] args) throws CreationException {
-		
+
 		JyroscopeDi jyDi = new JyroscopeDi("autofork_uberjar", args);
 		ParameterClient pc = jyDi.getParameterClient();
 
-
-		new Thread(new ThreadGroup(NodeNameManager.getNextThreadGroupName()), new Runnable() {
+		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					com.github.jy2.di.example.Main.main(new String[] {"__name:=jy2_di_example_launch"});
+					com.github.jy2.di.example.Main.main(new String[] { "__name:=jy2_di_example_launch" });
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

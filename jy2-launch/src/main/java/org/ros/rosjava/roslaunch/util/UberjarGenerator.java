@@ -49,7 +49,7 @@ public class UberjarGenerator {
 	private static String generateMainCalls(ArrayList<String[]> classes) {
 		StringBuffer sb = new StringBuffer();
 		for (String[] cl : classes) {
-			sb.append("		new Thread(new ThreadGroup(NodeNameManager.getNextThreadGroupName()), new Runnable() {\n"
+			sb.append("		new Thread(new Runnable() {\n"
 					+ "			@Override\n" + "			public void run() {\n" + "				try {\n"
 					+ "					");
 			sb.append(cl[0]);

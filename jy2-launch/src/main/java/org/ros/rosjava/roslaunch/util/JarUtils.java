@@ -18,7 +18,7 @@ import com.github.jy2.log.NodeNameManager;
 
 public class JarUtils {
 
-	public static ThreadGroup runJar(String fileName, String[] params) {
+	public static void runJar(String fileName, String[] params) {
 		File file = new File(fileName);
 
 		// add jar to classpatch (from main thread)
@@ -38,8 +38,7 @@ public class JarUtils {
 		}
 
 		// run main method (in new thread)
-		ThreadGroup tg = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
-		Thread t = new Thread(tg, new Runnable() {
+		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -63,7 +62,6 @@ public class JarUtils {
 			}
 		});
 		t.start();
-		return tg;
 	}
 
 	public static String getMainClass(File jar) throws FileNotFoundException, IOException {
