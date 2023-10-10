@@ -43,7 +43,7 @@ public class JyroscopeDiSingleton {
 //	private boolean useMemoryObserver = false;
 
 	@Parameter("/periodically_run_gc")
-	private boolean periodicallyRunGc = true;
+	private boolean periodicallyRunGc = false;
 
 	@Parameter("/install_uncaught_exception_handler")
 	private boolean installUncaughtExceptionHandler = true;
