@@ -169,8 +169,9 @@ public class JyroscopeDiSingleton {
 		isShutdown = true;
 	}
 	
-	@Repeat(interval = 30 * 1000)
+	@Repeat(interval = 30 * 1000, maxExecutionTime = 500)
 	public void runGc() {
+		NodeNameManager.setNodeName("/fake_node_jyroscope_singleton");
 		if (periodicallyRunGc) {
 			System.gc();
 		}
@@ -192,8 +193,7 @@ public class JyroscopeDiSingleton {
 //					double.class);
 			// one common topic for collecting hiccups from all members
 			Publisher<Double> jvmHiccupPublisher = jy2.createPublisher("/hiccup/jvm", Double.class);
-			ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
-			new JvmHiccupMeterThread(tgb, value -> {
+			new JvmHiccupMeterThread(value -> {
 				double valueMs = value * 0.0000001;
 				if (valueMs > minJvmHiccupToLog) {
 					LOG.warn("Jvm hiccup: " + valueMs);
