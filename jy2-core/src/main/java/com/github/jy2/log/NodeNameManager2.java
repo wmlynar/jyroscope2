@@ -3,9 +3,9 @@ package com.github.jy2.log;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class NodeNameManager {
+public class NodeNameManager2 {
 
-	private static HashMap<ThreadGroup, Holder<String>> threadMap = new HashMap<>();
+	private static HashMap<String, Holder<String>> threadMap = new HashMap<>();
 	private static final AtomicInteger counter = new AtomicInteger(0);
 
 	public static String getNextThreadGroupName() {
@@ -13,23 +13,23 @@ public class NodeNameManager {
 	}
 
 	public static synchronized void setNodeName(String nodeName) {
-		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-		Holder<String> holder = threadMap.get(threadGroup);
+		String threadGroupName = Thread.currentThread().getThreadGroup().getName();
+		Holder<String> holder = threadMap.get(threadGroupName);
 		if (holder == null) {
 			holder = new Holder<>();
-			threadMap.put(threadGroup, holder);
+			threadMap.put(threadGroupName, holder);
 		}
 		holder.value = nodeName;
 	}
 
 	public static synchronized String getNodeName() {
-		ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-		Holder<String> holder = threadMap.get(threadGroup);
-		return (holder == null) ? "UNKNOWN" : holder.value;
+		String threadGroupName = Thread.currentThread().getThreadGroup().getName();
+		Holder<String> holder = threadMap.get(threadGroupName);
+		return (holder == null) ? null : holder.value;
 	}
 
 	public static synchronized void removeThreadGroup() {
-		threadMap.remove(Thread.currentThread().getThreadGroup());
+		threadMap.remove(Thread.currentThread().getThreadGroup().getName());
 	}
 
 	public static class Holder<T> {
