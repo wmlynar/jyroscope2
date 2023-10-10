@@ -39,8 +39,11 @@ public class JyroscopeDiSingleton {
 	private static String memberName;
 	private static ArrayList<JyroscopeDi> nodes = new ArrayList<JyroscopeDi>();
 
-	@Parameter("/use_memory_observer")
-	private boolean useMemoryObserver = false;
+//	@Parameter("/use_memory_observer")
+//	private boolean useMemoryObserver = false;
+
+	@Parameter("/periodically_run_gc")
+	private boolean periodicallyRunGc = false;
 
 	@Parameter("/install_uncaught_exception_handler")
 	private boolean installUncaughtExceptionHandler = true;
@@ -165,13 +168,21 @@ public class JyroscopeDiSingleton {
 		jy2.shutdown();
 		isShutdown = true;
 	}
+	
+	@Repeat(interval = 30 * 1000, maxExecutionTime = 1000)
+	public void runGc() {
+		NodeNameManager.setNodeName("/fake_node_jyroscope_singleton");
+		if (periodicallyRunGc) {
+			System.gc();
+		}
+	}
 
 	@Init
 	public void init() {
 		// start memory observer
-		if (useMemoryObserver) {
-			new MemoryObserver().start();
-		}
+//		if (useMemoryObserver) {
+//			new MemoryObserver().start();
+//		}
 
 		if (installUncaughtExceptionHandler) {
 			ExitProcessOnUncaughtException.register();
@@ -182,8 +193,7 @@ public class JyroscopeDiSingleton {
 //					double.class);
 			// one common topic for collecting hiccups from all members
 			Publisher<Double> jvmHiccupPublisher = jy2.createPublisher("/hiccup/jvm", Double.class);
-			ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
-			new JvmHiccupMeterThread(tgb, value -> {
+			new JvmHiccupMeterThread(value -> {
 				double valueMs = value * 0.0000001;
 				if (valueMs > minJvmHiccupToLog) {
 					LOG.warn("Jvm hiccup: " + valueMs);

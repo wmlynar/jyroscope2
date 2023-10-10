@@ -20,11 +20,11 @@ public class JvmHiccupMeterThread extends Thread {
 
 	private volatile boolean doRun = true;
 
-	public JvmHiccupMeterThread(ThreadGroup tg, LongConsumer callback) {
-		this(tg, callback, 10);
+	public JvmHiccupMeterThread(LongConsumer callback) {
+		this(callback, 10);
 	}
 
-	public JvmHiccupMeterThread(ThreadGroup tg, LongConsumer callback, int resolutionMs) {
+	public JvmHiccupMeterThread(LongConsumer callback, int resolutionMs) {
 		super("JvmHiccupMeterThread");
 		this.callback = callback;
 		this.resolutionMs = resolutionMs;
