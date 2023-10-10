@@ -3,17 +3,20 @@ package com.jyroscope.types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 
 import org.ros.concurrent.CircularBlockingDeque;
 
 import com.github.jy2.di.LogSeldom;
 import com.github.jy2.log.Jy2DiLog;
+import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.mapper.RosTypeConverters;
 import com.github.jy2.serialization.RosTypeConvertersSerializationWrapper;
-import com.github.jy2.workqueue.MessageProcessor;
-import com.github.jy2.workqueue.MessageProcessorFactory;
+import com.github.jy2.workqueue.MessageProcessor2;
+import com.github.jy2.workqueue.MessageProcessorFactory2;
 import com.jyroscope.Link;
 import com.jyroscope.ros.RosMessage;
 
@@ -330,10 +333,17 @@ public class LinkManager {
 
 		private class WorkQueueConsumer<D> implements WorkConsumer<D> {
 			
-			private MessageProcessor<D> processor;
+			private MessageProcessor2<D> processor;
 
 			public WorkQueueConsumer(Link<D> subscriber, int queueSize, int timeout) {
-				this.processor = factory.createProcessor(message -> subscriber.handle((D) message), queueSize, timeout);
+				final String nodeName = NodeNameManager.getNodeName();
+				this.processor = factory.createProcessor(new Consumer() {
+					@Override
+					public void accept(Object message) {
+						NodeNameManager.setNodeName(nodeName);
+						subscriber.handle((D) message);
+					}
+				}, queueSize, timeout);
 			}
 
 			@Override
@@ -350,11 +360,12 @@ public class LinkManager {
 	
 	public static boolean USE_THREADED_CONSUMER = false;
 	public static boolean USE_THREADED_REPEATER = false;
-	private static final int WORK_QUEUE_SIZE = 500;
-	private static final int WORK_QUEUE_BUFFER = 10;
+	public static int WORK_QUEUE_MAX_SIZE = 500;
+	public static int WORK_QUEUE_BUFFER_SIZE = 20;
+	public static int SCHEDULER_POOL_SIZE = 2;
 
-	public static final MessageProcessorFactory factory = new MessageProcessorFactory(WORK_QUEUE_SIZE, WORK_QUEUE_BUFFER);
-	
+	public static MessageProcessorFactory2 factory = new MessageProcessorFactory2(WORK_QUEUE_MAX_SIZE, WORK_QUEUE_BUFFER_SIZE);
+
 	interface WorkConsumer<D> {
 		void offer(D message);
 		void stop();

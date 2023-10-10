@@ -95,6 +95,36 @@ public class JyroscopeCore implements PubSubClient {
 		} catch (IOException e1) {
 		}
 		LinkManager.USE_THREADED_REPEATER = !useThreadPoolRepeaters;
+
+		int size = 500;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/thread_pool_max_size");
+			if (param != null) {
+				size = Integer.parseInt(param.toString());
+			}
+		} catch (Exception e) {
+		}
+		LinkManager.WORK_QUEUE_MAX_SIZE = size;
+
+		int buffer = 20;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/thread_pool_buffer_size");
+			if (param != null) {
+				buffer = Integer.parseInt(param.toString());
+			}
+		} catch (Exception e) {
+		}
+		LinkManager.WORK_QUEUE_BUFFER_SIZE = buffer;
+
+		size = 2;
+		try {
+			param = topicProvider.getParameterClient().getParameter("/scheduler_pool_size");
+			if (param != null) {
+				size = Integer.parseInt(param.toString());
+			}
+		} catch (Exception e) {
+		}
+		LinkManager.SCHEDULER_POOL_SIZE = size;
 	}
 
 	private void configureLogging(RosTopicProvider topicProvider) {

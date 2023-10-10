@@ -10,21 +10,26 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.github.jy2.log.NodeNameManager;
+
 public class MessageProcessorFactory<T> {
 
-	private final ThreadPoolExecutor executor;
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue = new PriorityBlockingQueue<>();
 	private final Lock lock = new ReentrantLock();
 	private final Condition schedulerCondition = lock.newCondition();
 
+	private BufferedThreadFactory threadFactory;
+	private ThreadPoolExecutor executor;
+	private int maxThreads;
+	private int bufferSize;
+
 	public MessageProcessorFactory(int maxThreads, int bufferSize) {
-		this.executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-				new BufferedThreadFactory(bufferSize));
-		startScheduler();
+		this.maxThreads = maxThreads;
+		this.bufferSize = bufferSize;
 	}
 
 	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, this.executor,
+		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, getExecutor(),
 				this.timeoutQueue, this.lock, this.schedulerCondition);
 		if (timeout > 0) {
 			lock.lock();
@@ -39,7 +44,7 @@ public class MessageProcessorFactory<T> {
 	}
 
 	public MessageProcessor<T> createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, this.executor,
+		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, getExecutor(),
 				this.timeoutQueue, this.lock, this.schedulerCondition);
 		if (delay > 0 || interval > 0) {
 			lock.lock();
@@ -60,7 +65,9 @@ public class MessageProcessorFactory<T> {
 	}
 
 	private void startScheduler() {
-		new Thread(() -> {
+		ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+		Thread t = new Thread(tgb, () -> {
+			NodeNameManager.setNodeName("/fake_node_scheduler");
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					lock.lock();
@@ -73,10 +80,7 @@ public class MessageProcessorFactory<T> {
 
 					long delay = sq.getNextTimeout() - System.nanoTime();
 					if (delay <= 0) {
-//						timeoutQueue.poll();
 						sq.addMessage(MessageProcessor.TIMEOUT_MARKER);
-//						timeoutQueue.offer(sq);
-//						schedulerCondition.signalAll();
 					} else {
 						schedulerCondition.awaitNanos(delay);
 					}
@@ -86,7 +90,28 @@ public class MessageProcessorFactory<T> {
 					lock.unlock();
 				}
 			}
-		}, "work-pool-timer-thread").start();
+		}, "work-pool-timer-thread");
+		t.setDaemon(true);
+		t.start();
+	}
+
+	public synchronized ThreadPoolExecutor getExecutor() {
+		if (executor == null) {
+// replaced with a version that does not allocate so much new objects
+//			executor = new ThreadPoolExecutor(... , new NoAllocSynchronousQueue<>(),
+// but it does not work
+			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+					getBufferedThreadFactory());
+			startScheduler();
+		}
+		return executor;
+	}
+
+	public synchronized BufferedThreadFactory getBufferedThreadFactory() {
+		if (threadFactory == null) {
+			threadFactory = new BufferedThreadFactory(bufferSize);
+		}
+		return threadFactory;
 	}
 
 }

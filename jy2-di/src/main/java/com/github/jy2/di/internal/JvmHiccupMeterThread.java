@@ -8,6 +8,8 @@ package com.github.jy2.di.internal;
 import java.util.concurrent.TimeUnit;
 import java.util.function.LongConsumer;
 
+import com.github.jy2.log.NodeNameManager;
+
 public class JvmHiccupMeterThread extends Thread {
 
 	private static boolean allocateObjects = true;
@@ -18,11 +20,11 @@ public class JvmHiccupMeterThread extends Thread {
 
 	private volatile boolean doRun = true;
 
-	public JvmHiccupMeterThread(LongConsumer callback) {
-		this(callback, 10);
+	public JvmHiccupMeterThread(ThreadGroup tg, LongConsumer callback) {
+		this(tg, callback, 10);
 	}
 
-	public JvmHiccupMeterThread(LongConsumer callback, int resolutionMs) {
+	public JvmHiccupMeterThread(ThreadGroup tg, LongConsumer callback, int resolutionMs) {
 		super("JvmHiccupMeterThread");
 		this.callback = callback;
 		this.resolutionMs = resolutionMs;
@@ -32,6 +34,7 @@ public class JvmHiccupMeterThread extends Thread {
 	public void run() {
 		final long resolutionNsec = (long) (resolutionMs * 1000L * 1000L);
 		try {
+			NodeNameManager.setNodeName("/fake_node_jvm_hiccup");
 			long shortestObservedDeltaTimeNsec = Long.MAX_VALUE;
 			long timeBeforeMeasurement = Long.MAX_VALUE;
 			while (doRun) {

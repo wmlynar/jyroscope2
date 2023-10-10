@@ -21,6 +21,7 @@ import com.github.jy2.di.annotations.Publish;
 import com.github.jy2.di.annotations.Repeat;
 import com.github.jy2.di.exceptions.CreationException;
 import com.github.jy2.di.ros.TimeProvider;
+import com.github.jy2.log.NodeNameManager;
 
 import go.jyroscope.ros.introspection_msgs.Member;
 import go.jyroscope.ros.introspection_msgs.Node;
@@ -181,7 +182,8 @@ public class JyroscopeDiSingleton {
 //					double.class);
 			// one common topic for collecting hiccups from all members
 			Publisher<Double> jvmHiccupPublisher = jy2.createPublisher("/hiccup/jvm", Double.class);
-			new JvmHiccupMeterThread(value -> {
+			ThreadGroup tgb = new ThreadGroup(NodeNameManager.getNextThreadGroupName());
+			new JvmHiccupMeterThread(tgb, value -> {
 				double valueMs = value * 0.0000001;
 				if (valueMs > minJvmHiccupToLog) {
 					LOG.warn("Jvm hiccup: " + valueMs);

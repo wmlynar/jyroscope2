@@ -51,7 +51,6 @@ import com.github.jy2.internal.DeleteSubscriber;
 import com.github.jy2.log.Jy2DiLog;
 import com.github.jy2.log.NodeNameManager;
 import com.github.jy2.util.ExceptionUtil;
-import com.github.jy2.workqueue.MessageProcessor;
 import com.jyroscope.types.LinkManager;
 
 public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
@@ -655,8 +654,10 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 			}, "Repeater-" + method.toString());
 			repeater.thread.start();
 		} else {
+			final String nodeName = NodeNameManager.getNodeName();
 			Supplier<Boolean> supplier = () -> {
 				try {
+					NodeNameManager.setNodeName(nodeName);
 					long before = System.currentTimeMillis();
 					Object result = method.invoke(object);
 					long delta = System.currentTimeMillis() - before;
@@ -679,15 +680,14 @@ public class JyroscopeDi implements PubSubClient, DeleteSubscriber {
 				return true;
 			};
 			repeater.processor = LinkManager.factory.createRepeater(supplier, repeat.delay(), repeat.interval(), repeat.count());
-		}
-		
+		}		
 		
 		String name = repeat.name();
 		if (name != null && !name.isEmpty()) {
 			repeatersMap.put(new InstanceWithName(repeater.object, name), repeater);
 		}
 	}
-
+	
 	private <T> void injectPublishers(Field field, T object, String instanceName)
 			throws IllegalAccessException, IllegalArgumentException, CreationException {
 		Publish publish = field.getAnnotation(Publish.class);

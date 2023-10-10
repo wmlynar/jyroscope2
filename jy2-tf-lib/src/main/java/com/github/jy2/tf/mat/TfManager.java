@@ -34,6 +34,7 @@ public class TfManager {
 
 	public final static double DEAFULT_TIMEOUT_S = 0.5d;
 	public final static int SMALL_TIMEOUT_MS = 50;
+	public final static double DEAFULT_TIMEOUT_WARN = 0.1d;
 
 	@Parameter("/tf_static_transform_keyword")
 	public String staticTransformKeyword = "static";
@@ -297,16 +298,27 @@ public class TfManager {
 				}
 			}
 			now = timeProvider.now();
-			if (now - start > DEAFULT_TIMEOUT_S) {
-				break;
+			double delta = now - start;
+			if (delta > DEAFULT_TIMEOUT_S) {
+				LOG.warnSeldom("Wait for transform timeout " + delta + " at specific time "
+						+ String.format("%.4f", time) + ": " + from + "->" + to);
+				return false;
 			}
 			sleep(SMALL_TIMEOUT_MS);
+		}
+		now = timeProvider.now();
+		double delta = now - start;
+		if (delta > DEAFULT_TIMEOUT_WARN) {
+			LOG.warnSeldom("Wait for transform exceeded warning threshold " + delta + " at specific time "
+					+ String.format("%.4f", time) + ": " + from + "->" + to);
+			return false;
 		}
 		// System.out.println(String.format("waited %.3f\n", now-start));
 		return multiplyMatricesInPath(path.indexes, path.inverted, time, mat);
 	}
-	
-	public boolean waitForTransform(TimeProvider timeProvider, String from, String to, double time, TransformStamped transform) {
+
+	public boolean waitForTransform(TimeProvider timeProvider, String from, String to, double time,
+			TransformStamped transform) {
 		Matrix4d mat = new Matrix4d();
 		if (!waitForTransform(timeProvider, from, to, time, mat)) {
 			return false;
@@ -320,7 +332,7 @@ public class TfManager {
 		transform.transform.set(mat);
 
 		return true;
-	}	
+	}
 
 	/**
 	 * Waits for semi-static transform to be available by sleeping short amount of
@@ -334,7 +346,8 @@ public class TfManager {
 	 * @return <code>true</code> when transform was found, <code>true</code> when
 	 *         transform does not exist.
 	 */
-	public boolean waitForTransformSemi(TimeProvider timeProvider, String from, String to, double time, double semiTimeout, Matrix4d mat) {
+	public boolean waitForTransformSemi(TimeProvider timeProvider, String from, String to, double time,
+			double semiTimeout, Matrix4d mat) {
 		if (from.equals(to)) {
 			mat.setIdentity();
 			return true;
@@ -355,10 +368,20 @@ public class TfManager {
 				}
 			}
 			now = timeProvider.now();
-			if (now - start > DEAFULT_TIMEOUT_S) {
-				break;
+			double delta = now - start;
+			if (delta > DEAFULT_TIMEOUT_S) {
+				LOG.warnSeldom("Wait for transform semi timeout " + delta + " at specific time "
+						+ String.format("%.4f", time) + ": " + from + "->" + to);
+				return false;
 			}
 			sleep(SMALL_TIMEOUT_MS);
+		}
+		now = timeProvider.now();
+		double delta = now - start;
+		if (delta > DEAFULT_TIMEOUT_WARN) {
+			LOG.warnSeldom("Wait for transform semi exceeded warning threshold " + delta + " at specific time "
+					+ String.format("%.4f", time) + ": " + from + "->" + to);
+			return false;
 		}
 		// System.out.println(String.format("waited %.3f\n", now-start));
 		return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, semiTimeout, mat);
@@ -495,10 +518,10 @@ public class TfManager {
 	}
 
 	private void checkIfShouldReset(double time) {
-		if(!enableReset) {
+		if (!enableReset) {
 			return;
 		}
-		
+
 		if (time + secondsBackInTimeToReset < lastTime) {
 			for (TransformBuffer tb : transformBufferList) {
 				tb.reset(time);
