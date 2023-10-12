@@ -16,10 +16,12 @@ public class ProcessorFactory<T> {
 
 	private int maxThreads;
 	private int bufferSize;
+	private int keepAliveMinutes;
 	private int schedulerPoolSize;
 
-	public ProcessorFactory(int maxThreads, int bufferSize, int schedulerPoolSize) {
+	public ProcessorFactory(int maxThreads, int keepAliveMinutes, int bufferSize, int schedulerPoolSize) {
 		this.maxThreads = maxThreads;
+		this.keepAliveMinutes = keepAliveMinutes;
 		this.bufferSize = bufferSize;
 		this.schedulerPoolSize = schedulerPoolSize;
 	}
@@ -46,8 +48,8 @@ public class ProcessorFactory<T> {
 
 	public synchronized ThreadPoolExecutor getExecutor() {
 		if (executor == null) {
-			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-					getBufferedThreadFactory());
+			executor = new ThreadPoolExecutor(1, maxThreads, keepAliveMinutes, TimeUnit.MINUTES,
+					new SynchronousQueue<>(), getBufferedThreadFactory());
 		}
 		return executor;
 	}
