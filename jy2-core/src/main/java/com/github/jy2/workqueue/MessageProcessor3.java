@@ -98,15 +98,6 @@ public class MessageProcessor3<T> {
 		}
 	}
 
-	private void startProcessingMessages() {
-		isProcessing = true;
-		try {
-			executor.execute(command);
-		} catch (RejectedExecutionException e) {
-			isProcessing = false;
-		}
-	}
-
 	public void stop() {
 		keepRunning = false;
 		synchronized (this) {
@@ -114,6 +105,15 @@ public class MessageProcessor3<T> {
 			if (future != null) {
 				future.cancel(false);
 			}
+		}
+	}
+
+	private void startProcessingMessages() {
+		isProcessing = true;
+		try {
+			executor.execute(command);
+		} catch (RejectedExecutionException e) {
+			isProcessing = false;
 		}
 	}
 }

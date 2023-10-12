@@ -9,11 +9,8 @@ import java.util.function.Supplier;
 
 public class RepeaterProcessor3 {
 
-	public static final Object TIMEOUT_MARKER = new Object();
-
 	private final long interval;
 	private final ThreadPoolExecutor executor;
-	private final ScheduledExecutorService scheduledExecutor;
 	private volatile ScheduledFuture<?> future;
 	private boolean isProcessing = false;
 	private Runnable command;
@@ -27,7 +24,6 @@ public class RepeaterProcessor3 {
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
 		this.interval = interval;
 		this.executor = executor;
-		this.scheduledExecutor = scheduledExecutor;
 		this.counter = 0;
 
 		this.command = () -> {
@@ -45,6 +41,7 @@ public class RepeaterProcessor3 {
 									TimeUnit.MILLISECONDS);
 							rescheduleAndProcessTimeout = false;
 						} else {
+							// will be called again by timeout
 							isProcessing = false;
 							return;
 						}
@@ -87,15 +84,6 @@ public class RepeaterProcessor3 {
 		}
 	}
 
-	private void startProcessingMessages() {
-		isProcessing = true;
-		try {
-			executor.execute(command);
-		} catch (RejectedExecutionException e) {
-			isProcessing = false;
-		}
-	}
-
 	public void stop() {
 		keepRunning = false;
 		synchronized (this) {
@@ -103,6 +91,15 @@ public class RepeaterProcessor3 {
 				future.cancel(false);
 			}
 			rescheduleAndProcessTimeout = false;
+		}
+	}
+
+	private void startProcessingMessages() {
+		isProcessing = true;
+		try {
+			executor.execute(command);
+		} catch (RejectedExecutionException e) {
+			isProcessing = false;
 		}
 	}
 }
