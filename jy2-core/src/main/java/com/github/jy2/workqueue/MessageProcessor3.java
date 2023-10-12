@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 public class MessageProcessor3<T> {
 
 	public static final Object TIMEOUT_MARKER = new Object();
+	public static final Object RESCHEDULE_AND_TIMEOUT_MARKER = new Object();
 
 	private final long timeout;
 	private final ThreadPoolExecutor executor;
@@ -19,7 +20,6 @@ public class MessageProcessor3<T> {
 	private boolean isProcessing = false;
 	private Runnable command;
 	private Runnable callTimeout = () -> callTimeout();
-	private boolean rescheduleAndProcessTimeout = false;
 	private volatile boolean keepRunning = true;
 
 	public MessageProcessor3(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
@@ -35,19 +35,17 @@ public class MessageProcessor3<T> {
 				synchronized (MessageProcessor3.this) {
 					message = queue.pollFirst();
 					if (message == null) {
-						if (rescheduleAndProcessTimeout) {
-							rescheduleAndProcessTimeout = false;
-							this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
-									TimeUnit.MILLISECONDS);
-							// message = TIMEOUT_MARKER; <- not needed, because message is null anyway
-						} else {
-							// timeout is already scheduled
-							isProcessing = false;
-							return;
-						}
+						isProcessing = false;
+						return;
 					}
 				}
-				if (message == TIMEOUT_MARKER) {
+				if (message == RESCHEDULE_AND_TIMEOUT_MARKER) {
+					synchronized (MessageProcessor3.this) {
+						this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
+								TimeUnit.MILLISECONDS);
+					}
+					callback.accept(null);
+				} else if (message == TIMEOUT_MARKER) {
 					callback.accept(null);
 				} else {
 					callback.accept(message);
@@ -72,7 +70,6 @@ public class MessageProcessor3<T> {
 				if (future != null) {
 					future.cancel(false);
 				}
-				rescheduleAndProcessTimeout = false;
 				future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout, TimeUnit.MILLISECONDS);
 			}
 			queue.addLast(message);
@@ -88,15 +85,14 @@ public class MessageProcessor3<T> {
 		}
 		synchronized (this) {
 			queue.clear();
-			queue.setMarker((T) TIMEOUT_MARKER);
 			if (isProcessing) {
+				// stop the timer until current processing is finished and restart the timeout
 				if (future != null) {
 					future.cancel(false);
 				}
-				rescheduleAndProcessTimeout = true;
-				return;
+				queue.setMarker((T) RESCHEDULE_AND_TIMEOUT_MARKER);
 			} else {
-				rescheduleAndProcessTimeout = false;
+				queue.setMarker((T) TIMEOUT_MARKER);
 				startProcessingMessages();
 			}
 		}
@@ -115,7 +111,6 @@ public class MessageProcessor3<T> {
 		keepRunning = false;
 		synchronized (this) {
 			queue.clear();
-			rescheduleAndProcessTimeout = false;
 			if (future != null) {
 				future.cancel(false);
 			}

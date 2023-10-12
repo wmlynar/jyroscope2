@@ -35,22 +35,16 @@ public class RepeaterProcessor3 {
 				++counter;
 				boolean result = callable.get();
 				if (!result) {
-					synchronized (RepeaterProcessor3.this) {
-						if (future != null) {
-							future.cancel(false);
-						}
-						isProcessing = false;
-						return;
-					}
+					stop();
+					return;
 				}
 				if (interval > 0) {
 					synchronized (RepeaterProcessor3.this) {
 						if (rescheduleAndProcessTimeout) {
-							rescheduleAndProcessTimeout = false;
 							this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 									TimeUnit.MILLISECONDS);
+							rescheduleAndProcessTimeout = false;
 						} else {
-							// timeout is already scheduled
 							isProcessing = false;
 							return;
 						}
@@ -81,10 +75,11 @@ public class RepeaterProcessor3 {
 		synchronized (this) {
 			if (isProcessing) {
 				if (interval > 0) {
-					rescheduleAndProcessTimeout = true;
+					// stop the timer until current processing is finished and restart the timeout
 					if (future != null) {
 						future.cancel(false);
 					}
+					rescheduleAndProcessTimeout = true;
 				}
 			} else {
 				startProcessingMessages();
