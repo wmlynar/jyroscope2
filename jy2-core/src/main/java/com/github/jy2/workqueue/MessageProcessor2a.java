@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class MessageProcessor2<T> {
+public class MessageProcessor2a<T> {
 
 	public static final Object TIMEOUT_MARKER = new Object();
 
@@ -21,10 +21,11 @@ public class MessageProcessor2<T> {
 	private boolean isProcessing = false;
 	private Runnable command;
 	private Runnable wakeup = () -> wakeup();
+	private boolean processTimeoutAndReschedule = false;
 
 	private int counter;
 
-	public MessageProcessor2(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
+	public MessageProcessor2a(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			ScheduledExecutorService scheduledExecutor) {
 		this.queue = new CircularBuffer<>(queueLength);
 		this.timeout = timeout;
@@ -34,11 +35,16 @@ public class MessageProcessor2<T> {
 		this.command = () -> {
 			T message;
 			while (true) {
-				synchronized (MessageProcessor2.this) {
+				synchronized (MessageProcessor2a.this) {
 					message = queue.pollFirst();
 					if (message == null) {
-						isProcessing = false;
-						return;
+						if (processTimeoutAndReschedule) {
+							processTimeoutAndReschedule = false;
+							this.future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+						} else {
+							isProcessing = false;
+							return;
+						}
 					}
 				}
 				if (message == TIMEOUT_MARKER) {
@@ -56,7 +62,7 @@ public class MessageProcessor2<T> {
 		}
 	}
 
-	public MessageProcessor2(Supplier<Boolean> callable, int delay, int interval, int count,
+	public MessageProcessor2a(Supplier<Boolean> callable, int delay, int interval, int count,
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
 		this.queue = new CircularBuffer<>(1);
 		this.timeout = interval;
@@ -68,18 +74,23 @@ public class MessageProcessor2<T> {
 			T message;
 			while (count == 0 || counter < count) {
 				if (timeout > 0) {
-					synchronized (MessageProcessor2.this) {
+					synchronized (MessageProcessor2a.this) {
 						message = queue.pollFirst();
 						if (message == null) {
-							isProcessing = false;
-							return;
+							if (processTimeoutAndReschedule) {
+								processTimeoutAndReschedule = false;
+								this.future = scheduledExecutor.schedule(wakeup, interval, TimeUnit.MILLISECONDS);
+							} else {
+								isProcessing = false;
+								return;
+							}
 						}
 					}
 				}
 				++counter;
 				boolean result = callable.get();
 				if (!result) {
-					synchronized (MessageProcessor2.this) {
+					synchronized (MessageProcessor2a.this) {
 						if (future != null) {
 							future.cancel(false);
 						}
@@ -105,7 +116,13 @@ public class MessageProcessor2<T> {
 				if (future != null) {
 					future.cancel(false);
 				}
-				future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+				if (message == TIMEOUT_MARKER && isProcessing) {
+					processTimeoutAndReschedule = true;
+					return;
+				} else {
+					processTimeoutAndReschedule = false;
+					future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+				}
 			}
 			if (message == TIMEOUT_MARKER) {
 				queue.clear();
@@ -129,7 +146,7 @@ public class MessageProcessor2<T> {
 	}
 
 	public void wakeup() {
-		((MessageProcessor2) this).addMessage(MessageProcessor2.TIMEOUT_MARKER);
+		((MessageProcessor2a) this).addMessage(MessageProcessor2a.TIMEOUT_MARKER);
 	}
 
 	public void stopTimer() {
