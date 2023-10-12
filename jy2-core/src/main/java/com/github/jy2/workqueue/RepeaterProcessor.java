@@ -7,13 +7,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class RepeaterProcessor3 {
-
-	public static final Object TIMEOUT_MARKER = new Object();
+public class RepeaterProcessor {
 
 	private final long interval;
 	private final ThreadPoolExecutor executor;
-	private final ScheduledExecutorService scheduledExecutor;
 	private volatile ScheduledFuture<?> future;
 	private boolean isProcessing = false;
 	private Runnable command;
@@ -23,11 +20,10 @@ public class RepeaterProcessor3 {
 
 	private int counter;
 
-	public RepeaterProcessor3(Supplier<Boolean> callable, int delay, int interval, int count,
+	public RepeaterProcessor(Supplier<Boolean> callable, int delay, int interval, int count,
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
 		this.interval = interval;
 		this.executor = executor;
-		this.scheduledExecutor = scheduledExecutor;
 		this.counter = 0;
 
 		this.command = () -> {
@@ -35,22 +31,17 @@ public class RepeaterProcessor3 {
 				++counter;
 				boolean result = callable.get();
 				if (!result) {
-					synchronized (RepeaterProcessor3.this) {
-						if (future != null) {
-							future.cancel(false);
-						}
-						isProcessing = false;
-						return;
-					}
+					stop();
+					return;
 				}
 				if (interval > 0) {
-					synchronized (RepeaterProcessor3.this) {
+					synchronized (RepeaterProcessor.this) {
 						if (rescheduleAndProcessTimeout) {
-							rescheduleAndProcessTimeout = false;
 							this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 									TimeUnit.MILLISECONDS);
+							rescheduleAndProcessTimeout = false;
 						} else {
-							// timeout is already scheduled
+							// will be called again by timeout
 							isProcessing = false;
 							return;
 						}
@@ -81,23 +72,15 @@ public class RepeaterProcessor3 {
 		synchronized (this) {
 			if (isProcessing) {
 				if (interval > 0) {
-					rescheduleAndProcessTimeout = true;
+					// stop the timer until current processing is finished and restart the timeout
 					if (future != null) {
 						future.cancel(false);
 					}
+					rescheduleAndProcessTimeout = true;
 				}
 			} else {
 				startProcessingMessages();
 			}
-		}
-	}
-
-	private void startProcessingMessages() {
-		isProcessing = true;
-		try {
-			executor.execute(command);
-		} catch (RejectedExecutionException e) {
-			isProcessing = false;
 		}
 	}
 
@@ -108,6 +91,15 @@ public class RepeaterProcessor3 {
 				future.cancel(false);
 			}
 			rescheduleAndProcessTimeout = false;
+		}
+	}
+
+	private void startProcessingMessages() {
+		isProcessing = true;
+		try {
+			executor.execute(command);
+		} catch (RejectedExecutionException e) {
+			isProcessing = false;
 		}
 	}
 }

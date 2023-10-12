@@ -1,7 +1,6 @@
 package com.github.jy2.workqueue;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -9,11 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.jyroscope.types.LinkManager;
-
-public class MessageProcessorFactory3<T> {
-
-	private final PriorityBlockingQueue<MessageProcessor2<T>> timeoutQueue = new PriorityBlockingQueue<>();
+public class ProcessorFactory<T> {
 
 	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
@@ -21,18 +16,22 @@ public class MessageProcessorFactory3<T> {
 
 	private int maxThreads;
 	private int bufferSize;
+	private int keepAliveMinutes;
+	private int schedulerPoolSize;
 
-	public MessageProcessorFactory3(int maxThreads, int bufferSize) {
+	public ProcessorFactory(int maxThreads, int keepAliveMinutes, int bufferSize, int schedulerPoolSize) {
 		this.maxThreads = maxThreads;
+		this.keepAliveMinutes = keepAliveMinutes;
 		this.bufferSize = bufferSize;
+		this.schedulerPoolSize = schedulerPoolSize;
 	}
 
-	public MessageProcessor3<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
-		return new MessageProcessor3<T>(callback, queueLength, timeout, getExecutor(), getScheduledExecutor());
+	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
+		return new MessageProcessor<T>(callback, queueLength, timeout, getExecutor(), getScheduledExecutor());
 	}
 
-	public RepeaterProcessor3 createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
-		return new RepeaterProcessor3(callback, delay, interval, count, getExecutor(), getScheduledExecutor());
+	public RepeaterProcessor createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
+		return new RepeaterProcessor(callback, delay, interval, count, getExecutor(), getScheduledExecutor());
 	}
 
 	public void shutdownAll() {
@@ -49,15 +48,15 @@ public class MessageProcessorFactory3<T> {
 
 	public synchronized ThreadPoolExecutor getExecutor() {
 		if (executor == null) {
-			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-					getBufferedThreadFactory());
+			executor = new ThreadPoolExecutor(1, maxThreads, keepAliveMinutes, TimeUnit.MINUTES,
+					new SynchronousQueue<>(), getBufferedThreadFactory());
 		}
 		return executor;
 	}
 
 	public synchronized ScheduledExecutorService getScheduledExecutor() {
 		if (scheduledExecutor == null) {
-			scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
+			scheduledExecutor = Executors.newScheduledThreadPool(schedulerPoolSize);
 		}
 		return scheduledExecutor;
 	}
