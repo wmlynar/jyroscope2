@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class WorkFactory<T> {
+public class ProcessorFactory<T> {
 
 	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
@@ -18,7 +18,7 @@ public class WorkFactory<T> {
 	private int bufferSize;
 	private int schedulerPoolSize;
 
-	public WorkFactory(int maxThreads, int bufferSize, int schedulerPoolSize) {
+	public ProcessorFactory(int maxThreads, int bufferSize, int schedulerPoolSize) {
 		this.maxThreads = maxThreads;
 		this.bufferSize = bufferSize;
 		this.schedulerPoolSize = schedulerPoolSize;
