@@ -1,7 +1,6 @@
 package com.github.jy2.workqueue;
 
 import java.util.concurrent.Executors;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -9,11 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.jyroscope.types.LinkManager;
-
-public class MessageProcessorFactory<T> {
-
-	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue = new PriorityBlockingQueue<>();
+public class WorkFactory<T> {
 
 	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
@@ -21,10 +16,12 @@ public class MessageProcessorFactory<T> {
 
 	private int maxThreads;
 	private int bufferSize;
+	private int schedulerPoolSize;
 
-	public MessageProcessorFactory(int maxThreads, int bufferSize) {
+	public WorkFactory(int maxThreads, int bufferSize, int schedulerPoolSize) {
 		this.maxThreads = maxThreads;
 		this.bufferSize = bufferSize;
+		this.schedulerPoolSize = schedulerPoolSize;
 	}
 
 	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
@@ -57,7 +54,7 @@ public class MessageProcessorFactory<T> {
 
 	public synchronized ScheduledExecutorService getScheduledExecutor() {
 		if (scheduledExecutor == null) {
-			scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
+			scheduledExecutor = Executors.newScheduledThreadPool(schedulerPoolSize);
 		}
 		return scheduledExecutor;
 	}

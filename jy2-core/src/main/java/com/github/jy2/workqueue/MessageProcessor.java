@@ -79,6 +79,7 @@ public class MessageProcessor<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void callTimeout() {
 		if (!keepRunning) {
 			return;
