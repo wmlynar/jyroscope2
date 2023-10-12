@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class RepeaterProcessor3 {
+public class RepeaterProcessor {
 
 	private final long interval;
 	private final ThreadPoolExecutor executor;
@@ -20,7 +20,7 @@ public class RepeaterProcessor3 {
 
 	private int counter;
 
-	public RepeaterProcessor3(Supplier<Boolean> callable, int delay, int interval, int count,
+	public RepeaterProcessor(Supplier<Boolean> callable, int delay, int interval, int count,
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
 		this.interval = interval;
 		this.executor = executor;
@@ -35,7 +35,7 @@ public class RepeaterProcessor3 {
 					return;
 				}
 				if (interval > 0) {
-					synchronized (RepeaterProcessor3.this) {
+					synchronized (RepeaterProcessor.this) {
 						if (rescheduleAndProcessTimeout) {
 							this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 									TimeUnit.MILLISECONDS);

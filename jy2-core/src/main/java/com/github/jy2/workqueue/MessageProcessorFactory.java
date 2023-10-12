@@ -1,25 +1,24 @@
 package com.github.jy2.workqueue;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.github.jy2.log.NodeNameManager;
+import com.jyroscope.types.LinkManager;
 
 public class MessageProcessorFactory<T> {
 
 	private final PriorityBlockingQueue<MessageProcessor<T>> timeoutQueue = new PriorityBlockingQueue<>();
-	private final Lock lock = new ReentrantLock();
-	private final Condition schedulerCondition = lock.newCondition();
 
 	private BufferedThreadFactory threadFactory;
 	private ThreadPoolExecutor executor;
+	public ScheduledExecutorService scheduledExecutor;
+
 	private int maxThreads;
 	private int bufferSize;
 
@@ -29,81 +28,16 @@ public class MessageProcessorFactory<T> {
 	}
 
 	public MessageProcessor<T> createProcessor(Consumer<T> callback, int queueLength, int timeout) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, queueLength, timeout, getExecutor(),
-				this.timeoutQueue, this.lock, this.schedulerCondition);
-		if (timeout > 0) {
-			lock.lock();
-			try {
-				timeoutQueue.add(messageProcessor);
-				schedulerCondition.signalAll();
-			} finally {
-				lock.unlock();
-			}
-		}
-		return messageProcessor;
+		return new MessageProcessor<T>(callback, queueLength, timeout, getExecutor(), getScheduledExecutor());
 	}
 
-	public MessageProcessor<T> createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
-		MessageProcessor<T> messageProcessor = new MessageProcessor<T>(callback, delay, interval, count, getExecutor(),
-				this.timeoutQueue, this.lock, this.schedulerCondition);
-		if (delay > 0 || interval > 0) {
-			lock.lock();
-			try {
-				timeoutQueue.add(messageProcessor);
-				schedulerCondition.signalAll();
-			} finally {
-				lock.unlock();
-			}
-		} else {
-			messageProcessor.wakeup();
-		}
-		return messageProcessor;
+	public RepeaterProcessor createRepeater(Supplier<Boolean> callback, int delay, int interval, int count) {
+		return new RepeaterProcessor(callback, delay, interval, count, getExecutor(), getScheduledExecutor());
 	}
 
 	public void shutdownAll() {
-		this.executor.shutdownNow();
-	}
-
-	private void startScheduler() {
-		Thread t = new Thread(() -> {
-			NodeNameManager.setNodeName("/fake_node_scheduler");
-			while (!Thread.currentThread().isInterrupted()) {
-				try {
-					lock.lock();
-					MessageProcessor sq = timeoutQueue.peek();
-
-					if (sq == null) {
-						schedulerCondition.await();
-						continue;
-					}
-
-					long delay = sq.getNextTimeout() - System.nanoTime();
-					if (delay <= 0) {
-						sq.addMessage(MessageProcessor.TIMEOUT_MARKER);
-					} else {
-						schedulerCondition.awaitNanos(delay);
-					}
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				} finally {
-					lock.unlock();
-				}
-			}
-		}, "work-pool-timer-thread");
-		t.setDaemon(true);
-		t.start();
-	}
-
-	public synchronized ThreadPoolExecutor getExecutor() {
-		if (executor == null) {
-// replaced with a version that does not allocate so much new objects
-//			executor = new ThreadPoolExecutor(... , new NoAllocSynchronousQueue<>(),
-// but it does not work
-			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
-					getBufferedThreadFactory());
-			startScheduler();
-		}
-		return executor;
+		executor.shutdown();
+		scheduledExecutor.shutdown();
 	}
 
 	public synchronized BufferedThreadFactory getBufferedThreadFactory() {
@@ -113,4 +47,18 @@ public class MessageProcessorFactory<T> {
 		return threadFactory;
 	}
 
+	public synchronized ThreadPoolExecutor getExecutor() {
+		if (executor == null) {
+			executor = new ThreadPoolExecutor(1, maxThreads, 60L, TimeUnit.SECONDS, new SynchronousQueue<>(),
+					getBufferedThreadFactory());
+		}
+		return executor;
+	}
+
+	public synchronized ScheduledExecutorService getScheduledExecutor() {
+		if (scheduledExecutor == null) {
+			scheduledExecutor = Executors.newScheduledThreadPool(LinkManager.SCHEDULER_POOL_SIZE);
+		}
+		return scheduledExecutor;
+	}
 }
