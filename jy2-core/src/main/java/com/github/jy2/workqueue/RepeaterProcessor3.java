@@ -19,6 +19,7 @@ public class RepeaterProcessor3 {
 	private Runnable command;
 	private Runnable wakeup = () -> wakeup();
 	private boolean rescheduleAndProcessTimeout = false;
+	private volatile boolean keepRunning = true;
 
 	private int counter;
 
@@ -30,11 +31,17 @@ public class RepeaterProcessor3 {
 		this.counter = 0;
 
 		this.command = () -> {
-			while (count == 0 || counter < count) {
+			while (keepRunning && (count == 0 || counter < count)) {
 				++counter;
 				boolean result = callable.get();
 				if (!result) {
-					break;
+					synchronized (RepeaterProcessor3.this) {
+						if (future != null) {
+							future.cancel(false);
+						}
+						isProcessing = false;
+						return;
+					}
 				}
 				if (interval > 0) {
 					synchronized (RepeaterProcessor3.this) {
@@ -49,13 +56,6 @@ public class RepeaterProcessor3 {
 						}
 					}
 				}
-			}
-			synchronized (RepeaterProcessor3.this) {
-				if (future != null) {
-					future.cancel(false);
-				}
-				isProcessing = false;
-				return;
 			}
 		};
 
@@ -75,6 +75,9 @@ public class RepeaterProcessor3 {
 	}
 
 	public void wakeup() {
+		if (!keepRunning) {
+			return;
+		}
 		synchronized (this) {
 			if (isProcessing) {
 				if (interval > 0) {
@@ -99,6 +102,7 @@ public class RepeaterProcessor3 {
 	}
 
 	public void stop() {
+		keepRunning = false;
 		synchronized (this) {
 			if (future != null) {
 				future.cancel(false);

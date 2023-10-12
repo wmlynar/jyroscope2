@@ -21,6 +21,7 @@ public class MessageProcessor3<T> {
 	private Runnable command;
 	private Runnable callTimeout = () -> callTimeout();
 	private boolean rescheduleAndProcessTimeout = false;
+	private volatile boolean keepRunning = true;
 
 	public MessageProcessor3(Consumer<T> callback, int queueLength, int timeout, ThreadPoolExecutor executor,
 			ScheduledExecutorService scheduledExecutor) {
@@ -31,7 +32,7 @@ public class MessageProcessor3<T> {
 
 		this.command = () -> {
 			T message;
-			while (true) {
+			while (keepRunning) {
 				synchronized (MessageProcessor3.this) {
 					message = queue.pollFirst();
 					if (message == null) {
@@ -64,6 +65,9 @@ public class MessageProcessor3<T> {
 	}
 
 	public void addMessage(T message) {
+		if (!keepRunning) {
+			return;
+		}
 		synchronized (this) {
 			if (timeout > 0) {
 				if (future != null) {
@@ -106,6 +110,7 @@ public class MessageProcessor3<T> {
 	}
 
 	public void stop() {
+		keepRunning = false;
 		synchronized (this) {
 			queue.clear();
 			rescheduleAndProcessTimeout = false;
