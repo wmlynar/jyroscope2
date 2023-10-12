@@ -21,6 +21,7 @@ public class MessageProcessor2<T> {
 	private boolean isProcessing = false;
 	private Runnable command;
 	private Runnable wakeup = () -> wakeup();
+	private boolean processTimeoutAndReschedule = false;
 
 	private int counter;
 
@@ -37,8 +38,13 @@ public class MessageProcessor2<T> {
 				synchronized (MessageProcessor2.this) {
 					message = queue.pollFirst();
 					if (message == null) {
-						isProcessing = false;
-						return;
+						if (processTimeoutAndReschedule) {
+							processTimeoutAndReschedule = false;
+							this.future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+						} else {
+							isProcessing = false;
+							return;
+						}
 					}
 				}
 				if (message == TIMEOUT_MARKER) {
@@ -71,8 +77,13 @@ public class MessageProcessor2<T> {
 					synchronized (MessageProcessor2.this) {
 						message = queue.pollFirst();
 						if (message == null) {
-							isProcessing = false;
-							return;
+							if (processTimeoutAndReschedule) {
+								processTimeoutAndReschedule = false;
+								this.future = scheduledExecutor.schedule(wakeup, interval, TimeUnit.MILLISECONDS);
+							} else {
+								isProcessing = false;
+								return;
+							}
 						}
 					}
 				}
@@ -105,7 +116,13 @@ public class MessageProcessor2<T> {
 				if (future != null) {
 					future.cancel(false);
 				}
-				future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+				if (message == TIMEOUT_MARKER && isProcessing) {
+					processTimeoutAndReschedule = true;
+					return;
+				} else {
+					processTimeoutAndReschedule = false;
+					future = scheduledExecutor.schedule(wakeup, timeout, TimeUnit.MILLISECONDS);
+				}
 			}
 			if (message == TIMEOUT_MARKER) {
 				queue.clear();
