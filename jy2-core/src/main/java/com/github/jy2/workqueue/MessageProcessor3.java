@@ -84,6 +84,9 @@ public class MessageProcessor3<T> {
 	}
 
 	public void callTimeout() {
+		if (!keepRunning) {
+			return;
+		}
 		synchronized (this) {
 			queue.clear();
 			queue.setMarker((T) TIMEOUT_MARKER);
