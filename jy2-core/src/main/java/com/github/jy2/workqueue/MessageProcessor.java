@@ -96,7 +96,6 @@ public class MessageProcessor<T> {
 				// stop the timer until current processing is finished and restart the timeout
 				if (future != null) {
 					future.cancel(false);
-					future = null;
 				}
 				queue.setMarker((T) RESCHEDULE_AND_TIMEOUT_MARKER);
 			} else {
@@ -112,7 +111,6 @@ public class MessageProcessor<T> {
 			queue.clear();
 			if (future != null) {
 				future.cancel(false);
-				future = null;
 			}
 		}
 	}
