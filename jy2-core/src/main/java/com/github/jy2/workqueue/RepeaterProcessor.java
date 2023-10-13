@@ -84,6 +84,7 @@ public class RepeaterProcessor {
 					// stop the timer until current processing is finished and restart the timeout
 					if (future != null) {
 						future.cancel(false);
+						future = null;
 					}
 					rescheduleAndProcessTimeout = true;
 				}
@@ -98,6 +99,7 @@ public class RepeaterProcessor {
 		synchronized (this) {
 			if (future != null) {
 				future.cancel(false);
+				future = null;
 			}
 			rescheduleAndProcessTimeout = false;
 		}
