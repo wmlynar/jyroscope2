@@ -41,6 +41,9 @@ public class MessageProcessor<T> {
 				}
 				if (message == RESCHEDULE_AND_TIMEOUT_MARKER) {
 					synchronized (MessageProcessor.this) {
+						if (future != null) {
+							future.cancel(false);
+						}
 						this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
 								TimeUnit.MILLISECONDS);
 					}
@@ -55,6 +58,9 @@ public class MessageProcessor<T> {
 
 		if (timeout > 0) {
 			synchronized (this) {
+				if (future != null) {
+					future.cancel(false);
+				}
 				this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
 						TimeUnit.MILLISECONDS);
 			}
