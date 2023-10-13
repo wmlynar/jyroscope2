@@ -37,6 +37,9 @@ public class RepeaterProcessor {
 				if (interval > 0) {
 					synchronized (RepeaterProcessor.this) {
 						if (rescheduleAndProcessTimeout) {
+							if (future != null) {
+								future.cancel(false);
+							}
 							this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 									TimeUnit.MILLISECONDS);
 							rescheduleAndProcessTimeout = false;
@@ -52,11 +55,17 @@ public class RepeaterProcessor {
 
 		if (delay > 0 && interval > 0) {
 			synchronized (this) {
+				if (future != null) {
+					future.cancel(false);
+				}
 				this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, delay, interval, TimeUnit.MILLISECONDS);
 			}
 		} else {
 			if (interval > 0) {
 				synchronized (this) {
+					if (future != null) {
+						future.cancel(false);
+					}
 					this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 							TimeUnit.MILLISECONDS);
 				}
