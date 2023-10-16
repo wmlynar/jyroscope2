@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.github.wmlynar</groupId>
 		<artifactId>jy2-parent</artifactId>
-		<version>0.0.38-SNAPSHOT</version>
+		<version>0.0.38</version>
 	</parent>
 	<artifactId>jy2-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
@@ -19,7 +19,7 @@
 		<dependency>
 			<groupId>com.github.wmlynar</groupId>
 			<artifactId>jy2-qdox</artifactId>
-			<version>0.0.38-SNAPSHOT</version>
+			<version>0.0.38</version>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.qdox</groupId>
