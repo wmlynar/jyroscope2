@@ -17,7 +17,7 @@ public class MessageProcessor<T> {
 	private final ScheduledExecutorService scheduledExecutor;
 	private volatile ScheduledFuture<?> future;
 	private final CircularBuffer<T> queue;
-	private boolean isProcessing = false;
+	private volatile boolean isProcessing = false;
 	private Runnable command;
 	private Runnable callTimeout = () -> callTimeout();
 	private volatile boolean keepRunning = true;
@@ -41,6 +41,9 @@ public class MessageProcessor<T> {
 				}
 				if (message == RESCHEDULE_AND_TIMEOUT_MARKER) {
 					synchronized (MessageProcessor.this) {
+						if (future != null) {
+							future.cancel(false);
+						}
 						this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
 								TimeUnit.MILLISECONDS);
 					}
@@ -54,7 +57,10 @@ public class MessageProcessor<T> {
 		};
 
 		if (timeout > 0) {
-			synchronized (this) {
+			synchronized (MessageProcessor.this) {
+				if (future != null) {
+					future.cancel(false);
+				}
 				this.future = scheduledExecutor.scheduleWithFixedDelay(callTimeout, timeout, timeout,
 						TimeUnit.MILLISECONDS);
 			}
@@ -65,7 +71,7 @@ public class MessageProcessor<T> {
 		if (!keepRunning) {
 			return;
 		}
-		synchronized (this) {
+		synchronized (MessageProcessor.this) {
 			if (timeout > 0) {
 				if (future != null) {
 					future.cancel(false);
@@ -84,12 +90,13 @@ public class MessageProcessor<T> {
 		if (!keepRunning) {
 			return;
 		}
-		synchronized (this) {
+		synchronized (MessageProcessor.this) {
 			queue.clear();
 			if (isProcessing) {
 				// stop the timer until current processing is finished and restart the timeout
 				if (future != null) {
 					future.cancel(false);
+					future = null;
 				}
 				queue.setMarker((T) RESCHEDULE_AND_TIMEOUT_MARKER);
 			} else {
@@ -101,10 +108,11 @@ public class MessageProcessor<T> {
 
 	public void stop() {
 		keepRunning = false;
-		synchronized (this) {
+		synchronized (MessageProcessor.this) {
 			queue.clear();
 			if (future != null) {
 				future.cancel(false);
+				future = null;
 			}
 		}
 	}

@@ -12,13 +12,13 @@ public class RepeaterProcessor {
 	private final long interval;
 	private final ThreadPoolExecutor executor;
 	private volatile ScheduledFuture<?> future;
-	private boolean isProcessing = false;
+	private volatile boolean isProcessing = false;
 	private Runnable command;
 	private Runnable wakeup = () -> wakeup();
-	private boolean rescheduleAndProcessTimeout = false;
+	private volatile boolean rescheduleAndProcessTimeout = false;
 	private volatile boolean keepRunning = true;
 
-	private int counter;
+	private volatile int counter;
 
 	public RepeaterProcessor(Supplier<Boolean> callable, int delay, int interval, int count,
 			ThreadPoolExecutor executor, ScheduledExecutorService scheduledExecutor) {
@@ -37,6 +37,9 @@ public class RepeaterProcessor {
 				if (interval > 0) {
 					synchronized (RepeaterProcessor.this) {
 						if (rescheduleAndProcessTimeout) {
+							if (future != null) {
+								future.cancel(false);
+							}
 							this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 									TimeUnit.MILLISECONDS);
 							rescheduleAndProcessTimeout = false;
@@ -51,12 +54,18 @@ public class RepeaterProcessor {
 		};
 
 		if (delay > 0 && interval > 0) {
-			synchronized (this) {
+			synchronized (RepeaterProcessor.this) {
+				if (future != null) {
+					future.cancel(false);
+				}
 				this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, delay, interval, TimeUnit.MILLISECONDS);
 			}
 		} else {
 			if (interval > 0) {
-				synchronized (this) {
+				synchronized (RepeaterProcessor.this) {
+					if (future != null) {
+						future.cancel(false);
+					}
 					this.future = scheduledExecutor.scheduleWithFixedDelay(wakeup, interval, interval,
 							TimeUnit.MILLISECONDS);
 				}
@@ -69,12 +78,13 @@ public class RepeaterProcessor {
 		if (!keepRunning) {
 			return;
 		}
-		synchronized (this) {
+		synchronized (RepeaterProcessor.this) {
 			if (isProcessing) {
 				if (interval > 0) {
 					// stop the timer until current processing is finished and restart the timeout
 					if (future != null) {
 						future.cancel(false);
+						future = null;
 					}
 					rescheduleAndProcessTimeout = true;
 				}
@@ -86,9 +96,10 @@ public class RepeaterProcessor {
 
 	public void stop() {
 		keepRunning = false;
-		synchronized (this) {
+		synchronized (RepeaterProcessor.this) {
 			if (future != null) {
 				future.cancel(false);
+				future = null;
 			}
 			rescheduleAndProcessTimeout = false;
 		}
