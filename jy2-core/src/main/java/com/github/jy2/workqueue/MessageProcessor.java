@@ -12,7 +12,6 @@ public class MessageProcessor<T> {
 	public static final Object TIMEOUT_MARKER = new Object();
 	public static final Object RESCHEDULE_AND_TIMEOUT_MARKER = new Object();
 
-	private final Object mutex = new Object();
 	private final long timeout;
 	private final ThreadPoolExecutor executor;
 	private final ScheduledExecutorService scheduledExecutor;
@@ -33,7 +32,7 @@ public class MessageProcessor<T> {
 		this.command = () -> {
 			T message;
 			while (keepRunning) {
-				synchronized (mutex) {
+				synchronized (MessageProcessor.this) {
 					message = queue.pollFirst();
 					if (message == null) {
 						isProcessing = false;
@@ -41,7 +40,7 @@ public class MessageProcessor<T> {
 					}
 				}
 				if (message == RESCHEDULE_AND_TIMEOUT_MARKER) {
-					synchronized (mutex) {
+					synchronized (MessageProcessor.this) {
 						if (future != null) {
 							future.cancel(false);
 						}
@@ -58,7 +57,7 @@ public class MessageProcessor<T> {
 		};
 
 		if (timeout > 0) {
-			synchronized (mutex) {
+			synchronized (MessageProcessor.this) {
 				if (future != null) {
 					future.cancel(false);
 				}
@@ -72,7 +71,7 @@ public class MessageProcessor<T> {
 		if (!keepRunning) {
 			return;
 		}
-		synchronized (mutex) {
+		synchronized (MessageProcessor.this) {
 			if (timeout > 0) {
 				if (future != null) {
 					future.cancel(false);
@@ -91,7 +90,7 @@ public class MessageProcessor<T> {
 		if (!keepRunning) {
 			return;
 		}
-		synchronized (mutex) {
+		synchronized (MessageProcessor.this) {
 			queue.clear();
 			if (isProcessing) {
 				// stop the timer until current processing is finished and restart the timeout
@@ -109,7 +108,7 @@ public class MessageProcessor<T> {
 
 	public void stop() {
 		keepRunning = false;
-		synchronized (mutex) {
+		synchronized (MessageProcessor.this) {
 			queue.clear();
 			if (future != null) {
 				future.cancel(false);
