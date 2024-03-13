@@ -24,7 +24,10 @@ import org.ros.rosjava.roslaunch.util.RosUtil;
 public class SubstitutionArgs
 {
 	/** The regular expression to match substitution args. */
-	private static final String SUBS_ARGS_PATTERN = "\\$\\(([a-zA-Z_]+)(\\s+([a-zA-Z0-9_! ]+))*\\)";
+// BUGFIX: let it also match negative double numbers like -1.5
+//	private static final String SUBS_ARGS_PATTERN = "\\$\\(([a-zA-Z_]+)(\\s+([a-zA-Z0-9_! ]+))*\\)";
+//	private static final String SUBS_ARGS_PATTERN = "\\$\\(([a-zA-Z_]+)(\\s+([a-zA-Z0-9_! \\-\\.]+))*\\)";
+	private static final String SUBS_ARGS_PATTERN = "\\$\\(([a-zA-Z_]+)(\\s+([^)]+))*\\)";
 
 	/** The context storing all anonymized ids. */
 	private static Map<String, String> ANON_CONTEXT = new HashMap<String, String>();
