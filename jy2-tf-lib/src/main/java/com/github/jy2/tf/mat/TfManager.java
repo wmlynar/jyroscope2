@@ -760,5 +760,40 @@ public class TfManager {
 		double sum = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
 		return sum > 0.5;
 	}
+	
+	// cleaned up api
+	
+	public boolean waitForTransform2(TimeProvider timeProvider, String from, String to, double time,
+			double timeout, double semiTimeout, Matrix4d mat) {
+		if (from.equals(to)) {
+			mat.setIdentity();
+			return true;
+		}
+		Path path;
+		synchronized (mutex) {
+			path = getPath(from, to);
+			if (path == null || path.indexes.length == 0) {
+				return false;
+			}
+		}
+		double start = timeProvider.now();
+		double now = start;
+		while (true) {
+			synchronized (mutex) {
+				if (transformExistsSemi(path.indexes, time)) {
+					break;
+				}
+			}
+			now = timeProvider.now();
+			double delta = now - start;
+			if (delta > timeout) {
+				LOG.warnSeldom("Wait for transform time " + delta + " exceeded timeout " + timeout + " at specific time "
+						+ String.format("%.4f", time) + ": " + from + "->" + to);
+				return false;
+			}
+			sleep(SMALL_TIMEOUT_MS);
+		}
+		return multiplyMatricesInPathSemi(path.indexes, path.inverted, time, semiTimeout, mat);
+	}
 
 }
