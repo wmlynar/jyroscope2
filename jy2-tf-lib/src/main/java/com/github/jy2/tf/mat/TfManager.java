@@ -626,6 +626,7 @@ public class TfManager {
 				LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb.from + "->" + tb.to);
 				return false;
 			}
+			latestTime.time = Double.POSITIVE_INFINITY;
 			tb.getLatestTime(latestTime);
 			if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
 				LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb.from + "->" + tb.to);
@@ -645,6 +646,7 @@ public class TfManager {
 					LOG.warnSeldom("Missing latest transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
 					return false;
 				}
+				latestTime.time = Double.POSITIVE_INFINITY;
 				tb2.getLatestTime(latestTime);
 				if (latestTime.time < time - semiTimeout && time != Double.POSITIVE_INFINITY) {
 					LOG.warnSeldom("Too old semi static transform in transfrom buffer: " + tb2.from + "->" + tb2.to);
