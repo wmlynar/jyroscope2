@@ -357,8 +357,8 @@ public class LinkManager {
 		}
     }
 	
-	public static boolean USE_THREADED_CONSUMER = false;
-	public static boolean USE_THREADED_REPEATER = false;
+	public static boolean USE_THREADED_CONSUMER = true;
+	public static boolean USE_THREADED_REPEATER = true;
 	public static int WORK_QUEUE_MAX_SIZE = 500;
 	public static int WORK_QUEUE_KEEP_ALIVE_MINTES = 5;
 	public static int WORK_QUEUE_BUFFER_SIZE = 20;
