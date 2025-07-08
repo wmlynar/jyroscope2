@@ -408,6 +408,20 @@ public class LaunchHandle {
 
 				LOG.info("Process shutdown " + fileName + ", respawn=" + perfornRespawn);
 				
+				if(perfornRespawn) {
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e) {
+							}
+							start(type, name, fileName, workingDir, suspendDebug, remoteProfiling, useLegacyDebug, zGc,
+									finaljavaMemoryLimit);
+						}
+					}).start();
+				}
+				
 				// shutdown inputstream readers
 				shutdown = true;
 				waitForProcessThread.interrupt();
@@ -415,16 +429,6 @@ public class LaunchHandle {
 				errorThread.interrupt();
 				synchronized (OrchestratorStartStop.monitor) {
 					item.isStarted = false;
-				}
-				
-				// if not stopped then wait 0.5 second and respawn
-				if (perfornRespawn) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-					}
-					start(type, name, fileName, workingDir, suspendDebug, remoteProfiling, useLegacyDebug, zGc,
-							finaljavaMemoryLimit);
 				}
 			}
 		});
