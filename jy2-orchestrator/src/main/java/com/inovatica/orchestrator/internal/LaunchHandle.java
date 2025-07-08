@@ -78,6 +78,9 @@ public class LaunchHandle {
 	boolean allowChangingNice;
 	Pattern nicePatern = Pattern.compile("nice(-?\\d+)");
 
+	public OrchestratorStartStop restartRef;
+	public String restartName;
+
 	public LaunchHandle(OrchestratorModelItem item, String jarParams, String javaOpts, boolean debug, boolean jmx,
 			String bashParams, String hostName, boolean heapDumpOnOutOfMemory, String heapDumpPath,
 			boolean shenandoahGc, boolean concurrentGc, boolean optimizeGc, boolean preallocateGc, boolean killOnOutOfMemory, int newRatio, String user,
@@ -390,7 +393,6 @@ public class LaunchHandle {
 			item.isStarted = true;
 		}
 
-		int finaljavaMemoryLimit = javaMemoryLimit;
 		waitForProcessThread = new Thread(new Runnable() {
 
 			@Override
@@ -416,8 +418,7 @@ public class LaunchHandle {
 								Thread.sleep(5000);
 							} catch (InterruptedException e) {
 							}
-							start(type, name, fileName, workingDir, suspendDebug, remoteProfiling, useLegacyDebug, zGc,
-									finaljavaMemoryLimit);
+							restartRef.start(restartName);
 						}
 					}).start();
 				}

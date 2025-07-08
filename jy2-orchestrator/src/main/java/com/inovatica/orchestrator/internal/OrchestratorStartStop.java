@@ -69,6 +69,8 @@ public class OrchestratorStartStop {
 					model.bashParams, model.hostName, model.heapDumpOnOutOfMemomry, model.heapDumpPath,
 					model.shenandoahGc, model.concurrentGc, model.optimizeGc, model.preallocateGc, model.killOnOutOfMemory, newRatio, user,
 					runAsSudoWhenSuffix, limitMemoryWhenXmx, model.allowChangingNice, model.logGc, model.logGcPath, callback);
+			handle.restartRef = this;
+			handle.restartName = name;
 			if (handle.start(item.type, item.name, item.absolutePath, model.workingDir, suspendDebug, remoteProfiling,
 					useLegacyDebug, zGc, javaMemoryLimit)) {
 				item.handle = handle;
