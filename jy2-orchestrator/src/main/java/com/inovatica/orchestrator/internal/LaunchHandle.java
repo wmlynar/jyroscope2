@@ -30,6 +30,7 @@ public class LaunchHandle {
 	private Thread errorThread;
 
 	private boolean shutdown = false;
+	private boolean stop = false;
 
 	public HandleType type;
 
@@ -109,7 +110,8 @@ public class LaunchHandle {
 	public synchronized boolean start(HandleType type, String name, String fileName, File workingDir,
 			boolean suspendDebug, boolean remoteProfiling, boolean useLegacyDebug, boolean zGc, int javaMemoryLimit) {
 
-		boolean respawn = name.endsWith("respawn");
+		stop = false;
+		boolean respawn = name.contains("respawn");
 		
 		String user = this.user;
 		if (runAsSudoWhenSuffix && name.endsWith("sudo")) {
@@ -402,7 +404,9 @@ public class LaunchHandle {
 					}
 				}
 				// check if crashed or stopped
-				boolean perfornRespawn = respawn && !shutdown;
+				boolean perfornRespawn = respawn && !stop;
+
+				LOG.info("Process shutdown " + fileName + ", respawn=" + perfornRespawn);
 				
 				// shutdown inputstream readers
 				shutdown = true;
@@ -511,6 +515,7 @@ public class LaunchHandle {
 
 	public synchronized void stop(boolean destroyForcibly) {
 		shutdown = true;
+		stop = true;
 
 		if (destroyForcibly) {
 			process.destroyForcibly();
