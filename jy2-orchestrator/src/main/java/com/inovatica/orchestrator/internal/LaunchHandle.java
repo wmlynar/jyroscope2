@@ -77,6 +77,8 @@ public class LaunchHandle {
 	
 	boolean allowChangingNice;
 	Pattern nicePatern = Pattern.compile("nice(-?\\d+)");
+	
+	Pattern respawnPatern = Pattern.compile("respawn(\\d+)s");
 
 	public OrchestratorStartStop restartRef;
 	public String restartName;
@@ -114,7 +116,6 @@ public class LaunchHandle {
 			boolean suspendDebug, boolean remoteProfiling, boolean useLegacyDebug, boolean zGc, int javaMemoryLimit) {
 
 		stop = false;
-		boolean respawn = name.contains("respawn");
 		
 		String user = this.user;
 		if (runAsSudoWhenSuffix && name.endsWith("sudo")) {
@@ -135,6 +136,13 @@ public class LaunchHandle {
 				nice = Integer.parseInt(niceMatcher.group(1));
 			}
 		}
+		
+		int respawnTime1 = -1;
+		Matcher respawnMatcher = respawnPatern.matcher(name);
+		if (respawnMatcher.find()) {
+			respawnTime1 = Integer.parseInt(respawnMatcher.group(1));
+		}
+		int respawnTime = respawnTime1;
 
 		String env = "";
 //		if (debug || !javaOpts.trim().isEmpty() || jmx) {
@@ -406,16 +414,16 @@ public class LaunchHandle {
 					}
 				}
 				// check if crashed or stopped
-				boolean perfornRespawn = respawn && !stop;
+				boolean perfornRespawn = respawnTime > 0 && !stop;
 
-				LOG.info("Process shutdown " + fileName + ", respawn=" + perfornRespawn);
+				LOG.info("Process shutdown " + fileName + ", respawn=" + perfornRespawn + ", respawnTime=" + respawnTime);
 				
 				if(perfornRespawn) {
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
 							try {
-								Thread.sleep(5000);
+								Thread.sleep(respawnTime * 1000);
 							} catch (InterruptedException e) {
 							}
 							restartRef.start(restartName);
