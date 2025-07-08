@@ -109,6 +109,8 @@ public class LaunchHandle {
 	public synchronized boolean start(HandleType type, String name, String fileName, File workingDir,
 			boolean suspendDebug, boolean remoteProfiling, boolean useLegacyDebug, boolean zGc, int javaMemoryLimit) {
 
+		boolean respawn = name.endsWith("respawn");
+		
 		String user = this.user;
 		if (runAsSudoWhenSuffix && name.endsWith("sudo")) {
 			user = "root";
@@ -386,6 +388,7 @@ public class LaunchHandle {
 			item.isStarted = true;
 		}
 
+		int finaljavaMemoryLimit = javaMemoryLimit;
 		waitForProcessThread = new Thread(new Runnable() {
 
 			@Override
@@ -398,6 +401,9 @@ public class LaunchHandle {
 								+ ", shutting down process and output stream readers", e);
 					}
 				}
+				// check if crashed or stopped
+				boolean perfornRespawn = respawn && !shutdown;
+				
 				// shutdown inputstream readers
 				shutdown = true;
 				waitForProcessThread.interrupt();
@@ -405,6 +411,16 @@ public class LaunchHandle {
 				errorThread.interrupt();
 				synchronized (OrchestratorStartStop.monitor) {
 					item.isStarted = false;
+				}
+				
+				// if not stopped then wait 0.5 second and respawn
+				if (perfornRespawn) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+					start(type, name, fileName, workingDir, suspendDebug, remoteProfiling, useLegacyDebug, zGc,
+							finaljavaMemoryLimit);
 				}
 			}
 		});
